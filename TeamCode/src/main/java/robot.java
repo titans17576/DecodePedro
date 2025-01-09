@@ -26,23 +26,19 @@ import java.util.List;
  */
 @Config
 public class robot{
-    public DcMotorEx leftFront, leftRear, rightRear, rightFront, liftMotor;
+    public DcMotorEx  liftMotor;
+    // public DcMotorEx leftFront, leftRear, rightRear, rightFront,
     private List<DcMotorEx> motors;
     //public CRServo claw;
     public Servo claw, arm, extendo, intakeWrist, intakeClaw;
 
-    private IMU imu;
-    private VoltageSensor batteryVoltageSensor;
-
-    private List<Integer> lastEncPositions = new ArrayList<>();
-    private List<Integer> lastEncVels = new ArrayList<>();
-
     public robot(HardwareMap hardwareMap) {
-
+        /*
         leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
         leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+         */
         arm = hardwareMap.get(Servo.class, "armServo");
         //claw = hardwareMap.get(CRServo.class, "clawServo");
         claw = hardwareMap.get(Servo.class, "clawServo");
@@ -51,7 +47,7 @@ public class robot{
         intakeClaw = hardwareMap.get(Servo.class, "intakeClawServo");
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
 
-        leftFront.setPower(0);
+        /*leftFront.setPower(0);
         leftRear.setPower(0);
         rightRear.setPower(0);
         rightFront.setPower(0);
@@ -83,6 +79,6 @@ public class robot{
             MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
             motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
             motor.setMotorType(motorConfigurationType);
-        }
+        }*/
     }
 }

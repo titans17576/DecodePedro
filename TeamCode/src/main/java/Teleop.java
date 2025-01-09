@@ -23,6 +23,8 @@ public class Teleop extends OpMode {
     private Gamepad previousGamepad1;
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
+    private liftFSM LiftFSM;
+
     private final Pose startPose = new Pose(0,0,0);
 
     /** This method is call once when init is played, it initializes the follower **/
@@ -38,6 +40,7 @@ public class Teleop extends OpMode {
         Gamepad previousGamepad2 = new Gamepad();
 
         R = new robot(hardwareMap);
+        LiftFSM = new liftFSM(R, telemetry, currentGamepad1,previousGamepad1);
     }
 
     /** This method is called continuously after Init while waiting to be started. **/
@@ -49,6 +52,7 @@ public class Teleop extends OpMode {
     @Override
     public void start() {
         follower.startTeleopDrive();
+        LiftFSM.initialize();
     }
 
     /** This is the main loop of the opmode and runs continuously after play **/
@@ -67,6 +71,8 @@ public class Teleop extends OpMode {
 
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
+
+        LiftFSM.teleopUpdate();
 
         if (gamepad1.a && !previousGamepad1.a) {
             R.claw.setPosition(0.2);
