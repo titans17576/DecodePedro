@@ -1,12 +1,9 @@
-package subsystems;
-
 import static java.lang.Math.abs;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 public class liftFSM {
     // Enum for state memory
     public enum LiftState {
