@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /*
- * Simple mecanum drive hardware implementation for REV hardware.
+ * sigma
  */
 @Config
 public class robot{
