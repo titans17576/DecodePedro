@@ -34,10 +34,10 @@ public class Teleop extends OpMode {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        Gamepad currentGamepad1 = new Gamepad();
-        Gamepad previousGamepad1 = new Gamepad();
-        Gamepad currentGamepad2 = new Gamepad();
-        Gamepad previousGamepad2 = new Gamepad();
+        currentGamepad1 = new Gamepad();
+        previousGamepad1 = new Gamepad();
+        currentGamepad2 = new Gamepad();
+        previousGamepad2 = new Gamepad();
 
         R = new robot(hardwareMap);
         LiftFSM = new liftFSM(R, telemetry, currentGamepad1,previousGamepad1);
