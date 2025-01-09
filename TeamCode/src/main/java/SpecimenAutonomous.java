@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
-
+/*@Autonomous(name = "Specimen Autonomous")*/
 public class SpecimenAutonomous {
 
 }
