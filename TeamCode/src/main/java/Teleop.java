@@ -29,7 +29,7 @@ public class Teleop extends OpMode {
 
     private final Pose startPose = new Pose(0,0,0);
     private double defaultSpeed = 0.45;
-    private double highSpeed = 0.8;
+    private double highSpeed = 1;
 
     /** This method is call once when init is played, it initializes the follower **/
     @Override
@@ -37,7 +37,6 @@ public class Teleop extends OpMode {
         Constants.setConstants(FConstants.class,LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
-
         currentGamepad1 = new Gamepad();
         previousGamepad1 = new Gamepad();
         currentGamepad2 = new Gamepad();
@@ -64,10 +63,8 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
 
-        /*previousGamepad1.copy(currentGamepad1);
         currentGamepad1.copy(gamepad1);
-        previousGamepad2.copy(currentGamepad2);
-        currentGamepad2.copy(gamepad2);*/
+        currentGamepad2.copy(gamepad2);
 
         /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
@@ -75,7 +72,7 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-        double speed = (gamepad1.right_bumper && !previousGamepad1.right_bumper) ? highSpeed:defaultSpeed;
+        double speed = (gamepad1.x && !previousGamepad1.x) ? highSpeed:defaultSpeed;
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
@@ -158,7 +155,8 @@ public class Teleop extends OpMode {
 
         /* Update Telemetry to the Driver Hub */
         telemetry.update();
-
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
     }
 
     /** We do not use this because everything automatically should disable **/
