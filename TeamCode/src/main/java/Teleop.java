@@ -3,6 +3,7 @@ import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import pedroPathing.constants.FConstants;
@@ -26,6 +27,7 @@ public class Teleop extends OpMode {
     private liftFSM LiftFSM;
 
     private final Pose startPose = new Pose(0,0,0);
+
 
     /** This method is call once when init is played, it initializes the follower **/
     @Override
@@ -53,15 +55,18 @@ public class Teleop extends OpMode {
     public void start() {
         follower.startTeleopDrive();
         LiftFSM.initialize();
+
     }
 
     /** This is the main loop of the opmode and runs continuously after play **/
     @Override
     public void loop() {
-        previousGamepad1.copy(currentGamepad1);
+
+        /*previousGamepad1.copy(currentGamepad1);
         currentGamepad1.copy(gamepad1);
         previousGamepad2.copy(currentGamepad2);
-        currentGamepad2.copy(gamepad2);
+        currentGamepad2.copy(gamepad2);*/
+
         /* Update Pedro to move the robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
         - Left/Right Movement: -gamepad1.left_stick_x
@@ -72,24 +77,59 @@ public class Teleop extends OpMode {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
-        LiftFSM.teleopUpdate();
+        /*LiftFSM.testUpdate();*/
+        if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
+            R.liftMotor.setTargetPosition(1600);
+            R.liftMotor.setPower(1);
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        }
+        if (gamepad1.left_trigger >= 0.5 && previousGamepad1.left_trigger < 0.5) {
+            R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() - 400);
+            R.liftMotor.setPower(1);
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        }
+        if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
+            R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() + 200);
+            R.liftMotor.setPower(1);
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        }
+        if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
+            R.liftMotor.setTargetPosition(0);
+            R.liftMotor.setPower(0.8);
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        }
+        if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
+            R.liftMotor.setPower(0);
+            R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        } else if (gamepad1.y && !previousGamepad1.y) {
+            R.liftMotor.setPower(0);
+            R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        if (R.liftMotor.getTargetPosition() < 0) {
+            R.liftMotor.setTargetPosition(0);
+        } else if (R.liftMotor.getTargetPosition() > 3000) {
+            R.liftMotor.setTargetPosition(3000);
+        }
 
         if (gamepad1.a && !previousGamepad1.a) {
             R.claw.setPosition(0.2);
         } else if (gamepad1.b && !previousGamepad1.b) {
-            R.claw.setPosition(0.41);
+            R.claw.setPosition(0.42);
         }
 
-        if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
-            R.arm.setPosition(0.37);
-        } else if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.arm.setPosition(0.934);
-        } else if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
+
+        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
             R.arm.setPosition(0.3);
+        } else if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
+            R.arm.setPosition(0.95);
         }
 
         if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
-            R.extendo.setPosition(0.63);
+            R.extendo.setPosition(0.64);
         } else if (gamepad2.right_bumper && !previousGamepad2.right_bumper) {
             R.extendo.setPosition(0.5);
         }
@@ -97,7 +137,7 @@ public class Teleop extends OpMode {
         if (gamepad2.x && !previousGamepad2.x) {
             R.intakeWrist.setPosition(0.0);
         } else if (gamepad2.y && !previousGamepad2.y) {
-            R.intakeWrist.setPosition(0.9);
+            R.intakeWrist.setPosition(0.7);
         } else if (gamepad2.a && !previousGamepad2.a) {
             R.intakeWrist.setPosition(0.5);
         }

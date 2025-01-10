@@ -39,6 +39,7 @@ public class StraightBackAndForth extends OpMode {
     private boolean forward = true;
 
     private Follower follower;
+    private robot R;
 
     private Path forwards;
     private Path backwards;
@@ -64,6 +65,7 @@ public class StraightBackAndForth extends OpMode {
                             + " inches forward. The robot will go forward and backward continuously"
                             + " along the path. Make sure you have enough room.");
         telemetryA.update();
+        R.extendo.setPosition(0.64);
     }
 
     /**
