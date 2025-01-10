@@ -72,24 +72,24 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-        double speed = (gamepad1.x && !previousGamepad1.x) ? highSpeed:defaultSpeed;
+        double speed = (gamepad1.x) ? highSpeed:defaultSpeed;
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
         /*LiftFSM.testUpdate();*/
         if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
-            R.liftMotor.setTargetPosition(1600);
+            R.liftMotor.setTargetPosition(1400);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         }
         if (gamepad1.left_trigger >= 0.5 && previousGamepad1.left_trigger < 0.5) {
-            R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() - 400);
+            R.liftMotor.setTargetPosition(2600);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
-            R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() + 200);
+            R.liftMotor.setTargetPosition(900);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
