@@ -50,7 +50,7 @@ public class liftFSM {
     }
 
     // Method to add encoders and status to telemetry
-    private void updateTelemetry(String status) {
+    public void updateTelemetry(String status) {
         // Add encoder position to telemetry
         telemetry.addData("Lift Ticks", R.liftMotor.getCurrentPosition());
         // Add lift position to telemetry

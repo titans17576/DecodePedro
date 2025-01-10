@@ -28,7 +28,8 @@ public class Teleop extends OpMode {
     private liftFSM LiftFSM;
 
     private final Pose startPose = new Pose(0,0,0);
-
+    private double defaultSpeed = 0.45;
+    private double highSpeed = 0.8;
 
     /** This method is call once when init is played, it initializes the follower **/
     @Override
@@ -74,8 +75,8 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        double speed = (gamepad1.right_bumper && !previousGamepad1.right_bumper) ? highSpeed:defaultSpeed;
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
         /*LiftFSM.testUpdate();*/
@@ -89,14 +90,13 @@ public class Teleop extends OpMode {
             R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() - 400);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         }
         if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
             R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() + 200);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         }
+        LiftFSM.updateTelemetry("");
         if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
             R.liftMotor.setTargetPosition(0);
             R.liftMotor.setPower(0.8);
