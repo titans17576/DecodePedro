@@ -37,7 +37,7 @@ import java.util.Locale;
 This opmode shows how to use the goBILDA® Pinpoint Odometry Computer.
 The goBILDA Odometry Computer is a device designed to solve the Pose Exponential calculation
 commonly associated with Dead Wheel Odometry systems. It reads two encoders, and an integrated
-system of senors to determine the robot's current heading, X position, and Y position.
+system of senors to determine the util.robot's current heading, X position, and Y position.
 
 it uses an ESP32-S3 as a main cpu, with an STM LSM6DSV16X IMU.
 It is validated with goBILDA "Dead Wheel" Odometry pods, but should be compatible with any
@@ -46,7 +46,7 @@ at a maximum of 40mhz per channel. Though the maximum in-application tested numb
 
 The device expects two perpendicularly mounted Dead Wheel pods. The encoder pulses are translated
 into mm and their readings are transformed by an "offset", this offset describes how far away
-the pods are from the "tracking point", usually the center of rotation of the robot.
+the pods are from the "tracking point", usually the center of rotation of the util.robot.
 
 Dead Wheel pods should both increase in count when moved forwards and to the left.
 The gyro will report an increase in heading when rotated counterclockwise.
@@ -73,7 +73,7 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
+        // to the names assigned during the util.robot configuration step on the DS or RC devices.
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
@@ -88,7 +88,7 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
         pinpoint.setOffsets(-84.0, -168.0); //these are tuned for 3110-0002-0001 Product Insight #1
 
         /*
-        Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
+        Set the kind of pods used by your util.robot. If you're using goBILDA odometry pods, select either
         the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
         If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
         number of ticks per mm of your odometry pod.
@@ -99,16 +99,16 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
 
         /*
         Set the direction that each of the two odometry pods count. The X (forward) pod should
-        increase when you move the robot forward. And the Y (strafe) pod should increase when
-        you move the robot to the left.
+        increase when you move the util.robot forward. And the Y (strafe) pod should increase when
+        you move the util.robot to the left.
          */
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
 
         /*
-        Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
+        Before running the util.robot, recalibrate the IMU. This needs to happen when the util.robot is stationary
         The IMU will automatically calibrate when first powered on, but recalibrating before running
-        the robot is a good idea to ensure that the calibration is "good".
+        the util.robot is a good idea to ensure that the calibration is "good".
         resetPosAndIMU will reset the position to 0,0,0 and also recalibrate the IMU.
         This is recommended before you run your autonomous, as a bad initial calibration can cause
         an incorrect starting value for x, y, and heading.
@@ -165,7 +165,7 @@ public class SensorGoBildaPinpointExample extends LinearOpMode {
 
 
             /*
-            gets the current Position (x & y in mm, and heading in degrees) of the robot, and prints it.
+            gets the current Position (x & y in mm, and heading in degrees) of the util.robot, and prints it.
              */
             Pose2D pos = pinpoint.getPosition();
             String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));

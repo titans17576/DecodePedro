@@ -33,14 +33,14 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 /**
- * This is the ForwardZeroPowerAccelerationTuner autonomous follower OpMode. This runs the robot
- * forward until a specified velocity is achieved. Then, the robot cuts power to the motors, setting
- * them to zero power. The deceleration, or negative acceleration, is then measured until the robot
- * stops. The accelerations across the entire time the robot is slowing down is then averaged and
- * that number is then printed. This is used to determine how the robot will decelerate in the
+ * This is the ForwardZeroPowerAccelerationTuner autonomous follower OpMode. This runs the util.robot
+ * forward until a specified velocity is achieved. Then, the util.robot cuts power to the motors, setting
+ * them to zero power. The deceleration, or negative acceleration, is then measured until the util.robot
+ * stops. The accelerations across the entire time the util.robot is slowing down is then averaged and
+ * that number is then printed. This is used to determine how the util.robot will decelerate in the
  * forward direction when power is cut, making the estimations used in the calculations for the
  * drive Vector more accurate and giving better braking at the end of Paths.
- * You can adjust the max velocity the robot will hit on FTC Dashboard: 192/168/43/1:8080/dash
+ * You can adjust the max velocity the util.robot will hit on FTC Dashboard: 192/168/43/1:8080/dash
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @author Aaron Yang - 10158 Scott's Bots
@@ -101,7 +101,7 @@ public class ForwardZeroPowerAccelerationTuner extends OpMode {
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run forward until it reaches " + VELOCITY + " inches per second.");
+        telemetryA.addLine("The util.robot will run forward until it reaches " + VELOCITY + " inches per second.");
         telemetryA.addLine("Then, it will cut power from the drivetrain and roll to a stop.");
         telemetryA.addLine("Make sure you have enough room.");
         telemetryA.addLine("After stopping, the forward zero power acceleration (natural deceleration) will be displayed.");
@@ -122,7 +122,7 @@ public class ForwardZeroPowerAccelerationTuner extends OpMode {
 
     /**
      * This runs the OpMode. At any point during the running of the OpMode, pressing CROSS or A on
-     * game pad 1 will stop the OpMode. When the robot hits the specified velocity, the robot will
+     * game pad 1 will stop the OpMode. When the util.robot hits the specified velocity, the util.robot will
      * record its deceleration / negative acceleration until it stops. Then, it will average all the
      * recorded deceleration / negative acceleration and print that value.
      */

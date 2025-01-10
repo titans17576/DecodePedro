@@ -17,8 +17,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 /**
- * This is the CurvedBackAndForth autonomous OpMode. It runs the robot in a specified distance
- * forward and to the left. On reaching the end of the forward Path, the robot runs the backward
+ * This is the CurvedBackAndForth autonomous OpMode. It runs the util.robot in a specified distance
+ * forward and to the left. On reaching the end of the forward Path, the util.robot runs the backward
  * Path the same distance back to the start. Rinse and repeat! This is good for testing a variety
  * of Vectors, like the drive Vector, the translational Vector, the heading Vector, and the
  * centripetal Vector. Remember to test your tunings on StraightBackAndForth as well, since tunings
@@ -60,8 +60,8 @@ public class CurvedBackAndForth extends OpMode {
         follower.followPath(forwards);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("This will run the robot in a curve going " + DISTANCE + " inches"
-                            + " to the left and the same number of inches forward. The robot will go"
+        telemetryA.addLine("This will run the util.robot in a curve going " + DISTANCE + " inches"
+                            + " to the left and the same number of inches forward. The util.robot will go"
                             + "forward and backward continuously along the path. Make sure you have"
                             + "enough room.");
         telemetryA.update();

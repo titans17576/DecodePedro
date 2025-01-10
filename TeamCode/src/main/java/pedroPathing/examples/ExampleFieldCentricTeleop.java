@@ -44,7 +44,7 @@ public class ExampleFieldCentricTeleop extends OpMode {
     @Override
     public void loop() {
 
-        /* Update Pedro to move the robot based on:
+        /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
         - Left/Right Movement: -gamepad1.left_stick_x
         - Turn Left/Right Movement: -gamepad1.right_stick_x

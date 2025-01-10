@@ -16,9 +16,11 @@ import com.pedropathing.pathgen.Point;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
+import util.robot;
+
 /**
- * This is the StraightBackAndForth autonomous OpMode. It runs the robot in a specified distance
- * straight forward. On reaching the end of the forward Path, the robot runs the backward Path the
+ * This is the StraightBackAndForth autonomous OpMode. It runs the util.robot in a specified distance
+ * straight forward. On reaching the end of the forward Path, the util.robot runs the backward Path the
  * same distance back to the start. Rinse and repeat! This is good for testing a variety of Vectors,
  * like the drive Vector, the translational Vector, and the heading Vector. Remember to test your
  * tunings on CurvedBackAndForth as well, since tunings that work well for straight lines might
@@ -39,10 +41,12 @@ public class StraightBackAndForth extends OpMode {
     private boolean forward = true;
 
     private Follower follower;
-    private robot R;
 
     private Path forwards;
     private Path backwards;
+
+    private robot R;
+
 
     /**
      * This initializes the Follower and creates the forward and backward Paths. Additionally, this
@@ -50,6 +54,8 @@ public class StraightBackAndForth extends OpMode {
      */
     @Override
     public void init() {
+        R = new robot(hardwareMap);
+
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
 
@@ -61,11 +67,10 @@ public class StraightBackAndForth extends OpMode {
         follower.followPath(forwards);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("This will run the robot in a straight line going " + DISTANCE
-                            + " inches forward. The robot will go forward and backward continuously"
+        telemetryA.addLine("This will run the util.robot in a straight line going " + DISTANCE
+                            + " inches forward. The util.robot will go forward and backward continuously"
                             + " along the path. Make sure you have enough room.");
         telemetryA.update();
-        R.extendo.setPosition(0.64);
     }
 
     /**
@@ -84,7 +89,7 @@ public class StraightBackAndForth extends OpMode {
                 follower.followPath(forwards);
             }
         }
-
+        R.extendo.setPosition(0.64);
         telemetryA.addData("going forward", forward);
         follower.telemetryDebug(telemetryA);
     }

@@ -31,8 +31,8 @@ import pedroPathing.constants.*;
 
 /**
  * This is the LocalizationTest OpMode. This is basically just a simple mecanum drive attached to a
- * PoseUpdater. The OpMode will print out the robot's pose to telemetry as well as draw the robot
- * on FTC Dashboard (192/168/43/1:8080/dash). You should use this to check the robot's localization.
+ * PoseUpdater. The OpMode will print out the util.robot's pose to telemetry as well as draw the util.robot
+ * on FTC Dashboard (192/168/43/1:8080/dash). You should use this to check the util.robot's localization.
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @version 1.0, 5/6/2024
@@ -82,8 +82,8 @@ public class LocalizationTest extends OpMode {
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("This will print your robot's position to telemetry while "
-                + "allowing robot control through a basic mecanum drive on gamepad 1.");
+        telemetryA.addLine("This will print your util.robot's position to telemetry while "
+                + "allowing util.robot control through a basic mecanum drive on gamepad 1.");
         telemetryA.update();
 
         Drawing.drawRobot(poseUpdater.getPose(), "#4CAF50");
@@ -91,8 +91,8 @@ public class LocalizationTest extends OpMode {
     }
 
     /**
-     * This updates the robot's pose estimate, the simple mecanum drive, and updates the FTC
-     * Dashboard telemetry with the robot's position as well as draws the robot's position.
+     * This updates the util.robot's pose estimate, the simple mecanum drive, and updates the FTC
+     * Dashboard telemetry with the util.robot's position as well as draws the util.robot's position.
      */
     @Override
     public void loop() {

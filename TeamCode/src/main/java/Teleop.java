@@ -8,9 +8,10 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
+import util.robot;
 
 /**
- * This is an example teleop that showcases movement and robot-centric driving.
+ * This is an example teleop that showcases movement and util.robot-centric driving.
  *
  * @author Baron Henderson - 20077 The Indubitables
  * @version 2.0, 12/30/2024
@@ -67,7 +68,7 @@ public class Teleop extends OpMode {
         previousGamepad2.copy(currentGamepad2);
         currentGamepad2.copy(gamepad2);*/
 
-        /* Update Pedro to move the robot based on:
+        /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
         - Left/Right Movement: -gamepad1.left_stick_x
         - Turn Left/Right Movement: -gamepad1.right_stick_x

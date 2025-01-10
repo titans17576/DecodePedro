@@ -33,14 +33,14 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 /**
- * This is the StrafeVelocityTuner autonomous follower OpMode. This runs the robot right at max
+ * This is the StrafeVelocityTuner autonomous follower OpMode. This runs the util.robot right at max
  * power until it reaches some specified distance. It records the most recent velocities, and on
  * reaching the end of the distance, it averages them and prints out the velocity obtained. It is
  * recommended to run this multiple times on a full battery to get the best results. What this does
  * is, when paired with ForwardVelocityTuner, allows FollowerConstants to create a Vector that
  * empirically represents the direction your mecanum wheels actually prefer to go in, allowing for
  * more accurate following.
- * You can adjust the distance the robot will travel on FTC Dashboard: 192/168/43/1:8080/dash
+ * You can adjust the distance the util.robot will travel on FTC Dashboard: 192/168/43/1:8080/dash
  *
  * @author Anyi Lin - 10158 Scott's Bots
  * @author Aaron Yang - 10158 Scott's Bots
@@ -102,9 +102,9 @@ public class StrafeVelocityTuner extends OpMode {
         }
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("The robot will run at 1 power until it reaches " + DISTANCE + " inches to the right.");
-        telemetryA.addLine("Make sure you have enough room, since the robot has inertia after cutting power.");
-        telemetryA.addLine("After running the distance, the robot will cut power from the drivetrain and display the strafe velocity.");
+        telemetryA.addLine("The util.robot will run at 1 power until it reaches " + DISTANCE + " inches to the right.");
+        telemetryA.addLine("Make sure you have enough room, since the util.robot has inertia after cutting power.");
+        telemetryA.addLine("After running the distance, the util.robot will cut power from the drivetrain and display the strafe velocity.");
         telemetryA.addLine("Press CROSS or A on game pad 1 to stop.");
         telemetryA.update();
     }
@@ -123,7 +123,7 @@ public class StrafeVelocityTuner extends OpMode {
     /**
      * This runs the OpMode. At any point during the running of the OpMode, pressing CROSS or A on
      * game pad1 will stop the OpMode. This continuously records the RECORD_NUMBER most recent
-     * velocities, and when the robot has run sideways enough, these last velocities recorded are
+     * velocities, and when the util.robot has run sideways enough, these last velocities recorded are
      * averaged and printed.
      */
     @Override

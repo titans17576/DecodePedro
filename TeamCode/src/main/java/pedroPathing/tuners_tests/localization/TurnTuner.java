@@ -16,10 +16,10 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 /**
- * This is the TurnTuner OpMode. This tracks the turning movement of the robot and displays the
+ * This is the TurnTuner OpMode. This tracks the turning movement of the util.robot and displays the
  * necessary ticks to inches multiplier. This displayed multiplier is what's necessary to scale the
- * robot's current angle in ticks to the specified angle in radians. So, to use this, run the
- * tuner, then pull/push the robot to the specified angle using a protractor or lines on the ground.
+ * util.robot's current angle in ticks to the specified angle in radians. So, to use this, run the
+ * tuner, then pull/push the util.robot to the specified angle using a protractor or lines on the ground.
  * When you're at the end of the angle, record the ticks to inches multiplier. Feel free to run
  * multiple trials and average the results. Then, input the multiplier into the turning ticks to
  * radians in your localizer of choice.
@@ -49,7 +49,7 @@ public class TurnTuner extends OpMode {
         dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
 
         telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-        telemetryA.addLine("Turn your robot " + ANGLE + " radians. Your turn ticks to inches will be shown on the telemetry.");
+        telemetryA.addLine("Turn your util.robot " + ANGLE + " radians. Your turn ticks to inches will be shown on the telemetry.");
         telemetryA.update();
 
         Drawing.drawRobot(poseUpdater.getPose(), "#4CAF50");
@@ -57,8 +57,8 @@ public class TurnTuner extends OpMode {
     }
 
     /**
-     * This updates the robot's pose estimate, and updates the FTC Dashboard telemetry with the
-     * calculated multiplier and draws the robot.
+     * This updates the util.robot's pose estimate, and updates the FTC Dashboard telemetry with the
+     * calculated multiplier and draws the util.robot.
      */
     @Override
     public void loop() {
