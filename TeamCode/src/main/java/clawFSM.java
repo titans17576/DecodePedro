@@ -10,17 +10,15 @@ import util.robot;
 
 public class clawFSM {
     public enum ClawState{
-        ZERO,
-        MID,
+        CLOSED,
         OPEN,
     }
 
 
     // Position variables
 
-    final double zero_position = 0;
-    final double mid_position = 0.47;
-    final double open_position = 0.55;
+    final double closed_position = 0.2;
+    final double open_position = 0.42;
 
     // LiftState instance variable
     ClawState clawState = ClawState.ZERO;
@@ -59,57 +57,32 @@ public class clawFSM {
 
         switch (clawState) {
             // Lift set to 0
-            case ZERO:
+            case CLOSED:
 
-                moveTo(zero_position);
+                moveTo(closed_position);
 
                 telemetry.addData("Claw Moved", "TRUE");
 
 
                 // State inputs
                 if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                    clawState = ClawState.MID;
+                    setState(ClawState.OPEN);
                     telemetry.addData("Move Requested", "TRUE");
                 } else {
                     telemetry.addData("Move Requested", "FALSE");
                 }
 
-                updateTelemetry("Zero");
+                updateTelemetry("CLOSED");
 
                 break;
 
 
-            // Lift set to 3/3
-            case MID:
 
-                moveTo(mid_position);
-                telemetry.addData("Claw Moved", "TRUE");
-
-
-                // State inputs
-                if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-                    clawState = ClawState.ZERO;
-                    telemetry.addData("Move Requested", "TRUE");
-                } else {
-                    telemetry.addData("Move Requested", "FALSE");
-                }
-
-                if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                    moveTo(open_position);
-                    telemetry.addData("Lift Moved", "TRUE");
-                } else {
-                    telemetry.addData("Move Requested", "FALSE");
-                }
-
-
-                updateTelemetry("HIGH");
-
-                break;
             case OPEN:
                 moveTo(open_position);
                 telemetry.addData("Claw Moved", "TRUE");
                 if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-                    clawState = ClawState.MID;
+                    setState(ClawState.CLOSED);
                     telemetry.addData("Move Requested", "TRUE");
                 } else {
                     telemetry.addData("Move Requested", "FALSE");
@@ -140,17 +113,18 @@ public class clawFSM {
         }
         public void update(){
             switch(clawState) {
-                case ZERO:
+                case CLOSED:
                     moveTo(zero_position);
-                    break;
-                case MID:
-                    moveTo(mid_position);
                     break;
                 case OPEN:
                     moveTo(open_position);
                     break;
-            
+
             }
+        }
+        public void setState(ClawState state){
+            clawState = state;
+
         }
     }
 }
