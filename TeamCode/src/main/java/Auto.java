@@ -47,13 +47,13 @@ public class Auto {
         switch(transferState){
             case 1:
                 actionBusy = true;
-                ClawFSM.setState(ClawFSM.ClawState.CLOSED);
+                ClawFSM.setState(clawFSM.ClawState.CLOSED);
                 transferTimer.resetTimer();
                 setTransferState(2);
                 break;
             case 2:
                 if(transferTimer.getElapsedTimeSeconds() > 1.5){
-                    LiftFSM.setState(LiftFSM.LiftState.HIGH);
+                    LiftFSM.setState(liftFSM.LiftState.HIGH);
                     transferTimer.resetTimer();
                     setTransferState(3);
                 }
@@ -61,13 +61,11 @@ public class Auto {
                 break;
             case 3:
                 if(transferTimer.getElapsedTimeSeconds() > 1){
-                    ClawFSM.setState(ClawFSM.ClawState.OPEN);
+                    ClawFSM.setState(clawFSM.ClawState.OPEN);
                     actionBusy = false;
                     setTransferState(-1);
                 }
                 break;
-
-
         }
     }
     public void setTransferState(int x) {
