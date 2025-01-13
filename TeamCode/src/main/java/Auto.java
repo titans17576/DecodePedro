@@ -62,13 +62,18 @@ public class Auto {
                 break;
             case 2:
                 if(transferTimer.getElapsedTimeSeconds() > 1.5){
-                    LiftFSM.setState(liftFSM.LiftState.HIGH);
+                    LiftFSM.setState(liftFSM.LiftState.MED);
                     transferTimer.resetTimer();
                     setTransferState(3);
                 }
-
                 break;
             case 3:
+                if(LiftFSM.actionNotBusy()){
+                    LiftFSM.setState(liftFSM.LiftState.LOW);
+                    transferTimer.resetTimer();
+                    setTransferState(4);
+                }
+            case 4:
                 if(LiftFSM.actionNotBusy()){
                     ClawFSM.setState(clawFSM.ClawState.OPEN);
                     actionBusy = false;
