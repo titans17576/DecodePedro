@@ -12,7 +12,7 @@ public class liftFSM {
     public enum LiftState {
         ZERO,
         LOW,
-        MED,
+        MID,
         HIGH
     }
 
@@ -45,10 +45,12 @@ public class liftFSM {
 
     // Method to move to a targeted position
     private void moveTo(int position) {
-        R.liftMotor.setTargetPosition(position);
-        R.liftMotor.setPower(0.8);
-        R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        R.liftMotor.setPower(0);
+        if (abs(R.liftMotor.getCurrentPosition() - position) > position_tolerance) {
+            R.liftMotor.setTargetPosition(position);
+            R.liftMotor.setPower(0.8);
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            R.liftMotor.setPower(0);
+        }
     }
 
     // Method to add encoders and status to telemetry
@@ -59,6 +61,22 @@ public class liftFSM {
         telemetry.addData("Status of Lift", status);
     }
 
+    public void update(){
+        switch (liftState){
+            case ZERO:
+                moveTo(zero_position);
+                break;
+            case LOW:
+                moveTo(low_position);
+                break;
+            case MID:
+                moveTo(mid_position);
+                break;
+            case HIGH:
+                moveTo(high_position);
+                break;
+        }
+    }
     // Update method for teleop implementation
     public void teleopUpdate() {
         telemetry.addLine("Lift Data");
@@ -66,19 +84,9 @@ public class liftFSM {
         switch (liftState) {
             // Lift set to 0
             case ZERO:
-                // Check position and move if not at 0
-                if (abs(R.liftMotor.getCurrentPosition() - zero_position) > position_tolerance) {
-
-                    moveTo(zero_position);
-
-                    telemetry.addData("Lift Moved", "TRUE");
-                } else {
-                    telemetry.addData("Lift Moved", "FALSE");
-                }
-
                 // State inputs
                 if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                    liftState = LiftState.HIGH;
+                    setState(LiftState.MID);
                     telemetry.addData("Move Requested", "TRUE");
                 } else {
                     telemetry.addData("Move Requested", "FALSE");
@@ -87,17 +95,41 @@ public class liftFSM {
                 updateTelemetry("Zero");
 
                 break;
+            case LOW:
+                // State inputs
+                if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
+                    setState(LiftState.ZERO);
+                    telemetry.addData("Move Requested", "TRUE");
+                }
+                else if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
+                    setState(LiftState.MID);
+                    telemetry.addData("Move Requested", "TRUE");
+                } else {
+                    telemetry.addData("Move Requested", "FALSE");
+                }
 
+                updateTelemetry("Low");
 
-            // Lift set to 3/3
+                break;
+            case MID:
+                // State inputs
+                if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
+                    setState(LiftState.LOW);
+                    telemetry.addData("Move Requested", "TRUE");
+                }
+                else if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
+                    setState(LiftState.HIGH);
+                    telemetry.addData("Move Requested", "TRUE");
+                } else {
+                    telemetry.addData("Move Requested", "FALSE");
+                }
+
+                updateTelemetry("Mid");
+
+                break;
+
             case HIGH:
                 // Check position and move if not at high_position
-                if (abs(R.liftMotor.getCurrentPosition() - high_position) > position_tolerance) {
-                    moveTo(high_position);
-                    telemetry.addData("Lift Moved", "TRUE");
-                } else {
-                    telemetry.addData("Lift Moved", "FALSE");
-                }
 
                 // State inputs
                 if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
@@ -113,7 +145,7 @@ public class liftFSM {
                 break;
 
         }
-
+        update();
     }
     public void testUpdate() {
         updateTelemetry("Test");
@@ -155,20 +187,8 @@ public class liftFSM {
             R.liftMotor.setTargetPosition(3000);
         }
     }
-    public void setState(){
-        switch (liftState){
-            case ZERO:
-                moveTo(ZERO);
-                break;
-            case LOW:
-                moveTo(LOW);
-                break;
-            case MID:
-                moveTo(MID);
-                break;
-            case HIGH:
-                moveTo(HIGH);
-                break;
-        }
+
+    public void setState(LiftState state){
+        liftState = state;
     }
 }
