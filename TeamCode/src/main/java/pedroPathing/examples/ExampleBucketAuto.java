@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
+import util.robot;
+
 /**
  * This is an example auto that showcases movement and control of two servos autonomously.
  * It is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
@@ -34,6 +36,7 @@ public class ExampleBucketAuto extends OpMode {
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
     private int pathState;
+    private robot R;
 
     /* Create and Define Poses + Paths
      * Poses are built with three constructors: x, y, and heading (in Radians).
@@ -48,7 +51,7 @@ public class ExampleBucketAuto extends OpMode {
     private final Pose startPose = new Pose(9, 111, Math.toRadians(270));
 
     /** Scoring Pose of our util.robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-    private final Pose scorePose = new Pose(14, 129, Math.toRadians(315));
+    private final Pose scorePose = new Pose(14, 129, Math.toRadians(270));
 
     /** Lowest (First) Sample from the Spike Mark */
     private final Pose pickup1Pose = new Pose(37, 121, Math.toRadians(0));
@@ -249,6 +252,7 @@ public class ExampleBucketAuto extends OpMode {
         // These loop the movements of the util.robot
         follower.update();
         autonomousPathUpdate();
+        R.extendo.setPosition(0.64);
 
         // Feedback to Driver Hub
         telemetry.addData("path state", pathState);
@@ -264,6 +268,7 @@ public class ExampleBucketAuto extends OpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
+        R = new robot(hardwareMap);
 
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
