@@ -44,7 +44,19 @@ public class Auto {
         transfer(); 
     }
     public void transfer(){
+        switch(transferState){
+            case 1:
+                ClawFSM.setState(CLOSE);
+                break;
+            case 2:
+                LiftFSM.setState(HIGH);
+                break;
+            case 3:
+                ClawFSM.setState(OPEN);
+                break;
 
+
+        }
     }
     public void setTransferState(int x) {
         transferState = x;
@@ -54,6 +66,7 @@ public class Auto {
         if (actionNotBusy()) {
             setTransferState(1);
         }
+
     }
     public boolean actionNotBusy() {
         return !actionBusy;
