@@ -1,6 +1,7 @@
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.robot.Robot;
 
@@ -13,9 +14,13 @@ public class Auto {
     public Telemetry telemetry;
 
     private robot R;
+    public boolean actionBusy;
 
     private liftFSM LiftFSM;
     private clawFSM ClawFSM;
+
+    public Timer transferTimer = new Timer();
+    public int transferState = -1;
     public Auto(robot Robot, Telemetry telemetry, Follower follower) {
         ClawFSM = new clawFSM(Robot, telemetry);
         LiftFSM = new liftFSM(Robot, telemetry);
@@ -29,7 +34,7 @@ public class Auto {
     }
 
     public void init() {
-        lift.initialize();
+        LiftFSM.initialize();
     }
     public void start(){
 
@@ -40,5 +45,21 @@ public class Auto {
     }
     public void transfer(){
 
+    }
+    public void setTransferState(int x) {
+        transferState = x;
+    }
+
+    public void startTransfer() {
+        if (actionNotBusy()) {
+            setTransferState(1);
+        }
+    }
+    public boolean actionNotBusy() {
+        return !actionBusy;
+    }
+
+    public boolean notBusy() {
+        return (!follower.isBusy() && actionNotBusy());
     }
 }
