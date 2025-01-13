@@ -21,7 +21,7 @@ public class clawFSM {
     final double open_position = 0.42;
 
     // LiftState instance variable
-    ClawState clawState = ClawState.ZERO;
+    ClawState clawState = ClawState.CLOSED;
 
     robot R;
     Telemetry telemetry;
@@ -111,21 +111,21 @@ public class clawFSM {
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  // hi
 
         }
-        public void update(){
-            switch(clawState) {
-                case CLOSED:
-                    moveTo(zero_position);
-                    break;
-                case OPEN:
-                    moveTo(open_position);
-                    break;
 
-            }
-        }
-        public void setState(ClawState state){
-            clawState = state;
+    }
+    public void update(){
+        switch(clawState) {
+            case CLOSED:
+                moveTo(closed_position);
+                break;
+            case OPEN:
+                moveTo(open_position);
+                break;
 
         }
+    }
+    public void setState(ClawState state){
+        clawState = state;
     }
 }
 

@@ -49,7 +49,15 @@ public class liftFSM {
             R.liftMotor.setTargetPosition(position);
             R.liftMotor.setPower(0.8);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            R.liftMotor.setPower(0);
+            //R.liftMotor.setPower(0);
+        }
+    }
+    private void moveTo(int position, double power) {
+        if (abs(R.liftMotor.getCurrentPosition() - position) > position_tolerance) {
+            R.liftMotor.setTargetPosition(position);
+            R.liftMotor.setPower(power);
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            //R.liftMotor.setPower(0);
         }
     }
 
@@ -64,16 +72,16 @@ public class liftFSM {
     public void update(){
         switch (liftState){
             case ZERO:
-                moveTo(zero_position);
+                moveTo(zero_position,1);
                 break;
             case LOW:
-                moveTo(low_position);
+                moveTo(low_position,1);
                 break;
             case MID:
-                moveTo(mid_position);
+                moveTo(mid_position,1);
                 break;
             case HIGH:
-                moveTo(high_position);
+                moveTo(high_position,0.8);
                 break;
         }
     }
@@ -81,68 +89,17 @@ public class liftFSM {
     public void teleopUpdate() {
         telemetry.addLine("Lift Data");
 
-        switch (liftState) {
-            // Lift set to 0
-            case ZERO:
-                // State inputs
-                if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                    setState(LiftState.MID);
-                    telemetry.addData("Move Requested", "TRUE");
-                } else {
-                    telemetry.addData("Move Requested", "FALSE");
-                }
-
-                updateTelemetry("Zero");
-
-                break;
-            case LOW:
-                // State inputs
-                if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-                    setState(LiftState.ZERO);
-                    telemetry.addData("Move Requested", "TRUE");
-                }
-                else if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                    setState(LiftState.MID);
-                    telemetry.addData("Move Requested", "TRUE");
-                } else {
-                    telemetry.addData("Move Requested", "FALSE");
-                }
-
-                updateTelemetry("Low");
-
-                break;
-            case MID:
-                // State inputs
-                if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-                    setState(LiftState.LOW);
-                    telemetry.addData("Move Requested", "TRUE");
-                }
-                else if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-                    setState(LiftState.HIGH);
-                    telemetry.addData("Move Requested", "TRUE");
-                } else {
-                    telemetry.addData("Move Requested", "FALSE");
-                }
-
-                updateTelemetry("Mid");
-
-                break;
-
-            case HIGH:
-                // Check position and move if not at high_position
-
-                // State inputs
-                if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-                    liftState = LiftState.ZERO;
-                    telemetry.addData("Move Requested", "TRUE");
-                } else {
-                    telemetry.addData("Move Requested", "FALSE");
-                }
-
-
-                updateTelemetry("HIGH");
-
-                break;
+        if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
+            setState(LiftState.MID);
+        }
+        if (gamepad1.left_trigger >= 0.5 && previousGamepad1.left_trigger < 0.5) {
+            setState(LiftState.HIGH);
+        }
+        if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
+           setState(LiftState.LOW);
+        }
+        if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
+            R.liftMotor.setPower(0.8);
 
         }
         update();
