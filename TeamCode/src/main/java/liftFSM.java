@@ -29,15 +29,15 @@ public class liftFSM {
     // OpMode variables
     robot R;
     Telemetry telemetry;
-    Gamepad gamepad1;
-    Gamepad previousGamepad1;
 
     // Import opmode variables when instance is created
-    public liftFSM(robot Robot, Telemetry t, Gamepad g1, Gamepad gp1) {
+    public liftFSM(robot Robot, Telemetry t) {
+        this(Robot, t, LiftState.ZERO);
+    }
+    public liftFSM(robot Robot, Telemetry t, LiftState lS) {
         R = Robot;
         telemetry = t;
-        gamepad1 = g1;
-        previousGamepad1 = gp1;
+        liftState = lS;
     }
     public void initialize() {
         R.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -86,46 +86,46 @@ public class liftFSM {
         }
     }
     // Update method for teleop implementation
-    public void teleopUpdate() {
+    public void teleopUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         telemetry.addLine("Lift Data");
 
-        if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
+        if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
             setState(LiftState.MID);
         }
-        if (gamepad1.left_trigger >= 0.5 && previousGamepad1.left_trigger < 0.5) {
+        if (currentGamepad.left_trigger >= 0.5 && previousGamepad.left_trigger < 0.5) {
             setState(LiftState.HIGH);
         }
-        if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
+        if (currentGamepad.right_trigger >= 0.5 && previousGamepad.right_trigger < 0.5) {
            setState(LiftState.LOW);
         }
-        if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
+        if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
             setState(LiftState.ZERO);
 
         }
         update();
     }
-    public void testUpdate() {
+    public void testUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         updateTelemetry("Test");
-        if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
+        if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
             R.liftMotor.setTargetPosition(1600);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             R.arm.setPosition(1);
 
         }
-        if (gamepad1.left_trigger >= 0.5 && previousGamepad1.left_trigger < 0.5) {
+        if (currentGamepad.left_trigger >= 0.5 && previousGamepad.left_trigger < 0.5) {
             R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() - 400);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         }
-        if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
+        if (currentGamepad.right_trigger >= 0.5 && previousGamepad.right_trigger < 0.5) {
             R.liftMotor.setTargetPosition(R.liftMotor.getTargetPosition() + 200);
             R.liftMotor.setPower(1);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         }
-        if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
+        if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
             R.liftMotor.setTargetPosition(0);
             R.liftMotor.setPower(0.8);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -134,7 +134,7 @@ public class liftFSM {
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        } else if (gamepad1.y && !previousGamepad1.y) {
+        } else if (currentGamepad.y && !previousGamepad.y) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }

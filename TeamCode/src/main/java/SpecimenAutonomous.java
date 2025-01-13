@@ -22,5 +22,6 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 /*@Autonomous(name = "Specimen Autonomous")*/
 public class SpecimenAutonomous {
-
+    private liftFSM LiftFSM;
+    private clawFSM ClawFSM;
 }

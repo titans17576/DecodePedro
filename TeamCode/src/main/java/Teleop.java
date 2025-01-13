@@ -46,8 +46,8 @@ public class Teleop extends OpMode {
         previousGamepad2 = new Gamepad();
 
         R = new robot(hardwareMap);
-        LiftFSM = new liftFSM(R, telemetry, currentGamepad1,previousGamepad1);
-        ClawFSM = new clawFSM(R, telemetry, currentGamepad1,previousGamepad1);
+        LiftFSM = new liftFSM(R, telemetry);
+        ClawFSM = new clawFSM(R, telemetry);
 
     }
 
@@ -81,8 +81,8 @@ public class Teleop extends OpMode {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
-        LiftFSM.teleopUpdate();
-        ClawFSM.teleopUpdate();
+        LiftFSM.teleopUpdate(currentGamepad1, previousGamepad1);
+        ClawFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);
@@ -96,8 +96,6 @@ public class Teleop extends OpMode {
         } else if (R.liftMotor.getTargetPosition() > 3000) {
             R.liftMotor.setTargetPosition(3000);
         }
-
-
 
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
             R.arm.setPosition(0.3);

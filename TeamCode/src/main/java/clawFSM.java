@@ -21,19 +21,19 @@ public class clawFSM {
     final double open_position = 0.2;
 
     // LiftState instance variable
-    ClawState clawState = ClawState.CLOSED;
 
     robot R;
     Telemetry telemetry;
-    Gamepad gamepad1;
-    Gamepad previousGamepad1;
+    ClawState clawState;
 
     // Import opmode variables when instance is created
-    public clawFSM(robot Robot, Telemetry t, Gamepad g1, Gamepad gp1) {
+    public clawFSM(robot Robot, Telemetry t) {
+        this(Robot, t, ClawState.CLOSED);
+    }
+    public clawFSM(robot Robot, Telemetry t, ClawState cS) {
         R = Robot;
         telemetry = t;
-        gamepad1 = g1;
-        previousGamepad1 = gp1;
+        clawState = cS;
     }
     //public void initialize() {
     //}
@@ -50,7 +50,7 @@ public class clawFSM {
     }
 
     // Update method for teleop implementation
-    public void teleopUpdate() {
+    public void teleopUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         telemetry.addLine("Lift Data");
 
         switch (clawState) {
@@ -58,14 +58,14 @@ public class clawFSM {
             case CLOSED:
                 telemetry.addData("Claw Moved", "TRUE");
             // State inputs
-                if (gamepad1.a && !previousGamepad1.a) {
+                if (currentGamepad.a && !previousGamepad.a) {
                     setState(ClawState.OPEN);
                 }
                 updateTelemetry("CLOSED");
                 break;
             case OPEN:
                 telemetry.addData("Claw Moved", "TRUE");
-                if (gamepad1.a && !previousGamepad1.a) {
+                if (currentGamepad.a && !previousGamepad.a) {
                     setState(ClawState.CLOSED);
                 }
                 updateTelemetry("OPEN");
@@ -73,26 +73,13 @@ public class clawFSM {
         }
         update();
     }
-    public void testUpdate() {
+    public void testUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         updateTelemetry("Test");
-        if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
-            R.liftMotor.setTargetPosition(6000);
-            R.liftMotor.setPower(1);
-            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+        if (currentGamepad.a && !previousGamepad.a) {
+            R.claw.setPosition(0.2);
+        } else if (currentGamepad.b && !previousGamepad.b) {
+            R.claw.setPosition(0.42);
         }
-        if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            R.liftMotor.setTargetPosition(0);
-            R.liftMotor.setPower(0.8);
-            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        }
-        if (R.liftMotor.getCurrentPosition() < 30 && R.liftMotor.getTargetPosition() != 6000){
-            R.liftMotor.setPower(0);
-            R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  // hi
-
-        }
-
     }
     public void update(){
         switch(clawState) {
