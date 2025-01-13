@@ -1,6 +1,10 @@
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.robot.Robot;
@@ -21,6 +25,7 @@ public class Auto {
 
     public Timer transferTimer = new Timer();
     public int transferState = -1;
+    public PathChain moveCurve;
     public Auto(robot Robot, Telemetry telemetry, Follower follower) {
         ClawFSM = new clawFSM(Robot, telemetry);
         LiftFSM = new liftFSM(Robot, telemetry);
@@ -90,17 +95,16 @@ public class Auto {
         return (!follower.isBusy() && actionNotBusy());
     }
     public void buildPaths(){
-        moveForward = follower.pathBuilder()
+        moveCurve = follower.pathBuilder()
                 .addPath(
-                        // Line 1
                         new BezierCurve(
-                                new Point(9.484, 107.064, Point.CARTESIAN),
-                                new Point(34.440, 107.813, Point.CARTESIAN),
-                                new Point(13.227, 73.373, Point.CARTESIAN),
-                                new Point(39.182, 73.373, Point.CARTESIAN)
+                                new Point(9.484, 107.064),
+                                new Point(34.440, 107.813),
+                                new Point(13.227, 73.373),
+                                new Point(39.182, 73.373)
                         )
                 )
-                .setTangentHeadingInterpolation();
+                .setTangentHeadingInterpolation()
                 .build();
     }
 }
