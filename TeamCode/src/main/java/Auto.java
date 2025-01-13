@@ -62,7 +62,7 @@ public class Auto {
                 break;
             case 2:
                 if(transferTimer.getElapsedTimeSeconds() > 1.5){
-                    LiftFSM.setState(liftFSM.LiftState.MED);
+                    LiftFSM.setState(liftFSM.LiftState.MID);
                     transferTimer.resetTimer();
                     setTransferState(3);
                 }
