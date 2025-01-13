@@ -11,8 +11,16 @@ public class Auto {
 
     private liftFSM LiftFSM;
     private clawFSM ClawFSM;
-    public Auto(HardwareMap hardwareMap, Telemetry telemetry, Follower follower) {
+    public Auto(Robot robot, Telemetry telemetry, Follower follower) {
+        claw = new ClFSM(hardwareMap, clawState);
+        lift = new LiftSubsystem(hardwareMap, telemetry);
 
+
+        this.follower = follower;
+        this.telemetry = telemetry;
+
+        
+        init();
     }
 
     public void init() {
