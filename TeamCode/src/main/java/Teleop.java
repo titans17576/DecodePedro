@@ -159,6 +159,7 @@ public class Teleop extends OpMode {
         previousGamepad2.copy(currentGamepad2);
     }
 
+
     /** We do not use this because everything automatically should disable **/
     @Override
     public void stop() {

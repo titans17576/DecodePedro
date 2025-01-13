@@ -11,15 +11,17 @@ public class liftFSM {
     // Enum for state memory
     public enum LiftState {
         ZERO,
+        LOW,
+        MED,
         HIGH
     }
 
     // Position variables
     final int position_tolerance = 15;
     final int zero_position = 0;
-    // int low_position = 1500;
-    //final int mid_position = 1442; // max we could reach was like 1500 ticks so idk
-    final int high_position = 1980;
+    int low_position = 900;
+    final int mid_position = 1400; // max we could reach was like 1500 ticks so idk
+    final int high_position = 2600;
 
     // LiftState instance variable
     LiftState liftState = LiftState.ZERO;
@@ -151,6 +153,22 @@ public class liftFSM {
             R.liftMotor.setTargetPosition(0);
         } else if (R.liftMotor.getTargetPosition() > 3000) {
             R.liftMotor.setTargetPosition(3000);
+        }
+    }
+    public void setState(){
+        switch (liftState){
+            case ZERO:
+                moveTo(ZERO);
+                break;
+            case LOW:
+                moveTo(LOW);
+                break;
+            case MID:
+                moveTo(MID);
+                break;
+            case HIGH:
+                moveTo(HIGH);
+                break;
         }
     }
 }
