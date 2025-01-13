@@ -89,4 +89,18 @@ public class Auto {
     public boolean notBusy() {
         return (!follower.isBusy() && actionNotBusy());
     }
+    public void buildPaths(){
+        moveForward = follower.pathBuilder()
+                .addPath(
+                        // Line 1
+                        new BezierCurve(
+                                new Point(9.484, 107.064, Point.CARTESIAN),
+                                new Point(34.440, 107.813, Point.CARTESIAN),
+                                new Point(13.227, 73.373, Point.CARTESIAN),
+                                new Point(39.182, 73.373, Point.CARTESIAN)
+                        )
+                )
+                .setTangentHeadingInterpolation();
+                .build();
+    }
 }
