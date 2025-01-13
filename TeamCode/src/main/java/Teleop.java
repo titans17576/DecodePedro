@@ -25,7 +25,10 @@ public class Teleop extends OpMode {
     private Gamepad previousGamepad1;
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
+
     private liftFSM LiftFSM;
+    private clawFSM ClawFSM;
+
 
     private final Pose startPose = new Pose(0,0,0);
     private double defaultSpeed = 0.45;
@@ -44,6 +47,8 @@ public class Teleop extends OpMode {
 
         R = new robot(hardwareMap);
         LiftFSM = new liftFSM(R, telemetry, currentGamepad1,previousGamepad1);
+        ClawFSM = new clawFSM(R, telemetry, currentGamepad1,previousGamepad1);
+
     }
 
     /** This method is called continuously after Init while waiting to be started. **/
@@ -76,30 +81,9 @@ public class Teleop extends OpMode {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
-        /*LiftFSM.testUpdate();*/
-        if (gamepad1.right_bumper && !previousGamepad1.right_bumper) {
-            R.liftMotor.setTargetPosition(1400);
-            R.liftMotor.setPower(1);
-            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        }
-        if (gamepad1.left_trigger >= 0.5 && previousGamepad1.left_trigger < 0.5) {
-            R.liftMotor.setTargetPosition(2600);
-            R.liftMotor.setPower(1);
-            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        if (gamepad1.right_trigger >= 0.5 && previousGamepad1.right_trigger < 0.5) {
-            R.liftMotor.setTargetPosition(900);
-            R.liftMotor.setPower(1);
-            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        LiftFSM.updateTelemetry("");
-        if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            R.liftMotor.setTargetPosition(0);
-            R.liftMotor.setPower(0.8);
-            R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        }
+        LiftFSM.teleopUpdate();
+        ClawFSM.teleopUpdate();
+        
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -113,11 +97,6 @@ public class Teleop extends OpMode {
             R.liftMotor.setTargetPosition(3000);
         }
 
-        if (gamepad1.a && !previousGamepad1.a) {
-            R.claw.setPosition(0.2);
-        } else if (gamepad1.b && !previousGamepad1.b) {
-            R.claw.setPosition(0.42);
-        }
 
 
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {

@@ -99,7 +99,7 @@ public class liftFSM {
            setState(LiftState.LOW);
         }
         if (gamepad1.left_bumper && !previousGamepad1.left_bumper) {
-            R.liftMotor.setPower(0.8);
+            setState(LiftState.ZERO);
 
         }
         update();

@@ -45,10 +45,8 @@ public class clawFSM {
 
     // Method to add encoders and status to telemetry
     private void updateTelemetry(String status) {
-        // Add encoder position to telemetry
-        telemetry.addData("Lift Ticks", R.liftMotor.getCurrentPosition());
         // Add lift position to telemetry
-        telemetry.addData("Status of Lift", status);
+        telemetry.addData("Status of Claw", status);
     }
 
     // Update method for teleop implementation
@@ -58,22 +56,14 @@ public class clawFSM {
         switch (clawState) {
             // Lift set to 0
             case CLOSED:
-                moveTo(closed_position);
                 telemetry.addData("Claw Moved", "TRUE");
-
-
-                // State inputs
+            // State inputs
                 if (gamepad1.a && !previousGamepad1.a) {
                     setState(ClawState.OPEN);
                 }
                 updateTelemetry("CLOSED");
-
                 break;
-
-
-
             case OPEN:
-                moveTo(open_position);
                 telemetry.addData("Claw Moved", "TRUE");
                 if (gamepad1.a && !previousGamepad1.a) {
                     setState(ClawState.CLOSED);
