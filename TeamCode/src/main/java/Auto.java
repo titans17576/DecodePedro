@@ -41,6 +41,10 @@ public class Auto {
     }
     public void update(){
         follower.update();
+        LiftFSM.update();
+        ClawFSM.update();
+
+
         transfer(); 
     }
     public void transfer(){
