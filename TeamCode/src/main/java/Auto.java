@@ -29,13 +29,14 @@ public class Auto {
     }
 
     public void init() {
-
+        lift.initialize();
     }
     public void start(){
 
     }
     public void update(){
-
+        follower.update();
+        transfer(); 
     }
     public void transfer(){
 
