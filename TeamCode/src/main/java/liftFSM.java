@@ -25,6 +25,7 @@ public class liftFSM {
 
     // LiftState instance variable
     LiftState liftState = LiftState.ZERO;
+    public boolean actionBusy = false;
 
     // OpMode variables
     robot R;
@@ -58,6 +59,10 @@ public class liftFSM {
             R.liftMotor.setPower(power);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //R.liftMotor.setPower(0);
+            actionBusy = true;
+        }
+        else{
+            actionBusy = false;
         }
     }
 
@@ -147,5 +152,8 @@ public class liftFSM {
 
     public void setState(LiftState state){
         liftState = state;
+    }
+    public boolean actionNotBusy() {
+        return !actionBusy;
     }
 }

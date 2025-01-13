@@ -13,11 +13,12 @@ import util.robot;
 public class testAuton extends OpMode {
     private Follower follower;
 
-    public int pathState;
+    public int pathState = -1;
     public Auto auto;
     public robot R;
     private final Pose startPose = new Pose(0, 0, 0);
     public Timer pathTimer = new Timer();
+
 
     @Override
     public void init() {
@@ -31,7 +32,7 @@ public class testAuton extends OpMode {
     @Override
     public void start() {
         auto.start();
-        setPathState(0);
+        setPathState(1);
     }
 
     @Override

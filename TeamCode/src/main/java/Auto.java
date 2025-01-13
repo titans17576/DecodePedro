@@ -64,7 +64,7 @@ public class Auto {
 
                 break;
             case 3:
-                if(transferTimer.getElapsedTimeSeconds() > 1){
+                if(LiftFSM.actionNotBusy()){
                     ClawFSM.setState(clawFSM.ClawState.OPEN);
                     actionBusy = false;
                     setTransferState(-1);
