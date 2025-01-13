@@ -83,7 +83,7 @@ public class Teleop extends OpMode {
 
         LiftFSM.teleopUpdate();
         ClawFSM.teleopUpdate();
-        
+
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
