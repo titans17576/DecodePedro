@@ -46,13 +46,25 @@ public class Auto {
     public void transfer(){
         switch(transferState){
             case 1:
-                ClawFSM.setState(CLOSE);
+                actionBusy = true;
+                ClawFSM.setState(ClawFSM.ClawState.CLOSED);
+                transferTimer.resetTimer();
+                setTransferState(2);
                 break;
             case 2:
-                LiftFSM.setState(HIGH);
+                if(transferTimer.getElapsedTimeSeconds() > 1.5){
+                    LiftFSM.setState(LiftFSM.LiftState.HIGH);
+                    transferTimer.resetTimer();
+                    setTransferState(3);
+                }
+
                 break;
             case 3:
-                ClawFSM.setState(OPEN);
+                if(transferTimer.getElapsedTimeSeconds() > 1){
+                    ClawFSM.setState(ClawFSM.ClawState.OPEN);
+                    actionBusy = false;
+                    setTransferState(-1);
+                }
                 break;
 
 
