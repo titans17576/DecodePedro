@@ -1,19 +1,24 @@
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import util.robot;
 
 public class Auto {
-    private Follower follower;
+    public Follower follower;
+    public Telemetry telemetry;
+
     private robot R;
 
     private liftFSM LiftFSM;
     private clawFSM ClawFSM;
-    public Auto(Robot robot, Telemetry telemetry, Follower follower) {
-        claw = new ClFSM(hardwareMap, clawState);
-        lift = new LiftSubsystem(hardwareMap, telemetry);
+    public Auto(robot Robot, Telemetry telemetry, Follower follower) {
+        ClawFSM = new clawFSM(Robot, telemetry);
+        LiftFSM = new liftFSM(Robot, telemetry);
 
 
         this.follower = follower;
