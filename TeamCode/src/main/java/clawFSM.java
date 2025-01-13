@@ -138,6 +138,20 @@ public class clawFSM {
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  // hi
 
         }
+        public void update(){
+            switch(clawState) {
+                case ZERO:
+                    moveTo(zero_position);
+                    break;
+                case MID:
+                    moveTo(mid_position);
+                    break;
+                case OPEN:
+                    moveTo(open_position);
+                    break;
+            
+            }
+        }
     }
 }
 
