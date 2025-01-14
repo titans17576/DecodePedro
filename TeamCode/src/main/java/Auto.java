@@ -2,6 +2,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -25,6 +26,8 @@ public class Auto {
 
     public Timer transferTimer = new Timer();
     public int transferState = -1;
+    public Path forwards, backwards;
+
     public PathChain moveCurve;
     public Auto(robot Robot, Telemetry telemetry, Follower follower) {
         ClawFSM = new clawFSM(Robot, telemetry);
@@ -111,5 +114,10 @@ public class Auto {
                 )
                 .setTangentHeadingInterpolation()
                 .build();
+        forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(40,0, Point.CARTESIAN)));
+        forwards.setConstantHeadingInterpolation(0);
+        backwards = new Path(new BezierLine(new Point(40,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
+        backwards.setConstantHeadingInterpolation(0);
+
     }
 }
