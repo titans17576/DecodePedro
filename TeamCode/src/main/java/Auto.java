@@ -18,6 +18,10 @@ import util.robot;
 public class Auto {
     public Follower follower;
     public Telemetry telemetry;
+    public enum Side{
+        BUCKET,
+        OBSERVATION,
+    }
 
     private robot R;
     public boolean actionBusy;
@@ -25,7 +29,7 @@ public class Auto {
     private liftFSM LiftFSM;
     private clawFSM ClawFSM;
 
-
+    private Side side;
     public Timer transferTimer = new Timer();
     public int transferState = -1;
     public Path forwards, backwards;
@@ -37,19 +41,27 @@ public class Auto {
             pickup2Pose, pickup3Pose, pickup4Pose;
 
     public PathChain moveCurve;
-    public Auto(robot Robot, Telemetry telemetry, Follower follower) {
+    public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         ClawFSM = new clawFSM(Robot, telemetry);
         LiftFSM = new liftFSM(Robot, telemetry);
 
 
         this.follower = follower;
         this.telemetry = telemetry;
+        this.side = side;
 
-
+        createPose();
         
         init();
     }
-
+    public void createPose(){
+        switch(side){
+            case BUCKET:
+                break;
+            case OBSERVATION:
+                break;
+        }
+    }
     public void init() {
         LiftFSM.initialize();
     }
