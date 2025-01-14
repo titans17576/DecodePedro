@@ -24,9 +24,12 @@ public class Auto {
     private liftFSM LiftFSM;
     private clawFSM ClawFSM;
 
+
     public Timer transferTimer = new Timer();
     public int transferState = -1;
     public Path forwards, backwards;
+
+    public Pose speciman1Pose,speciman2Pose, speciman3Pose, longBack2Pose, longBack3Pose, longBack4Pose, shift2Pose, shift3Pose, shift4Pose, zone2Pose, zone3Pose, zone4Pose, shortBack1Pose;
 
     public PathChain moveCurve;
     public Auto(robot Robot, Telemetry telemetry, Follower follower) {
