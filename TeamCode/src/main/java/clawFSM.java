@@ -92,7 +92,7 @@ public class clawFSM {
 
         }
     }
-    public void setStatesetState(ClawState state){
+    public void setState(ClawState state){
         clawState = state;
     }
 }

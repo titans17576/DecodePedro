@@ -1,6 +1,7 @@
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
@@ -29,7 +30,11 @@ public class Auto {
     public int transferState = -1;
     public Path forwards, backwards;
 
-    public Pose speciman1Pose,speciman2Pose, speciman3Pose, longBack2Pose, longBack3Pose, longBack4Pose, shift2Pose, shift3Pose, shift4Pose, zone2Pose, zone3Pose, zone4Pose, shortBack1Pose;
+    public Pose startPose,
+            specimen1Pose,specimen2Pose, specimen3Pose,
+            shortBack1Pose, longBack2Pose, longBack3Pose, longBack4Pose,
+            shift2Pose, shift3Pose, shift4Pose,
+            pickup2Pose, pickup3Pose, pickup4Pose;
 
     public PathChain moveCurve;
     public Auto(robot Robot, Telemetry telemetry, Follower follower) {
@@ -39,6 +44,7 @@ public class Auto {
 
         this.follower = follower;
         this.telemetry = telemetry;
+
 
         
         init();
