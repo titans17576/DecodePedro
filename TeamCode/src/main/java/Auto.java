@@ -59,6 +59,7 @@ public class Auto {
             case BUCKET:
                 break;
             case OBSERVATION:
+                startPose = new Pose(10.500, 60.500);
                 break;
         }
     }
