@@ -38,7 +38,10 @@ public class Auto {
             specimen1Pose,specimen2Pose, specimen3Pose,
             shortBack1Pose, longBack2Pose, longBack3Pose, longBack4Pose,
             shift2Pose, shift3Pose, shift4Pose,
-            pickup2Pose, pickup3Pose, pickup4Pose;
+            pickup2Pose, pickup3Pose, pickup4Pose,
+            specimenControlPoint1Pose, specimenControlPoint2Pose,
+            curveControlPoint1Pose, curveControlPoint2Pose;
+
 
     public PathChain moveCurve;
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
@@ -60,6 +63,22 @@ public class Auto {
                 break;
             case OBSERVATION:
                 startPose = new Pose(10.500, 60.500, Math.toRadians(0));
+                specimen1Pose = new Pose(35.000, 71.500, Math.toRadians(0));
+                specimen2Pose = new Pose(35,68,Math.toRadians(0));
+                specimen3Pose = new Pose(35, 64.5,Math.toRadians(0));
+                specimenControlPoint1Pose = new Pose(17, 46.5); // What is the direction on the robot?
+                specimenControlPoint2Pose = new Pose(22, 64);
+                curveControlPoint1Pose = new Pose(34.5, 33.5);
+                curveControlPoint2Pose = new Pose(59, 41.5);
+                longBack2Pose= new Pose(66, 25, Math.toRadians(180));
+                longBack3Pose= new Pose(66, 14,Math.toRadians(180));
+                shortBack1Pose = new Pose(26.5, 71.5, Math.toRadians(0));
+                shift2Pose = new Pose(20, 14, Math.toRadians(180));
+                shift3Pose = new Pose(20, 25,Math.toRadians(180)) ;
+                pickup2Pose = new Pose(9.5, 25, Math.Math.toRadians(180));
+                pickup3Pose = new Pose(9.5, 14, Math.Math.toRadians(180) ;
+
+
                 break;
         }
     }
