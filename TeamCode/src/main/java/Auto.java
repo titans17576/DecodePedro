@@ -44,7 +44,8 @@ public class Auto {
 
 
     public PathChain moveCurve, push23, gather3, goal2, goal3;
-    public Path goal1;
+    public Path goal1, score11, score12, score21, score22, score31, score32;
+    public int DISTANCE = 1;
 
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         ClawFSM = new clawFSM(Robot, telemetry);
@@ -136,6 +137,25 @@ public class Auto {
                     .addPath(new BezierCurve(new Point(shift3Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen3Pose)))
                     .setLinearHeadingInterpolation(shift3Pose.getHeading(), specimen3Pose.getHeading())
                     .build();
+            
+            score11 = new Path(new BezierCurve(new Point(specimen1Pose), new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY()));
+            score11.setConstantHeadingInterpolation(specimen1Pose.getHeading());
+
+            score12 = new Path(new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY()), new BezierCurve(new Point(specimen1Pose));
+            score12.setConstantHeadingInterpolation(specimen1Pose.getHeading());
+
+            score21 = new Path(new BezierCurve(new Point(specimen2Pose), new Point(specimen2Pose.getX() + DISTANCE, specimen2Pose.getY()));
+            score21.setConstantHeadingInterpolation(specimen2Pose.getHeading());
+
+            score22 = new Path(new BezierCurve(new Point(specimen2Pose.getX() + DISTANCE, specimen2Pose.getY()), new Point(specimen2Pose));
+            score22.setConstantHeadingInterpolation(specimen2Pose.getHeading());
+
+            score31 = new Path(new BezierCurve(new Point(specimen3Pose), new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY()));
+            score31.setConstantHeadingInterpolation(specimen3Pose.getHeading());
+
+            score32 = new Path(new BezierCurve(new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY()), new Point(specimen3Pose));
+            score32.setConstantHeadingInterpolation(specimen3Pose.getHeading());
+
 
 
 
@@ -175,29 +195,23 @@ public class Auto {
 
         transfer(); 
     }
-    public void transfer(){
+    public void transfer(Pose specimenPose){
         switch(transferState){
             case 1:
-                actionBusy = true;
-                ClawFSM.setState(clawFSM.ClawState.CLOSED);
-                transferTimer.resetTimer();
-                setTransferState(2);
+                //if(transferTimer.getElapsedTimeSeconds() > 1.5){
+                    LiftFSM.setState(liftFSM.LiftState.MID);
+                    transferTimer.resetTimer();
+                    setTransferState(2);
+                //}
                 break;
             case 2:
-                if(transferTimer.getElapsedTimeSeconds() > 1.5){
-                    LiftFSM.setState(liftFSM.LiftState.MID);
+                if(LiftFSM.actionNotBusy()){
+                    LiftFSM.setState(liftFSM.LiftState.LOW);
                     transferTimer.resetTimer();
                     setTransferState(3);
                 }
                 break;
             case 3:
-                if(LiftFSM.actionNotBusy()){
-                    LiftFSM.setState(liftFSM.LiftState.LOW);
-                    transferTimer.resetTimer();
-                    setTransferState(4);
-                }
-                break;
-            case 4:
                 if(LiftFSM.actionNotBusy()){
                     ClawFSM.setState(clawFSM.ClawState.OPEN);
                     actionBusy = false;
