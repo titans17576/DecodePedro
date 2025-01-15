@@ -31,8 +31,9 @@ public class Auto {
 
     private Side side;
     public Timer transferTimer = new Timer();
-    public int transferState = -1;
+    public int transferState = -1, specimenNum = -1;
     public Path forwards, backwards;
+
 
     public Pose startPose,
             specimen1Pose,specimen2Pose, specimen3Pose,
@@ -44,7 +45,9 @@ public class Auto {
 
 
     public PathChain moveCurve, push23, gather3, goal2, goal3;
-    public Path goal1, score11, score12, score21, score22, score31, score32;
+    public Path goal1;
+
+    public Path[][] score = new Path[5][2];
     public int DISTANCE = 1;
 
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
@@ -137,24 +140,26 @@ public class Auto {
                     .addPath(new BezierCurve(new Point(shift3Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen3Pose)))
                     .setLinearHeadingInterpolation(shift3Pose.getHeading(), specimen3Pose.getHeading())
                     .build();
-            
-            score11 = new Path(new BezierCurve(new Point(specimen1Pose), new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY()));
-            score11.setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
-            score12 = new Path(new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY()), new BezierCurve(new Point(specimen1Pose));
-            score12.setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
-            score21 = new Path(new BezierCurve(new Point(specimen2Pose), new Point(specimen2Pose.getX() + DISTANCE, specimen2Pose.getY()));
-            score21.setConstantHeadingInterpolation(specimen2Pose.getHeading());
 
-            score22 = new Path(new BezierCurve(new Point(specimen2Pose.getX() + DISTANCE, specimen2Pose.getY()), new Point(specimen2Pose));
-            score22.setConstantHeadingInterpolation(specimen2Pose.getHeading());
+            score[1][0] = new Path(new BezierCurve(new Point(specimen1Pose), new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY())));
+            score[1][0].setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
-            score31 = new Path(new BezierCurve(new Point(specimen3Pose), new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY()));
-            score31.setConstantHeadingInterpolation(specimen3Pose.getHeading());
+            score[1][1] = new Path(new BezierCurve(new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY()), new Point(specimen1Pose)));
+            score[1][1].setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
-            score32 = new Path(new BezierCurve(new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY()), new Point(specimen3Pose));
-            score32.setConstantHeadingInterpolation(specimen3Pose.getHeading());
+            score[2][0] = new Path(new BezierCurve(new Point(specimen2Pose), new Point(specimen2Pose.getX() + DISTANCE, specimen2Pose.getY())));
+            score[2][0].setConstantHeadingInterpolation(specimen2Pose.getHeading());
+
+            score[2][1] = new Path(new BezierCurve(new Point(specimen2Pose.getX() + DISTANCE, specimen2Pose.getY()), new Point(specimen2Pose)));
+            score[2][1].setConstantHeadingInterpolation(specimen2Pose.getHeading());
+
+            score[3][0] = new Path(new BezierCurve(new Point(specimen3Pose), new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY())));
+            score[3][0].setConstantHeadingInterpolation(specimen3Pose.getHeading());
+
+            score[3][1] = new Path(new BezierCurve(new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY()), new Point(specimen3Pose)));
+            score[3][1].setConstantHeadingInterpolation(specimen3Pose.getHeading());
 
 
 
@@ -195,7 +200,7 @@ public class Auto {
 
         transfer(); 
     }
-    public void transfer(Pose specimenPose){
+    public void transfer(){
         switch(transferState){
             case 1:
                 //if(transferTimer.getElapsedTimeSeconds() > 1.5){
@@ -225,9 +230,10 @@ public class Auto {
         telemetry.addData("Transfer", x);
     }
 
-    public void startTransfer() {
+    public void startTransfer(int specimenNum) {
         if (actionNotBusy()) {
             setTransferState(1);
+            this.specimenNum = specimenNum;
         }
 
     }
