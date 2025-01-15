@@ -51,6 +51,10 @@ public class liftFSM {
             R.liftMotor.setPower(0.8);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //R.liftMotor.setPower(0);
+            actionBusy = true;
+        }
+        else{
+            actionBusy = false;
         }
     }
     private void moveTo(int position, double power) {
@@ -77,7 +81,7 @@ public class liftFSM {
     public void update(){
         switch (liftState){
             case ZERO:
-                moveTo(zero_position,1);
+                moveTo(zero_position,0.8);
                 break;
             case LOW:
                 moveTo(low_position,1);
@@ -86,7 +90,7 @@ public class liftFSM {
                 moveTo(mid_position,1);
                 break;
             case HIGH:
-                moveTo(high_position,0.8);
+                moveTo(high_position,1);
                 break;
         }
     }

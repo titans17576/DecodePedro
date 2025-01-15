@@ -73,6 +73,7 @@ public class Auto {
                     transferTimer.resetTimer();
                     setTransferState(4);
                 }
+                break;
             case 4:
                 if(LiftFSM.actionNotBusy()){
                     ClawFSM.setState(clawFSM.ClawState.OPEN);
