@@ -49,13 +49,20 @@ public class testAutom extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                auto.follower.followPath(auto.moveCurve, false);
+                auto.follower.followPath(auto.forwards, false);
                 setPathState(2);
                 break;
             case 2:
+                if(auto.notBusy()) {
+                    auto.follower.followPath(auto.backwards, false);
+                    setPathState(3);
+                }
+                break;
+            case 3:
                 if(auto.notBusy()){
                     setPathState(-1);
                 }
+                break;
         }
     }
     public void setPathState(int x) {
