@@ -203,26 +203,49 @@ public class Auto {
     public void transfer(){
         switch(transferState){
             case 1:
-                //if(transferTimer.getElapsedTimeSeconds() > 1.5){
-                    LiftFSM.setState(liftFSM.LiftState.MID);
-                    transferTimer.resetTimer();
-                    setTransferState(2);
-                //}
+                actionBusy = true;
+                LiftFSM.setState(liftFSM.LiftState.MID);
+                setTransferState(2);
                 break;
             case 2:
                 if(LiftFSM.actionNotBusy()){
-                    LiftFSM.setState(liftFSM.LiftState.LOW);
-                    transferTimer.resetTimer();
+                    follower.followPath(score[specimenNum][0], false);
                     setTransferState(3);
                 }
                 break;
             case 3:
-                if(LiftFSM.actionNotBusy()){
-                    ClawFSM.setState(clawFSM.ClawState.OPEN);
-                    actionBusy = false;
-                    setTransferState(-1);
+                if(!follower.isBusy()){
+                    LiftFSM.setState(liftFSM.LiftState.LOW);
+                    setTransferState(4);
                 }
                 break;
+            case 4:
+                if(LiftFSM.actionNotBusy()){
+                    ClawFSM.setState(clawFSM.ClawState.OPEN);
+                    transferTimer.resetTimer();
+                    setTransferState(5);
+
+
+                }
+                break;
+            case 5:
+                if (transferTimer.getElapsedTimeSecounds() > 0.5) {
+                    LiftFSM.setState(liftFSM.LiftState.ZERO);
+                    setTransferState(6);
+                }
+                break;
+            case 6:
+                if(LiftFSM.actionNotBusy()) {
+                    follower.followPath(score[specimenNum][1], false);
+                    setTransferState(7);
+                }
+                break;
+            case 7:
+                if(!follower.isBusy()){
+                    action = false;
+                    setTransferState(-1);
+                }
+
         }
     }
     public void setTransferState(int x) {
