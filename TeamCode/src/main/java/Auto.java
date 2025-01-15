@@ -109,6 +109,11 @@ public class Auto {
                     .addPath(new BezierLine(new Point(longBack3Pose), new Point(pickup3Pose)));
                     .setConstantHeadingInterpolation(longBack3Pose.getHeading());
                     .build();
+            backup2 = new Path(new BezierLine(new Point(pickup2Pose), new Point(shift2Pose)));
+            backup2.setConstantHeadingInterpolation(pickup2Pose.getHeading());
+            backup3 = new Path(new BezierLine(new Point(pickup3Pose), new Point(shift3Pose)));
+            backup3.setConstantHeadingInterpolation(pickup3Pose.getHeading());
+
             break;
         }
 
