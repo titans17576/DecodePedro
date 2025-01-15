@@ -27,7 +27,7 @@ public class testAutom extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
-        auto = new Auto(R, telemetry, follower);
+        auto = new Auto(R, telemetry, follower, Auto.Side.BUCKET);
     }
 
     @Override

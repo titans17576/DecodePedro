@@ -54,7 +54,8 @@ public class Auto {
         this.side = side;
 
         createPose();
-        
+        buildPaths();
+
         init();
     }
     public void createPose(){
@@ -75,12 +76,29 @@ public class Auto {
                 shortBack1Pose = new Pose(26.5, 71.5, Math.toRadians(0));
                 shift2Pose = new Pose(20, 14, Math.toRadians(180));
                 shift3Pose = new Pose(20, 25,Math.toRadians(180)) ;
-                pickup2Pose = new Pose(9.5, 25, Math.Math.toRadians(180));
-                pickup3Pose = new Pose(9.5, 14, Math.Math.toRadians(180) ;
-
+                pickup2Pose = new Pose(9.5, 25, Math.toRadians(180));
+                pickup3Pose = new Pose(9.5, 14, Math.toRadians(180));
 
                 break;
         }
+    }
+    public void buildPaths(){
+        moveCurve = follower.pathBuilder()
+                .addPath(
+                        new BezierCurve(
+                                new Point(9.484, 107.064),
+                                new Point(34.440, 107.813),
+                                new Point(13.227, 73.373),
+                                new Point(39.182, 73.373)
+                        )
+                )
+                .setTangentHeadingInterpolation()
+                .build();
+        forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(40,0, Point.CARTESIAN)));
+        forwards.setConstantHeadingInterpolation(0);
+        backwards = new Path(new BezierLine(new Point(40,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
+        backwards.setConstantHeadingInterpolation(0);
+
     }
     public void init() {
         LiftFSM.initialize();
@@ -143,22 +161,5 @@ public class Auto {
     public boolean notBusy() {
         return (!follower.isBusy() && actionNotBusy());
     }
-    public void buildPaths(){
-        moveCurve = follower.pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Point(9.484, 107.064),
-                                new Point(34.440, 107.813),
-                                new Point(13.227, 73.373),
-                                new Point(39.182, 73.373)
-                        )
-                )
-                .setTangentHeadingInterpolation()
-                .build();
-        forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(40,0, Point.CARTESIAN)));
-        forwards.setConstantHeadingInterpolation(0);
-        backwards = new Path(new BezierLine(new Point(40,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
-        backwards.setConstantHeadingInterpolation(0);
 
-    }
 }

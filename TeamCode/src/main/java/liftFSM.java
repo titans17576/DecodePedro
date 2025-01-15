@@ -51,6 +51,7 @@ public class liftFSM {
             R.liftMotor.setPower(0.8);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //R.liftMotor.setPower(0);
+            actionBusy = true;
         }
     }
     private void moveTo(int position, double power) {
