@@ -19,6 +19,9 @@ public class robot{
     private List<DcMotorEx> motors;
     //public CRServo claw;
     public Servo claw, arm, extendo, intakeWrist, intakeClaw;
+    public robot() {
+
+    }
 
     public robot(HardwareMap hardwareMap) {
         /*
