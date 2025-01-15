@@ -43,7 +43,9 @@ public class Auto {
             curveControlPoint1Pose, curveControlPoint2Pose;
 
 
-    public PathChain moveCurve;
+    public PathChain moveCurve, push23, gather3;
+    public Path goal1, goal2, goal3, shift, backup2, backup3;
+
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         ClawFSM = new clawFSM(Robot, telemetry);
         LiftFSM = new liftFSM(Robot, telemetry);
@@ -83,6 +85,20 @@ public class Auto {
         }
     }
     public void buildPaths(){
+        switch(side){
+            case BUCKET:
+                break;
+            case OBSERVATION:
+                goal1 = follower.pathBuilder()
+                        .addPath(new BezierLine(new Point(startPose), new Point(specimen1Pose)))
+                        .setConstantHeadingInterpolation(Math.toRadians(0))
+                        .build();
+                moveCurve = follower.pathBuilder()
+                        .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)))
+                break;
+
+
+
         moveCurve = follower.pathBuilder()
                 .addPath(
                         new BezierCurve(
