@@ -80,7 +80,6 @@ public class Auto {
                 shift3Pose = new Pose(20, 25,Math.toRadians(180)) ;
                 pickup2Pose = new Pose(9.5, 25, Math.toRadians(180));
                 pickup3Pose = new Pose(9.5, 14, Math.toRadians(180));
-
                 break;
         }
     }
@@ -112,9 +111,9 @@ public class Auto {
                 )
                 .setTangentHeadingInterpolation()
                 .build();
-        forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(40,0, Point.CARTESIAN)));
+        forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(10,0, Point.CARTESIAN)));
         forwards.setConstantHeadingInterpolation(0);
-        backwards = new Path(new BezierLine(new Point(40,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
+        backwards = new Path(new BezierLine(new Point(10,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
         backwards.setConstantHeadingInterpolation(0);
 
     }
@@ -165,6 +164,8 @@ public class Auto {
     }
     public void setTransferState(int x) {
         transferState = x;
+        telemetry.addData("Transfer", x);
+
     }
 
     public void startTransfer() {
