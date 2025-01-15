@@ -78,8 +78,8 @@ public class Auto {
                 shortBack1Pose = new Pose(26.5, 71.5, Math.toRadians(0));
                 shift2Pose = new Pose(20, 14, Math.toRadians(180));
                 shift3Pose = new Pose(20, 25,Math.toRadians(180)) ;
-                pickup2Pose = new Pose(9.5, 25, Math.toRadians(180));
-                pickup3Pose = new Pose(9.5, 14, Math.toRadians(180));
+                pickup2Pose = new Pose(9.5, 14, Math.toRadians(180));
+                pickup3Pose = new Pose(9.5, 25, Math.toRadians(180));
                 break;
         }
     }
@@ -88,14 +88,28 @@ public class Auto {
             case BUCKET:
                 break;
             case OBSERVATION:
-                /*goal1 = follower.pathBuilder()
-                        .addPath(new BezierLine(new Point(startPose), new Point(specimen1Pose)))
-                        .setConstantHeadingInterpolation(Math.toRadians(0))
-                        .build();*/
-                moveCurve = follower.pathBuilder()
-                        .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)))
+                goal1 = new Path(new BezierCurve(new Point(startPose), new Point(specimen1Pose)));
+                goal1.setConstantHeadingInterpolation(specimen1Pose.getHeading());
+
+            moveCurve = follower.pathBuilder()
+                        .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)));
+                        .setConstantHeadingInterpolation(parkPose.getHeading())
+                        .addPath(new BezierCurve(new Point(shortBack1Pose), new Point(curveControlPoint1Pose), new Point(curveControlPoint2Pose),  Point(longBack2Pose)));
+                        .setLinearHeadingInterpolation(specimen1Pose.getHeading(), longBack2.getHeading());
                         .build();
                 break;
+
+            push23 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(longBack2Pose), new Point(pickup3Pose)));
+                    .setConstantHeadingInterpolation(pickup3Pose.getHeading());
+                    .addPath(new BezierLine(new Point(pickup3Pose), new Point(longBack2Pose)));
+                    .setConstantHeadingInterpolation(longBack2.getHeading());
+                    .addPath(new BezierLine(new Point(longBack2Pose), new Point(longBack3Pose)));
+                    .setConstantHeading(longBack2Pose.getHeading());
+                    .addPath(new BezierLine(new Point(longBack3Pose), new Point(pickup3Pose)));
+                    .setConstantHeadingInterpolation(longBack3Pose.getHeading());
+                    .build();
+            break;
         }
 
 
