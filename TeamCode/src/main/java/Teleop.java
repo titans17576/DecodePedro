@@ -129,7 +129,7 @@ public class Teleop extends OpMode {
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
-
+        telemetry.addData("Lift Ticks", R.liftMotor.getCurrentPosition());
         /* Update Telemetry to the Driver Hub */
         telemetry.update();
         previousGamepad1.copy(currentGamepad1);
