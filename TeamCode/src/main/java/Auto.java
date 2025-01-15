@@ -43,8 +43,8 @@ public class Auto {
             curveControlPoint1Pose, curveControlPoint2Pose;
 
 
-    public PathChain moveCurve, push23, gather3;
-    public Path goal1, goal2, goal3, shift, backup2, backup3;
+    public PathChain moveCurve, push23, gather3, goal2, goal3;
+    public Path goal1;
 
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         ClawFSM = new clawFSM(Robot, telemetry);
@@ -92,27 +92,52 @@ public class Auto {
                 goal1.setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
             moveCurve = follower.pathBuilder()
-                        .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)));
-                        .setConstantHeadingInterpolation(parkPose.getHeading())
-                        .addPath(new BezierCurve(new Point(shortBack1Pose), new Point(curveControlPoint1Pose), new Point(curveControlPoint2Pose),  Point(longBack2Pose)));
-                        .setLinearHeadingInterpolation(specimen1Pose.getHeading(), longBack2.getHeading());
+                        .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)))
+                        .setConstantHeadingInterpolation(shortBack1Pose.getHeading())
+                        .addPath(new BezierCurve(new Point(shortBack1Pose), new Point(curveControlPoint1Pose), new Point(curveControlPoint2Pose),  new Point(longBack2Pose)))
+                        .setLinearHeadingInterpolation(shortBack1Pose.getHeading(), longBack2Pose.getHeading())
                         .build();
-                break;
+
 
             push23 = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(longBack2Pose), new Point(pickup3Pose)));
-                    .setConstantHeadingInterpolation(pickup3Pose.getHeading());
-                    .addPath(new BezierLine(new Point(pickup3Pose), new Point(longBack2Pose)));
-                    .setConstantHeadingInterpolation(longBack2.getHeading());
-                    .addPath(new BezierLine(new Point(longBack2Pose), new Point(longBack3Pose)));
-                    .setConstantHeading(longBack2Pose.getHeading());
-                    .addPath(new BezierLine(new Point(longBack3Pose), new Point(pickup3Pose)));
-                    .setConstantHeadingInterpolation(longBack3Pose.getHeading());
+                    .addPath(new BezierLine(new Point(longBack2Pose), new Point(pickup3Pose)))
+                    .setConstantHeadingInterpolation(pickup3Pose.getHeading())
+                    .addPath(new BezierLine(new Point(pickup3Pose), new Point(longBack2Pose)))
+                    .setConstantHeadingInterpolation(longBack2Pose.getHeading())
+                    .addPath(new BezierLine(new Point(longBack2Pose), new Point(longBack3Pose)))
+                    .setConstantHeadingInterpolation(longBack2Pose.getHeading())
+                    .addPath(new BezierLine(new Point(longBack3Pose), new Point(pickup3Pose)))
+                    .setConstantHeadingInterpolation(longBack3Pose.getHeading())
                     .build();
-            backup2 = new Path(new BezierLine(new Point(pickup2Pose), new Point(shift2Pose)));
-            backup2.setConstantHeadingInterpolation(pickup2Pose.getHeading());
-            backup3 = new Path(new BezierLine(new Point(pickup3Pose), new Point(shift3Pose)));
-            backup3.setConstantHeadingInterpolation(pickup3Pose.getHeading());
+
+
+
+
+                goal2 = follower.pathBuilder()
+                        .addPath(new BezierLine(new Point(pickup2Pose), new Point(shift2Pose)))
+                    .setConstantHeadingInterpolation(pickup2Pose.getHeading())
+                    .addPath(new BezierLine(new Point(shift2Pose), new Point(shift3Pose)))
+                    .setConstantHeadingInterpolation(shift3Pose.getHeading())
+                    .addPath(new BezierCurve(new Point(shift3Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen2Pose)))
+                    .setLinearHeadingInterpolation(shift3Pose.getHeading(), specimen2Pose.getHeading())
+                    .build();
+
+             gather3 = follower.pathBuilder()
+                     .addPath(new BezierCurve(new Point(specimen2Pose), new Point(specimenControlPoint2Pose), new Point(specimenControlPoint1Pose), new Point(shift3Pose)))
+                     .setLinearHeadingInterpolation(specimen2Pose.getHeading(), shift3Pose.getHeading())
+                     .addPath(new BezierLine(new Point(shift3Pose), new Point(pickup3Pose)))
+                     .setConstantHeadingInterpolation(pickup3Pose.getHeading())
+                     .build();
+
+
+            goal3 = follower.pathBuilder()
+                    .addPath(new BezierLine(new Point(pickup3Pose), new Point(shift3Pose)))
+                    .setConstantHeadingInterpolation((shift3Pose.getHeading()))
+                    .addPath(new BezierCurve(new Point(shift3Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen3Pose)))
+                    .setLinearHeadingInterpolation(shift3Pose.getHeading(), specimen3Pose.getHeading())
+                    .build();
+
+
 
             break;
         }
