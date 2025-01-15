@@ -16,6 +16,7 @@ public class testAutom extends OpMode {
 
     public int pathState = -1;
     public Auto auto;
+
     public robot R;
     private final Pose startPose = new Pose(9.483535528596187, 107.06412478336222);
     public Timer pathTimer = new Timer();
@@ -23,7 +24,7 @@ public class testAutom extends OpMode {
 
     @Override
     public void init() {
-        R = new robot(hardwareMap);
+        R = new robot();
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);

@@ -179,7 +179,6 @@ public class Auto {
     public void setTransferState(int x) {
         transferState = x;
         telemetry.addData("Transfer", x);
-
     }
 
     public void startTransfer() {
