@@ -85,17 +85,19 @@ public class Auto {
         }
     }
     public void buildPaths(){
-        switch(side){
+        switch(side) {
             case BUCKET:
                 break;
             case OBSERVATION:
-                goal1 = follower.pathBuilder()
+                /*goal1 = follower.pathBuilder()
                         .addPath(new BezierLine(new Point(startPose), new Point(specimen1Pose)))
                         .setConstantHeadingInterpolation(Math.toRadians(0))
-                        .build();
+                        .build();*/
                 moveCurve = follower.pathBuilder()
                         .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)))
+                        .build();
                 break;
+        }
 
 
 
