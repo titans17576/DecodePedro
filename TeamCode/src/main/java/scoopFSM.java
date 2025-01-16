@@ -58,14 +58,14 @@ public class scoopFSM {
             case SCORE:
                 telemetry.addData("Scoop Moved", "TRUE");
                 // State inputs
-                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     setState(ScoopState.WAIT);
                 }
                 updateTelemetry("SCORED");
                 break;
             case WAIT:
                 telemetry.addData("Scoop Moved", "TRUE");
-                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     setState(ScoopState.SCORE);
                 }
                 updateTelemetry("WAITING");
