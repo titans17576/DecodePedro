@@ -28,6 +28,7 @@ public class Auto {
 
     public liftFSM LiftFSM;
     public clawFSM ClawFSM;
+    public scoopFSM ScoopFSM;
 
     private Side side;
     public Timer transferTimer = new Timer();
@@ -55,6 +56,7 @@ public class Auto {
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         ClawFSM = new clawFSM(Robot, telemetry);
         LiftFSM = new liftFSM(Robot, telemetry);
+        ScoopFSM = new scoopFSM(Robot, telemetry);
 
 
         this.follower = follower;
@@ -198,6 +200,7 @@ public class Auto {
         follower.update();
         LiftFSM.update();
         ClawFSM.update();
+        ScoopFSM.update();
 
 
         transfer(); 
@@ -254,13 +257,13 @@ public class Auto {
         switch(depositState){
             case 1:
                 actionBusy = true;
-                scoopFSM.setState(scoopFSM.ScoopState.SCORE);
+                ScoopFSM.setState(scoopFSM.ScoopState.SCORE);
                 depositTimer.resetTimer();
                 setDepositState(2);
                 break;
             case 2:
                 if(depositTimer.getElapsedTimeSeconds() > 0.5){
-                    scoopFSM.setState(scoopFSM.ScoopState.WAIT);
+                    ScoopFSM.setState(scoopFSM.ScoopState.WAIT);
                     depositTimer.resetTimer();
                     setDepositState(3);
                 }
