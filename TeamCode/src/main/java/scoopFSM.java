@@ -10,15 +10,15 @@ import util.robot;
 
 public class scoopFSM {
     public enum ScoopState{
-        CLOSED,
-        OPEN,
+        SCORE,
+        WAIT,
     }
 
 
     // Position variables
 
-    final double closed_position = 0.42;
-    final double open_position = 0.2;
+    final double score_position = 0.3;
+    final double wait_position = 0.95;
 
     // LiftState instance variable
 
@@ -55,20 +55,20 @@ public class scoopFSM {
 
         switch (scoopState) {
             // Lift set to 0
-            case CLOSED:
+            case SCORE:
                 telemetry.addData("Scoop Moved", "TRUE");
                 // State inputs
-                if (currentGamepad.a && !previousGamepad.a) {
-                    setState(scoopState.OPEN);
+                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                    setState(scoopState.WAIT);
                 }
-                updateTelemetry("CLOSED");
+                updateTelemetry("SCORED");
                 break;
-            case OPEN:
+            case WAIT:
                 telemetry.addData("Scoop Moved", "TRUE");
-                if (currentGamepad.a && !previousGamepad.a) {
-                    setState(ScoopState.CLOSED);
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+                    setState(ScoopState.SCORE);
                 }
-                updateTelemetry("OPEN");
+                updateTelemetry("WAITING");
                 break;
         }
         update();
@@ -83,11 +83,11 @@ public class scoopFSM {
     }
     public void update(){
         switch(scoopState) {
-            case CLOSED:
-                moveTo(closed_position);
+            case SCORE:
+                moveTo(score_position);
                 break;
-            case OPEN:
-                moveTo(open_position);
+            case WAIT:
+                moveTo(wait_position);
                 break;
 
         }
