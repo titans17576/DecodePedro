@@ -55,34 +55,69 @@ public class BlueObservation extends OpMode {
                 break;
             case 2:
                 if(auto.notBusy()) {
-                    auto.follower.followPath(auto.moveCurve, false);
+                    auto.startTransfer(1);
                     setPathState(3);
                 }
                 break;
             case 3:
-                if(auto.notBusy()){
-                    auto.follower.followPath(auto.push23, false);
+                if(auto.actionNotBusy()){
+                    auto.follower.followPath(auto.moveCurve, false);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if(){
-                    auto.follower.followPath(auto.goal2, false);
+                if(auto.notBusy()){
+                    auto.follower.followPath(auto.push23, false);
+                    setPathState(5);
                 }
-                setPathState(5);
-                break:
+                break;
             case 5:
-                if(){
-                    auto.follower.followPath(auto.gather3, false);
+                if(auto.notBusy()){
+                    auto.ClawFSM.setState(clawFSM.ClawState.CLOSED);
+                    pathTimer.resetTimer();
+                    setPathState(6);
                 }
-                setPathState(6);
                 break;
             case 6:
-                if(){
-                    auto.follower.followPath(auto.goal3, false);
+                if(pathTimer.getElapsedTimeSeconds() > 0.5){
+                    auto.follower.followPath(auto.goal2, false);
+                    setPathState(7);
                 }
-                setPathState(-1);
+                break:
+            case 7:
+                if(auto.notBusy()){
+                    auto.startTransfer(2);
+                    setPathState(8);
+                }
                 break;
+            case 8:
+                if(auto.actionNotBusy()){
+                    auto.follower.followPath(auto.gather3, false);
+                    setPathState(9);
+                }
+                break;
+            case 9:
+                if(auto.notBusy()){
+                    auto.ClawFSM.setState(clawFSM.ClawState.CLOSED);
+                    pathTimer.resetTimer();
+                    setPathState(10);
+                }
+                break;
+            case 10:
+                if(pathTimer.getElapsedTimeSeconds() > 0.5){
+                    auto.follower.followPath(auto.goal3, false);
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                if(auto.notBusy()){
+                    auto.startTransfer(3);
+                    setPathState(12);
+                }
+            case 12:
+                if(auto.notBusy()){
+                    setPathState(-1);
+                }
         }
     }
     public void setPathState(int x) {
