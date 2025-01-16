@@ -1,7 +1,5 @@
 import static java.lang.Math.abs;
 
-
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -17,8 +15,8 @@ public class clawFSM {
 
     // Position variables
 
-    final double closed_position = 0.42;
-    final double open_position = 0.2;
+    final double closed_position = 0.0;
+    final double open_position = 0.47;
 
     // LiftState instance variable
 

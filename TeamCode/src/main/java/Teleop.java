@@ -31,7 +31,7 @@ public class Teleop extends OpMode {
 
 
     private final Pose startPose = new Pose(0,0,0);
-    private double defaultSpeed = 0.45;
+    private double defaultSpeed = 0.55;
     private double highSpeed = 1;
 
     /** This method is call once when init is played, it initializes the follower **/
