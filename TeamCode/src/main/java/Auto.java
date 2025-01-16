@@ -31,7 +31,9 @@ public class Auto {
 
     private Side side;
     public Timer transferTimer = new Timer();
+    public Timer depositTimer = new Timer();
     public int transferState = -1, specimenNum = -1;
+    public int depositState = -1;
     public Path forwards, backwards;
 
 
@@ -248,9 +250,36 @@ public class Auto {
 
         }
     }
+    public void deposit(){
+        switch(depositState){
+            case 1:
+                actionBusy = true;
+                scoopFSM.setState(scoopFSM.ScoopState.SCORE);
+                depositTimer.resetTimer();
+                setDepositState(2);
+                break;
+            case 2:
+                if(depositTimer.getElapsedTimeSeconds() > 0.5){
+                    scoopFSM.setState(scoopFSM.ScoopState.WAIT);
+                    depositTimer.resetTimer();
+                    setDepositState(3);
+                }
+                break;
+            case 3:
+                if(depositTimer.getElapsedTimeSeconds() > 0.5){
+                    actionBusy = false;
+                    setDepositState(-1);
+                }
+        }
+    }
     public void setTransferState(int x) {
         transferState = x;
         telemetry.addData("Transfer", x);
+    }
+
+    public void setDepositState(int x){
+        depositState = x;
+        telemetry.addData("Deposit", x);
     }
 
     public void startTransfer(int specimenNum) {
@@ -260,6 +289,13 @@ public class Auto {
         }
 
     }
+    public void startDesposit(){
+        if (actionNotBusy()) {
+            setDepositState(1);
+        }
+    }
+
+
     public boolean actionNotBusy() {
         return !actionBusy;
     }
