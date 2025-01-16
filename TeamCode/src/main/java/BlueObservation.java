@@ -83,7 +83,7 @@ public class BlueObservation extends OpMode {
                     auto.follower.followPath(auto.goal2, false);
                     setPathState(7);
                 }
-                break:
+                break;
             case 7:
                 if(auto.notBusy()){
                     auto.startTransfer(2);

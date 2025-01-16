@@ -26,12 +26,15 @@ public class Auto {
     private robot R;
     public boolean actionBusy;
 
-    private liftFSM LiftFSM;
-    private clawFSM ClawFSM;
+    public liftFSM LiftFSM;
+    public clawFSM ClawFSM;
+    public scoopFSM ScoopFSM;
 
     private Side side;
     public Timer transferTimer = new Timer();
+    public Timer depositTimer = new Timer();
     public int transferState = -1, specimenNum = -1;
+    public int depositState = -1;
     public Path forwards, backwards;
 
 
@@ -53,6 +56,7 @@ public class Auto {
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         ClawFSM = new clawFSM(Robot, telemetry);
         LiftFSM = new liftFSM(Robot, telemetry);
+        ScoopFSM = new scoopFSM(Robot, telemetry);
 
 
         this.follower = follower;
@@ -196,6 +200,7 @@ public class Auto {
         follower.update();
         LiftFSM.update();
         ClawFSM.update();
+        ScoopFSM.update();
 
 
         transfer(); 
@@ -248,9 +253,36 @@ public class Auto {
 
         }
     }
+    public void deposit(){
+        switch(depositState){
+            case 1:
+                actionBusy = true;
+                ScoopFSM.setState(scoopFSM.ScoopState.SCORE);
+                depositTimer.resetTimer();
+                setDepositState(2);
+                break;
+            case 2:
+                if(depositTimer.getElapsedTimeSeconds() > 0.5){
+                    ScoopFSM.setState(scoopFSM.ScoopState.WAIT);
+                    depositTimer.resetTimer();
+                    setDepositState(3);
+                }
+                break;
+            case 3:
+                if(depositTimer.getElapsedTimeSeconds() > 0.5){
+                    actionBusy = false;
+                    setDepositState(-1);
+                }
+        }
+    }
     public void setTransferState(int x) {
         transferState = x;
         telemetry.addData("Transfer", x);
+    }
+
+    public void setDepositState(int x){
+        depositState = x;
+        telemetry.addData("Deposit", x);
     }
 
     public void startTransfer(int specimenNum) {
@@ -260,6 +292,13 @@ public class Auto {
         }
 
     }
+    public void startDesposit(){
+        if (actionNotBusy()) {
+            setDepositState(1);
+        }
+    }
+
+
     public boolean actionNotBusy() {
         return !actionBusy;
     }
