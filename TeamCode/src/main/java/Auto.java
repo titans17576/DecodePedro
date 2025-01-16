@@ -26,8 +26,8 @@ public class Auto {
     private robot R;
     public boolean actionBusy;
 
-    private liftFSM LiftFSM;
-    private clawFSM ClawFSM;
+    public liftFSM LiftFSM;
+    public clawFSM ClawFSM;
 
     private Side side;
     public Timer transferTimer = new Timer();

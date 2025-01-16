@@ -27,10 +27,10 @@ public class scoopFSM {
     ScoopState scoopState;
 
     // Import opmode variables when instance is created
-    public sccopFSM(robot Robot, Telemetry t) {
+    public scoopFSM(robot Robot, Telemetry t) {
         this(Robot, t, ScoopState.CLOSED);
     }
-    public sccopFSM(robot Robot, Telemetry t, ScoopState cS) {
+    public scoopFSM(robot Robot, Telemetry t, ScoopState cS) {
         R = Robot;
         telemetry = t;
         scoopState = cS;
@@ -75,9 +75,9 @@ public class scoopFSM {
     }
     public void testUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         updateTelemetry("Test");
-        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
+        if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
             R.arm.setPosition(0.3);
-        } else if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
+        } else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
             R.arm.setPosition(0.95);
         }
     }
