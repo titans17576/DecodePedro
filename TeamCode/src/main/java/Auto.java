@@ -241,7 +241,9 @@ public class Auto {
             case 7:
                 if(!follower.isBusy()){
                     actionBusy = false;
+                    specimenNum = -1;
                     setTransferState(-1);
+
                 }
 
         }
