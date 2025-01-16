@@ -224,12 +224,10 @@ public class Auto {
                     ClawFSM.setState(clawFSM.ClawState.OPEN);
                     transferTimer.resetTimer();
                     setTransferState(5);
-
-
                 }
                 break;
             case 5:
-                if (transferTimer.getElapsedTimeSecounds() > 0.5) {
+                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
                     LiftFSM.setState(liftFSM.LiftState.ZERO);
                     setTransferState(6);
                 }
@@ -242,7 +240,7 @@ public class Auto {
                 break;
             case 7:
                 if(!follower.isBusy()){
-                    action = false;
+                    actionBusy = false;
                     setTransferState(-1);
                 }
 
