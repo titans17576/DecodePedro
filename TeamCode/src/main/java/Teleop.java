@@ -104,9 +104,9 @@ public class Teleop extends OpMode {
         }
 
         if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
-            R.extendo.setPosition(0.64);
+            R.extendo.setPosition(0.16);
         } else if (gamepad2.right_bumper && !previousGamepad2.right_bumper) {
-            R.extendo.setPosition(0.45);
+            R.extendo.setPosition(0.38);
         }
 
         if (gamepad2.x && !previousGamepad2.x) {
