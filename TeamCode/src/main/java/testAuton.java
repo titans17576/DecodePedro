@@ -9,7 +9,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 import util.robot;
 
-@Autonomous(name="testAuton")
+/*@Autonomous(name="testAuton")
 public class testAuton extends OpMode {
     private Follower follower;
 
@@ -61,4 +61,4 @@ public class testAuton extends OpMode {
         pathState = x;
         pathTimer.resetTimer();
     }
-}
+}*/

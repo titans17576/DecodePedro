@@ -18,7 +18,7 @@ public class robot{
     // public DcMotorEx leftFront, leftRear, rightRear, rightFront,
     private List<DcMotorEx> motors;
     //public CRServo claw;
-    public Servo claw, arm, extendo, intakeWrist, intakeClaw;
+    public Servo claw, arm, extendo, intakeWrist, intakeClaw, specArm, intakeWrist2;
     public robot() {
 
     }
@@ -31,11 +31,12 @@ public class robot{
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
          */
         arm = hardwareMap.get(Servo.class, "armServo");
-        //claw = hardwareMap.get(CRServo.class, "clawServo");
         claw = hardwareMap.get(Servo.class, "clawServo");
         extendo = hardwareMap.get(Servo.class, "extendoServo");
         intakeWrist = hardwareMap.get(Servo.class, "intakeWristServo");
         intakeClaw = hardwareMap.get(Servo.class, "intakeClawServo");
+        specArm = hardwareMap.get(Servo.class, "specArmServo");
+        /*intakeWrist2 = hardwareMap.get(Servo.class, "intakeWrist2Servo");*/
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
 
         /*leftFront.setPower(0);

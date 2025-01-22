@@ -4,6 +4,7 @@ import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import pedroPathing.constants.FConstants;
@@ -61,6 +62,8 @@ public class Teleop extends OpMode {
     public void start() {
         follower.startTeleopDrive();
         LiftFSM.initialize();
+        R.intakeWrist.setPosition(0.45);
+        R.extendo.setPosition(0.16);
 
     }
 
@@ -96,33 +99,48 @@ public class Teleop extends OpMode {
         } else if (R.liftMotor.getTargetPosition() > 3000) {
             R.liftMotor.setTargetPosition(3000);
         }
-
+        /*score-return*/
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
             R.arm.setPosition(0.3);
         } else if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-            R.arm.setPosition(0.95);
+            R.arm.setPosition(0.9);
         }
-
+        /*retract-extend*/
         if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
             R.extendo.setPosition(0.16);
         } else if (gamepad2.right_bumper && !previousGamepad2.right_bumper) {
             R.extendo.setPosition(0.38);
         }
-
+        /*down-transfer-mid*/
         if (gamepad2.x && !previousGamepad2.x) {
-            R.intakeWrist.setPosition(0.0);
+            R.intakeWrist.setPosition(0.09);
         } else if (gamepad2.y && !previousGamepad2.y) {
-            R.intakeWrist.setPosition(0.7);
+            R.intakeWrist.setPosition(0.85);
         } else if (gamepad2.a && !previousGamepad2.a) {
-            R.intakeWrist.setPosition(0.5);
+            R.intakeWrist.setPosition(0.45);
         }
-
-        if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
-            R.intakeClaw.setPosition(0.8);
-        } else if (gamepad2.dpad_up && !previousGamepad2.dpad_up) {
-            R.intakeClaw.setPosition(0.5);
+        /*close-open*/
+        if (gamepad2.dpad_up && !previousGamepad2.dpad_up) {
+            R.intakeClaw.setPosition(0.2);
         } else if (gamepad2.dpad_down && !previousGamepad2.dpad_down) {
-            R.intakeClaw.setPosition(1);
+            R.intakeClaw.setPosition(0.5);
+        }
+        /*pickup-score*/
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
+            R.specArm.setPosition(0.81);
+        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
+            R.specArm.setPosition(1);
+        }
+        /*emergency motor encoder reset*/
+        if (gamepad1.y && !previousGamepad1.y) {
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            R.liftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+            R.liftMotor.setPower(1);
+        } else if (gamepad1.b && !previousGamepad1.b) {
+            R.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            R.liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            R.liftMotor.setPower(0);
+            R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
         /* Telemetry Outputs of our Follower */

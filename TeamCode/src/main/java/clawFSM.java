@@ -15,8 +15,8 @@ public class clawFSM {
 
     // Position variables
 
-    final double closed_position = 0.0;
-    final double open_position = 0.47;
+    final double closed_position = 0;
+    final double open_position = 0.35;
 
     // LiftState instance variable
 
