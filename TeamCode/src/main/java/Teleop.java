@@ -126,11 +126,7 @@ public class Teleop extends OpMode {
             R.intakeClaw.setPosition(0.5);
         }
         /*pickup-score*/
-        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
-            R.specArm.setPosition(0.81);
-        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
-            R.specArm.setPosition(1);
-        }
+
         /*emergency motor encoder reset*/
         if (gamepad1.y && !previousGamepad1.y) {
             R.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

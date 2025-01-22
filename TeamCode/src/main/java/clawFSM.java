@@ -7,9 +7,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import util.robot;
 
 public class clawFSM {
-    public enum ClawState{
+    public enum ClawGrabState{
         CLOSED,
         OPEN,
+    }
+    public enum ClawWristState{
+        DOWN,
+        UP
     }
 
 
@@ -17,28 +21,35 @@ public class clawFSM {
 
     final double closed_position = 0;
     final double open_position = 0.35;
+    final double down_position = 0.81; // Insert a number
+    final double up_position = 1; // Insert a numbber
 
     // LiftState instance variable
 
     robot R;
     Telemetry telemetry;
-    ClawState clawState;
+    ClawGrabState clawGrabState;
+    ClawWristState clawWristState;
 
     // Import opmode variables when instance is created
     public clawFSM(robot Robot, Telemetry t) {
-        this(Robot, t, ClawState.CLOSED);
+        this(Robot, t, ClawGrabState.CLOSED, ClawWristState.DOWN);
     }
-    public clawFSM(robot Robot, Telemetry t, ClawState cS) {
+    public clawFSM(robot Robot, Telemetry t, ClawGrabState cG, ClawWristState cW) {
         R = Robot;
         telemetry = t;
-        clawState = cS;
+        clawWristState = cW;
+        clawGrabState = cG;
     }
     //public void initialize() {
     //}
 
     // Method to move to a targeted position
-    private void moveTo(Double position) {
+    private void moveGrabTo(Double position) {
         R.claw.setPosition(position);
+    }
+    private void moveWristTo(Double position) {
+        R.specArm.setPosition(position);
     }
 
     // Method to add encoders and status to telemetry
@@ -51,23 +62,37 @@ public class clawFSM {
     public void teleopUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         telemetry.addLine("Lift Data");
 
-        switch (clawState) {
+        switch (clawGrabState) {
             // Lift set to 0
             case CLOSED:
                 telemetry.addData("Claw Moved", "TRUE");
             // State inputs
                 if (currentGamepad.a && !previousGamepad.a) {
-                    setState(ClawState.OPEN);
+                    setGrabState(ClawGrabState.OPEN);
                 }
                 updateTelemetry("CLOSED");
                 break;
             case OPEN:
                 telemetry.addData("Claw Moved", "TRUE");
                 if (currentGamepad.a && !previousGamepad.a) {
-                    setState(ClawState.CLOSED);
+                    setGrabState(ClawGrabState.CLOSED);
                 }
                 updateTelemetry("OPEN");
                 break;
+        }
+
+        switch(clawWristState){
+            case DOWN:
+                if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+                    setWristState(ClawWristState.UP);
+                }
+                break;
+            case UP:
+                if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
+                    setWristState(ClawWristState.DOWN);
+                }
+            break;
+
         }
         update();
     }
@@ -78,20 +103,35 @@ public class clawFSM {
         } else if (currentGamepad.b && !previousGamepad.b) {
             R.claw.setPosition(0.42);
         }
-    }
-    public void update(){
-        switch(clawState) {
-            case CLOSED:
-                moveTo(closed_position);
-                break;
-            case OPEN:
-                moveTo(open_position);
-                break;
-
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
+            R.specArm.setPosition(0.81);
+        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
+            R.specArm.setPosition(1);
         }
     }
-    public void setState(ClawState state){
-        clawState = state;
+    public void update(){
+        switch(clawGrabState) {
+            case CLOSED:
+                moveGrabTo(closed_position);
+                break;
+            case OPEN:
+                moveGrabTo(open_position);
+                break;
+        }
+        switch(clawWristState){
+            case DOWN:
+                moveWristTo(down_position);
+                break;
+            case UP:
+                moveWristTo(up_position);
+                break;
+        }
+    }
+    public void setGrabState(ClawState state){
+        clawGrabState = state;
+    }
+    public void setWristState(ClawState state){
+        clawWristState = state;
     }
 }
 
