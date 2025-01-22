@@ -83,12 +83,12 @@ public class clawFSM {
 
         switch(clawWristState){
             case DOWN:
-                if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+                if (currentGamepad.dpad_left && !previousGamepad.dpad_left){
                     setWristState(ClawWristState.UP);
                 }
                 break;
             case UP:
-                if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
+                if (currentGamepad.dpad_right && !previousGamepad.dpad_right){
                     setWristState(ClawWristState.DOWN);
                 }
             break;
@@ -103,9 +103,9 @@ public class clawFSM {
         } else if (currentGamepad.b && !previousGamepad.b) {
             R.claw.setPosition(0.42);
         }
-        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
+        if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
             R.specArm.setPosition(0.81);
-        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
+        } else if (currentGamepad.dpad_left && !previousGamepad.dpad_left) {
             R.specArm.setPosition(1);
         }
     }
@@ -127,10 +127,10 @@ public class clawFSM {
                 break;
         }
     }
-    public void setGrabState(ClawState state){
+    public void setGrabState(ClawGrabState state){
         clawGrabState = state;
     }
-    public void setWristState(ClawState state){
+    public void setWristState(ClawWristState state){
         clawWristState = state;
     }
 }
