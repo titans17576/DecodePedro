@@ -283,20 +283,20 @@ public class Auto {
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
                     ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
                     transferTimer.resetTimer();
-                    setFakeTransferState(5);
+                    setFakeTransferState(4);
                 }
                 break;
             case 4:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
                     ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
                     transferTimer.resetTimer();
-                    setFakeTransferState(7);
+                    setFakeTransferState(5);
                 }
                 break;
             case 5:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
                     LiftFSM.setState(liftFSM.LiftState.ZERO);
-                    setFakeTransferState(8);
+                    setFakeTransferState(6);
                 }
                 break;
 
