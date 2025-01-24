@@ -33,8 +33,10 @@ public class Auto {
     private Side side;
     public Timer transferTimer = new Timer();
     public Timer depositTimer = new Timer();
+    public Timer otherDepositTimer = new Timer();
     public int transferState = -1, specimenNum = -1;
     public int depositState = -1;
+    public int otherDepositState = -1;
     public int fakeTransferState = -1;
     public Path forwards, backwards;
 
@@ -334,6 +336,44 @@ public class Auto {
                 }
         }
     }
+
+    public void otherDeposit(){
+        switch(otherDepositState){
+            case 1:
+                actionBusy = true;
+                LiftFSM.setState(liftFSM.LiftState.MID);
+                setOtherDepositState(2);
+                break;
+            case 2:
+                if (LiftFSM.actionNotBusy()) {
+                    ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
+                    otherDepositTimer.resetTimer();
+                    setOtherDepositState(3);
+                }
+                break;
+            case 3:
+                if (otherDepositTimer.getElapsedTimeSeconds() > 0.5) {
+                    ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
+                    otherDepositTimer.resetTimer();
+                    setOtherDepositState(4);
+                }
+                break;
+            case 4:
+                if(otherDepositTimer.getElapsedTimeSeconds()> 0.5){
+                    LiftFSM.setState(liftFSM.LiftState.ZERO);
+                    setOtherDepositState(5);
+                }
+                break;
+
+            case 5:
+                if(LiftFSM.actionNotBusy()) {
+                    setOtherDepositState(-1);
+                    actionBusy = false;
+                }
+                break;
+        }
+
+    }
     public void setTransferState(int x) {
         transferState = x;
         telemetry.addData("Transfer", x);
@@ -349,6 +389,11 @@ public class Auto {
         telemetry.addData("Deposit", x);
     }
 
+    public void setOtherDepositState(int x){
+        otherDepositState = x;
+        telemetry.addData("Deposit", x);
+    }
+
     public void startTransfer(int specimenNum) {
         if (actionNotBusy()) {
             setTransferState(1);
@@ -359,6 +404,12 @@ public class Auto {
     public void startDesposit(){
         if (actionNotBusy()) {
             setDepositState(1);
+        }
+    }
+    
+    public void startOtherDeposit(){
+        if (actionNotBusy()){
+            setOtherDepositState(1);
         }
     }
 
