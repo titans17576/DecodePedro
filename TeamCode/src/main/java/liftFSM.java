@@ -21,7 +21,7 @@ public class liftFSM {
     final int zero_position = 0;
     int low_position = 300;
     final int mid_position = 1150; // max we could reach was like 1500 ticks so idk
-    final int high_position = 2600;
+    final int high_position = 1450;
 
     // LiftState instance variable
     LiftState liftState = LiftState.ZERO;
@@ -109,10 +109,9 @@ public class liftFSM {
         }
         if (currentGamepad.right_trigger >= 0.5 && previousGamepad.right_trigger < 0.5) {
            setState(LiftState.LOW);
-            R.specArm.setPosition(0.81);
         }
         if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
-            R.specArm.setPosition(1);
+            R.specArm.setPosition(0.81);
             setState(LiftState.ZERO);
 
         }
