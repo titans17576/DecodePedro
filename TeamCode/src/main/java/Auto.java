@@ -35,6 +35,7 @@ public class Auto {
     public Timer depositTimer = new Timer();
     public int transferState = -1, specimenNum = -1;
     public int depositState = -1;
+    public int fakeTransferState = -1;
     public Path forwards, backwards;
 
 
@@ -203,7 +204,8 @@ public class Auto {
         ScoopFSM.update();
 
 
-        transfer(); 
+        transfer();
+        fakeTransfer();
     }
     public void transfer(){
         switch(transferState){
@@ -262,6 +264,54 @@ public class Auto {
 
         }
     }
+
+    public void fakeTransfer(){
+        switch(fakeTransferState){
+            case 1:
+                actionBusy = true;
+                LiftFSM.setState(liftFSM.LiftState.MID);
+                setFakeTransferState(2);
+                break;
+            case 2:
+                if(LiftFSM.actionNotBusy()){
+                    ClawFSM.setWristState(clawFSM.ClawWristState.UP);
+                    transferTimer.resetTimer();
+                    setFakeTransferState(3);
+                }
+                break;
+            case 3:
+                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
+                    ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
+                    transferTimer.resetTimer();
+                    setFakeTransferState(5);
+                }
+                break;
+            case 4:
+                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
+                    ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
+                    transferTimer.resetTimer();
+                    setFakeTransferState(7);
+                }
+                break;
+            case 5:
+                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
+                    LiftFSM.setState(liftFSM.LiftState.ZERO);
+                    setFakeTransferState(8);
+                }
+                break;
+
+            case 6:
+                if(LiftFSM.actionNotBusy()){
+                    actionBusy = false;
+                    specimenNum = -1;
+                    setFakeTransferState(-1);
+
+                }
+
+        }
+
+    }
+
     public void deposit(){
         switch(depositState){
             case 1:
@@ -285,6 +335,11 @@ public class Auto {
         }
     }
     public void setTransferState(int x) {
+        transferState = x;
+        telemetry.addData("Transfer", x);
+    }
+
+    public void setFakeTransferState(int x) {
         transferState = x;
         telemetry.addData("Transfer", x);
     }
