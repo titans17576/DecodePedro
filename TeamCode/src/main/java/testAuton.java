@@ -9,14 +9,14 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 import util.robot;
 
-/*@Autonomous(name="testAuton")
+@Autonomous(name="testAuton")
 public class testAuton extends OpMode {
     private Follower follower;
 
     public int pathState = -1;
     public Auto auto;
     public robot R;
-    private final Pose startPose = new Pose(9.483535528596187, 107.06412478336222);
+    private final Pose startPose = new Pose(0,0);
     public Timer pathTimer = new Timer();
 
 
@@ -48,7 +48,7 @@ public class testAuton extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                auto.startTransfer();
+                auto.startDeposit();
                 setPathState(2);
                 break;
             case 2:
@@ -61,4 +61,4 @@ public class testAuton extends OpMode {
         pathState = x;
         pathTimer.resetTimer();
     }
-}*/
+}

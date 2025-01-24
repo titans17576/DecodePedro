@@ -73,7 +73,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 5:
                 if(auto.notBusy()){
-                    auto.ClawFSM.setState(clawFSM.ClawState.CLOSED);
+                    auto.ClawFSM.setGrabState(clawFSM.ClawGrabState.CLOSED);
                     pathTimer.resetTimer();
                     setPathState(6);
                 }
@@ -98,7 +98,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 9:
                 if(auto.notBusy()){
-                    auto.ClawFSM.setState(clawFSM.ClawState.CLOSED);
+                    auto.ClawFSM.setGrabState(clawFSM.ClawGrabState.CLOSED);
                     pathTimer.resetTimer();
                     setPathState(10);
                 }
