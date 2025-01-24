@@ -18,7 +18,7 @@ public class scoopFSM {
     // Position variables
 
     final double score_position = 0.3;
-    final double wait_position = 0.95;
+    final double wait_position = 0.9;
 
     // LiftState instance variable
 
