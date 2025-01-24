@@ -203,8 +203,7 @@ public class Auto {
         ScoopFSM.update();
 
 
-        transfer();
-        deposit();
+        transfer(); 
     }
     public void transfer(){
         switch(transferState){
@@ -217,7 +216,7 @@ public class Auto {
                 if(LiftFSM.actionNotBusy()){
                     ClawFSM.setWristState(clawFSM.ClawWristState.UP);
                     transferTimer.resetTimer();
-                    setTransferState(4);
+                    setTransferState(3);
                 }
                 break;
             case 3:
@@ -231,7 +230,7 @@ public class Auto {
                     ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
                     transferTimer.resetTimer();
                     setTransferState(5);
-                }
+            }
                 break;
             case 5:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
@@ -272,14 +271,14 @@ public class Auto {
                 setDepositState(2);
                 break;
             case 2:
-                if(depositTimer.getElapsedTimeSeconds() > 1.25){
+                if(depositTimer.getElapsedTimeSeconds() > 0.5){
                     ScoopFSM.setState(scoopFSM.ScoopState.WAIT);
                     depositTimer.resetTimer();
                     setDepositState(3);
                 }
                 break;
             case 3:
-                if(depositTimer.getElapsedTimeSeconds() > 3.5){
+                if(depositTimer.getElapsedTimeSeconds() > 0.5){
                     actionBusy = false;
                     setDepositState(-1);
                 }
@@ -300,8 +299,9 @@ public class Auto {
             setTransferState(1);
             this.specimenNum = specimenNum;
         }
+
     }
-    public void startDeposit(){
+    public void startDesposit(){
         if (actionNotBusy()) {
             setDepositState(1);
         }
