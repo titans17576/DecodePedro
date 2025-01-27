@@ -48,11 +48,11 @@ public class testAuton extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                auto.startDeposit();
+                auto.startSpecScore();
                 setPathState(2);
                 break;
             case 2:
-                if(auto.actionNotBusy()){
+                if(auto.specScoreTimer.getElapsedTimeSeconds() > 10){
                     setPathState(-1);
                 }
         }

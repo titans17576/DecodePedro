@@ -20,7 +20,7 @@ public class clawFSM {
     // Position variables
 
     final double closed_position = 0;
-    final double open_position = 0.35;
+    final double open_position = 0.33;
     final double down_position = 0.81; // Insert a number
     final double up_position = 1; // Insert a numbber
 

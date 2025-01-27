@@ -32,11 +32,13 @@ public class Auto {
 
     private Side side;
     public Timer transferTimer = new Timer();
+    public Timer specScoreTimer = new Timer();
     public Timer depositTimer = new Timer();
-    public Timer otherDepositTimer = new Timer();
+    public Timer postSpecScoreTimer = new Timer();
     public int transferState = -1, specimenNum = -1;
     public int depositState = -1;
-    public int otherDepositState = -1;
+    public int scoreSpecState = -1;
+    public int postSpecScoreState = -1;
     public int fakeTransferState = -1;
     public Path forwards, backwards;
 
@@ -69,7 +71,7 @@ public class Auto {
         createPose();
         buildPaths();
 
-        init();
+        /*init();*/
     }
     public void createPose(){
         switch(side){
@@ -194,7 +196,7 @@ public class Auto {
 
     }
     public void init() {
-        LiftFSM.initialize();
+
     }
     public void start(){
 
@@ -206,8 +208,9 @@ public class Auto {
         ScoopFSM.update();
 
 
-        transfer();
-        fakeTransfer();
+        /*transfer();
+        fakeTransfer();*/
+        scoreSpec();
     }
     public void transfer(){
         switch(transferState){
@@ -323,51 +326,74 @@ public class Auto {
                 setDepositState(2);
                 break;
             case 2:
-                if(depositTimer.getElapsedTimeSeconds() > 0.5){
+                if(depositTimer.getElapsedTimeSeconds() > 1.25){
                     ScoopFSM.setState(scoopFSM.ScoopState.WAIT);
                     depositTimer.resetTimer();
                     setDepositState(3);
                 }
                 break;
             case 3:
-                if(depositTimer.getElapsedTimeSeconds() > 0.5){
+                if(depositTimer.getElapsedTimeSeconds() > 4){
                     actionBusy = false;
                     setDepositState(-1);
                 }
         }
     }
 
-    public void otherDeposit(){
-        switch(otherDepositState){
+    public void scoreSpec(){
+        switch(scoreSpecState){
+            case 1:
+                actionBusy = true;
+                ClawFSM.setGrabState(clawFSM.ClawGrabState.CLOSED);
+                LiftFSM.setState(liftFSM.LiftState.MID);
+                specScoreTimer.resetTimer();
+                setScoreSpecState(2);
+                break;
+            case 2:
+                if(specScoreTimer.getElapsedTimeSeconds() > 1.5){
+                    actionBusy = false;
+                    ClawFSM.setWristState(clawFSM.ClawWristState.UP);
+                    setScoreSpecState(3);
+                }
+                break;
+            case 3:
+                if(specScoreTimer.getElapsedTimeSeconds() > 4){
+                    setDepositState(-1);
+                }
+        }
+    }
+
+    public void postSpecScore(){
+        switch(postSpecScoreState){
             case 1:
                 actionBusy = true;
                 LiftFSM.setState(liftFSM.LiftState.MID);
-                setOtherDepositState(2);
+                setPostSpecScoreState(2);
                 break;
             case 2:
                 if (LiftFSM.actionNotBusy()) {
                     ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
-                    otherDepositTimer.resetTimer();
-                    setOtherDepositState(3);
+                    postSpecScoreTimer.resetTimer();
+                    setPostSpecScoreState(3);
                 }
                 break;
             case 3:
-                if (otherDepositTimer.getElapsedTimeSeconds() > 0.5) {
+                if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
                     ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
-                    otherDepositTimer.resetTimer();
-                    setOtherDepositState(4);
+                    postSpecScoreTimer.resetTimer();
+                    setPostSpecScoreState(4);
                 }
                 break;
             case 4:
-                if(otherDepositTimer.getElapsedTimeSeconds()> 0.5){
+                if(postSpecScoreTimer.getElapsedTimeSeconds() > 0.5){
                     LiftFSM.setState(liftFSM.LiftState.ZERO);
-                    setOtherDepositState(5);
+                    setPostSpecScoreState(5);
                 }
                 break;
 
             case 5:
                 if(LiftFSM.actionNotBusy()) {
-                    setOtherDepositState(-1);
+                    setPostSpecScoreState(-1);
                     actionBusy = false;
                 }
                 break;
@@ -388,10 +414,14 @@ public class Auto {
         depositState = x;
         telemetry.addData("Deposit", x);
     }
+    public void setScoreSpecState(int x){
+        scoreSpecState = x;
+        telemetry.addData("ScoreSpec", x);
+    }
 
-    public void setOtherDepositState(int x){
-        otherDepositState = x;
-        telemetry.addData("Deposit", x);
+    public void setPostSpecScoreState(int x){
+        postSpecScoreState = x;
+        telemetry.addData("PostScoreSpec", x);
     }
 
     public void startTransfer(int specimenNum) {
@@ -401,15 +431,20 @@ public class Auto {
         }
 
     }
-    public void startDesposit(){
+    public void startDeposit(){
         if (actionNotBusy()) {
             setDepositState(1);
         }
     }
+    public void startSpecScore(){
+        if (actionNotBusy()) {
+            setScoreSpecState(1);
+        }
+    }
     
-    public void startOtherDeposit(){
+    public void startPostSpecScore(){
         if (actionNotBusy()){
-            setOtherDepositState(1);
+            setPostSpecScoreState(1);
         }
     }
 

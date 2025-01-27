@@ -16,15 +16,14 @@ public class testAutom extends OpMode {
 
     public int pathState = -1;
     public Auto auto;
-
     public robot R;
-    private final Pose startPose = new Pose(9.483535528596187, 107.06412478336222);
+    private final Pose startPose = new Pose(0, 0);
     public Timer pathTimer = new Timer();
 
 
     @Override
     public void init() {
-        R = new robot();
+        R = new robot(hardwareMap);
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
@@ -51,7 +50,6 @@ public class testAutom extends OpMode {
         switch (pathState) {
             case 1:
                 auto.follower.followPath(auto.forwards, false);
-
                 setPathState(2);
                 break;
             case 2:

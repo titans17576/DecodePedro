@@ -20,15 +20,15 @@ public class FConstants {
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.REVERSE;
 
-        FollowerConstants.mass = 11.1;
+        FollowerConstants.mass = 9.797595;
 
-        FollowerConstants.xMovement = 88.4606;
-        FollowerConstants.yMovement = 71.3092;
+        FollowerConstants.xMovement = 75.66197313343535;
+        FollowerConstants.yMovement = 62.6259307236759;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -30.9582;
-        FollowerConstants.lateralZeroPowerAcceleration = -59.9975;
+        FollowerConstants.forwardZeroPowerAcceleration = -31.34114681296385;
+        FollowerConstants.lateralZeroPowerAcceleration = -58.07368329526205;
 
-        FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.05,0,0.08,0);
+        FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.1,0,0.04,0);
         FollowerConstants.useSecondaryTranslationalPID = false;
         FollowerConstants.secondaryTranslationalPIDFCoefficients.setCoefficients(0.1,0,0.01,0); // Not being used, @see useSecondaryTranslationalPID
 
@@ -36,15 +36,15 @@ public class FConstants {
         FollowerConstants.useSecondaryHeadingPID = false;
         FollowerConstants.secondaryHeadingPIDFCoefficients.setCoefficients(2,0,0.1,0); // Not being used, @see useSecondaryHeadingPID
 
-        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.0058,0,0.0001,0.6,0);
+        FollowerConstants.drivePIDFCoefficients.setCoefficients(0.013,0,0.00003,0.6,0);
         FollowerConstants.useSecondaryDrivePID = false;
         FollowerConstants.secondaryDrivePIDFCoefficients.setCoefficients(0.1,0,0,0.6,0); // Not being used, @see useSecondaryDrivePID
 
-        FollowerConstants.zeroPowerAccelerationMultiplier = 2;
+        FollowerConstants.zeroPowerAccelerationMultiplier = 4;
         FollowerConstants.centripetalScaling = 0.0002;
         FollowerConstants.useBrakeModeInTeleOp = true;
 
-        FollowerConstants.pathEndTimeoutConstraint = 150;
+        FollowerConstants.pathEndTimeoutConstraint = 100;
         FollowerConstants.pathEndTValueConstraint = 0.99;
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
