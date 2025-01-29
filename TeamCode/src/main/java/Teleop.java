@@ -27,8 +27,7 @@ public class Teleop extends OpMode {
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
 
-    private liftFSM LiftFSM;
-    private clawFSM ClawFSM;
+    private specimenFSM SpecimenFSM;
 
 
     private final Pose startPose = new Pose(0,0,0);
@@ -47,9 +46,7 @@ public class Teleop extends OpMode {
         previousGamepad2 = new Gamepad();
 
         R = new robot(hardwareMap);
-        LiftFSM = new liftFSM(R, telemetry);
-        ClawFSM = new clawFSM(R, telemetry);
-
+        SpecimenFSM = new specimenFSM(R, telemetry);
     }
 
     /** This method is called continuously after Init while waiting to be started. **/
@@ -61,7 +58,7 @@ public class Teleop extends OpMode {
     @Override
     public void start() {
         follower.startTeleopDrive();
-        LiftFSM.initialize();
+        SpecimenFSM.initialize();
         R.intakeWrist.setPosition(0.45);
         R.extendo.setPosition(0.16);
 
@@ -84,8 +81,7 @@ public class Teleop extends OpMode {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
-        LiftFSM.teleopUpdate(currentGamepad1, previousGamepad1);
-        ClawFSM.teleopUpdate(currentGamepad1, previousGamepad1);
+        SpecimenFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);

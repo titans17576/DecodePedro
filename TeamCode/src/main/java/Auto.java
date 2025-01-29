@@ -8,6 +8,7 @@ import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.robot.Robot;
 
@@ -26,8 +27,7 @@ public class Auto {
     private robot R;
     public boolean actionBusy;
 
-    public liftFSM LiftFSM;
-    public clawFSM ClawFSM;
+    public specimenFSM SpecimenFSM;
     public scoopFSM ScoopFSM;
 
     private Side side;
@@ -53,14 +53,13 @@ public class Auto {
 
 
     public PathChain moveCurve, push23, gather3, goal2, goal3;
-    public Path goal1;
+    public Path scorePreload, push1;
 
     public Path[][] score = new Path[5][2];
     public int DISTANCE = 1;
 
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
-        ClawFSM = new clawFSM(Robot, telemetry);
-        LiftFSM = new liftFSM(Robot, telemetry);
+        SpecimenFSM = new specimenFSM(Robot, telemetry);
         ScoopFSM = new scoopFSM(Robot, telemetry);
 
 
@@ -71,14 +70,14 @@ public class Auto {
         createPose();
         buildPaths();
 
-        /*init();*/
+        init();
     }
     public void createPose(){
         switch(side){
             case BUCKET:
                 break;
             case OBSERVATION:
-                startPose = new Pose(10.500, 60.500, Math.toRadians(180));
+                startPose = new Pose(10.500, 71.500, Math.toRadians(180));
                 specimen1Pose = new Pose(35.000, 71.500, Math.toRadians(180));
                 specimen2Pose = new Pose(35,68,Math.toRadians(180));
                 specimen3Pose = new Pose(35, 64.5,Math.toRadians(180));
@@ -87,12 +86,12 @@ public class Auto {
                 curveControlPoint1Pose = new Pose(34.5, 33.5);
                 curveControlPoint2Pose = new Pose(59, 41.5);
                 longBack2Pose= new Pose(66, 25, Math.toRadians(0));
-                longBack3Pose= new Pose(66, 14,Math.toRadians(0));
-                shortBack1Pose = new Pose(26.5, 71.5, Math.toRadians(180));
+                longBack3Pose= new Pose(66, 18,Math.toRadians(0));
+                shortBack1Pose = new Pose(26.5, 60, Math.toRadians(180));
                 shift3Pose = new Pose(20, 14, Math.toRadians(0));
                 shift2Pose = new Pose(20, 25,Math.toRadians(0)) ;
-                pickup3Pose = new Pose(9.5, 14, Math.toRadians(0));
-                pickup2Pose = new Pose(9.5, 25, Math.toRadians(0));
+                pickup3Pose = new Pose(18, 18, Math.toRadians(0));
+                pickup2Pose = new Pose(28, 25, Math.toRadians(0));
                 break;
         }
     }
@@ -101,12 +100,10 @@ public class Auto {
             case BUCKET:
                 break;
             case OBSERVATION:
-                goal1 = new Path(new BezierCurve(new Point(startPose), new Point(specimen1Pose)));
-                goal1.setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
             moveCurve = follower.pathBuilder()
                         .addPath(new BezierLine(new Point(specimen1Pose), new Point(shortBack1Pose)))
-                        .setConstantHeadingInterpolation(shortBack1Pose.getHeading())
+                        .setLinearHeadingInterpolation(specimen1Pose.getHeading(), shortBack1Pose.getHeading())
                         .addPath(new BezierCurve(new Point(shortBack1Pose), new Point(curveControlPoint1Pose), new Point(curveControlPoint2Pose),  new Point(longBack2Pose)))
                         .setLinearHeadingInterpolation(shortBack1Pose.getHeading(), longBack2Pose.getHeading())
                         .build();
@@ -152,7 +149,7 @@ public class Auto {
 
 
 
-            score[1][0] = new Path(new BezierCurve(new Point(specimen1Pose), new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY())));
+            /*score[1][0] = new Path(new BezierCurve(new Point(specimen1Pose), new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY())));
             score[1][0].setConstantHeadingInterpolation(specimen1Pose.getHeading());
 
             score[1][1] = new Path(new BezierCurve(new Point(specimen1Pose.getX() + DISTANCE, specimen1Pose.getY()), new Point(specimen1Pose)));
@@ -168,7 +165,7 @@ public class Auto {
             score[3][0].setConstantHeadingInterpolation(specimen3Pose.getHeading());
 
             score[3][1] = new Path(new BezierCurve(new Point(specimen3Pose.getX() + DISTANCE, specimen3Pose.getY()), new Point(specimen3Pose)));
-            score[3][1].setConstantHeadingInterpolation(specimen3Pose.getHeading());
+            score[3][1].setConstantHeadingInterpolation(specimen3Pose.getHeading());*/
 
 
 
@@ -177,18 +174,11 @@ public class Auto {
         }
 
 
+        scorePreload = new Path(new BezierCurve(new Point(startPose), new Point(specimen1Pose)));
+        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), specimen1Pose.getHeading());
+        push1 = new Path(new BezierCurve(new Point(shortBack1Pose), new Point(curveControlPoint1Pose), new Point(curveControlPoint2Pose),  new Point(longBack2Pose)));
+        push1.setLinearHeadingInterpolation(shortBack1Pose.getHeading(), longBack2Pose.getHeading());
 
-        moveCurve = follower.pathBuilder()
-                .addPath(
-                        new BezierCurve(
-                                new Point(9.484, 107.064),
-                                new Point(34.440, 107.813),
-                                new Point(13.227, 73.373),
-                                new Point(39.182, 73.373)
-                        )
-                )
-                .setTangentHeadingInterpolation()
-                .build();
         forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(10,0, Point.CARTESIAN)));
         forwards.setConstantHeadingInterpolation(0);
         backwards = new Path(new BezierLine(new Point(10,0, Point.CARTESIAN), new Point(0,0, Point.CARTESIAN)));
@@ -203,25 +193,25 @@ public class Auto {
     }
     public void update(){
         follower.update();
-        LiftFSM.update();
-        ClawFSM.update();
+        SpecimenFSM.update();
         ScoopFSM.update();
 
 
-        /*transfer();
-        fakeTransfer();*/
+        transfer();
+        fakeTransfer();
         scoreSpec();
+        postSpecScore();
     }
     public void transfer(){
         switch(transferState){
             case 1:
                 actionBusy = true;
-                LiftFSM.setState(liftFSM.LiftState.MID);
+                SpecimenFSM.setLiftState(specimenFSM.LiftState.MID);
                 setTransferState(2);
                 break;
             case 2:
-                if(LiftFSM.actionNotBusy()){
-                    ClawFSM.setWristState(clawFSM.ClawWristState.UP);
+                if(SpecimenFSM.actionNotBusy()){
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
                     transferTimer.resetTimer();
                     setTransferState(3);
                 }
@@ -234,7 +224,7 @@ public class Auto {
                 break;
             case 4:
                 if(!follower.isBusy()){
-                    ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
+                    SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
                     transferTimer.resetTimer();
                     setTransferState(5);
             }
@@ -247,26 +237,26 @@ public class Auto {
                 break;
             case 6:
                 if (!follower.isBusy()){
-                    ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
                     transferTimer.resetTimer();
                     setTransferState(7);
                 }
                 break;
             case 7:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    LiftFSM.setState(liftFSM.LiftState.ZERO);
+                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
                     setTransferState(8);
                 }
                 break;
 
             case 8:
-                if(LiftFSM.actionNotBusy()){
+                if(SpecimenFSM.actionNotBusy()){
                     actionBusy = false;
                     specimenNum = -1;
                     setTransferState(-1);
 
                 }
-
+                break;
         }
     }
 
@@ -274,39 +264,39 @@ public class Auto {
         switch(fakeTransferState){
             case 1:
                 actionBusy = true;
-                LiftFSM.setState(liftFSM.LiftState.MID);
+                SpecimenFSM.setLiftState(specimenFSM.LiftState.MID);
                 setFakeTransferState(2);
                 break;
             case 2:
-                if(LiftFSM.actionNotBusy()){
-                    ClawFSM.setWristState(clawFSM.ClawWristState.UP);
+                if(SpecimenFSM.actionNotBusy()){
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
                     transferTimer.resetTimer();
                     setFakeTransferState(3);
                 }
                 break;
             case 3:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
+                    SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
                     transferTimer.resetTimer();
                     setFakeTransferState(4);
                 }
                 break;
             case 4:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
                     transferTimer.resetTimer();
                     setFakeTransferState(5);
                 }
                 break;
             case 5:
                 if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    LiftFSM.setState(liftFSM.LiftState.ZERO);
+                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
                     setFakeTransferState(6);
                 }
                 break;
 
             case 6:
-                if(LiftFSM.actionNotBusy()){
+                if(SpecimenFSM.actionNotBusy()){
                     actionBusy = false;
                     specimenNum = -1;
                     setFakeTransferState(-1);
@@ -344,15 +334,15 @@ public class Auto {
         switch(scoreSpecState){
             case 1:
                 actionBusy = true;
-                ClawFSM.setGrabState(clawFSM.ClawGrabState.CLOSED);
-                LiftFSM.setState(liftFSM.LiftState.MID);
+                SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.CLOSED);
+                SpecimenFSM.setLiftState(specimenFSM.LiftState.MID);
                 specScoreTimer.resetTimer();
                 setScoreSpecState(2);
                 break;
             case 2:
-                if(specScoreTimer.getElapsedTimeSeconds() > 1.5){
+                if(specScoreTimer.getElapsedTimeSeconds() > 1.25){
                     actionBusy = false;
-                    ClawFSM.setWristState(clawFSM.ClawWristState.UP);
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
                     setScoreSpecState(3);
                 }
                 break;
@@ -367,34 +357,22 @@ public class Auto {
         switch(postSpecScoreState){
             case 1:
                 actionBusy = true;
-                LiftFSM.setState(liftFSM.LiftState.MID);
+                SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
+                postSpecScoreTimer.resetTimer();
                 setPostSpecScoreState(2);
                 break;
             case 2:
-                if (LiftFSM.actionNotBusy()) {
-                    ClawFSM.setGrabState(clawFSM.ClawGrabState.OPEN);
+                if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
+                    actionBusy = false;
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
+                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
                     postSpecScoreTimer.resetTimer();
                     setPostSpecScoreState(3);
                 }
                 break;
             case 3:
-                if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
-                    ClawFSM.setWristState(clawFSM.ClawWristState.DOWN);
-                    postSpecScoreTimer.resetTimer();
-                    setPostSpecScoreState(4);
-                }
-                break;
-            case 4:
-                if(postSpecScoreTimer.getElapsedTimeSeconds() > 0.5){
-                    LiftFSM.setState(liftFSM.LiftState.ZERO);
-                    setPostSpecScoreState(5);
-                }
-                break;
-
-            case 5:
-                if(LiftFSM.actionNotBusy()) {
+                if(postSpecScoreTimer.getElapsedTimeSeconds() > 1.5) {
                     setPostSpecScoreState(-1);
-                    actionBusy = false;
                 }
                 break;
         }

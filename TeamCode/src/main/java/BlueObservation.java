@@ -5,6 +5,7 @@ import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -18,23 +19,25 @@ public class BlueObservation extends OpMode {
     public Auto auto;
 
     public robot R;
-    private final Pose startPose = new Pose(9.483535528596187, 107.06412478336222);
+    private Pose startPose;
     public Timer pathTimer = new Timer();
 
 
     @Override
     public void init() {
-        R = new robot();
+        R = new robot(hardwareMap);
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
+        auto = new Auto(R, telemetry, follower, Auto.Side.OBSERVATION);
+        startPose = auto.startPose;
         follower.setStartingPose(startPose);
-        auto = new Auto(R, telemetry, follower, Auto.Side.BUCKET);
     }
 
     @Override
     public void start() {
         auto.start();
         setPathState(1);
+        R.extendo.setPosition(0.16);
     }
 
     @Override
@@ -50,71 +53,44 @@ public class BlueObservation extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                auto.follower.followPath(auto.goal1, false);
+                auto.startSpecScore();
                 setPathState(2);
                 break;
             case 2:
                 if(auto.notBusy()) {
-                    auto.startTransfer(1);
+                    auto.follower.followPath(auto.scorePreload, false);
                     setPathState(3);
                 }
                 break;
             case 3:
-                if(auto.actionNotBusy()){
-                    auto.follower.followPath(auto.moveCurve, false);
+                if(auto.notBusy()) {
+                    auto.startPostSpecScore();
                     setPathState(4);
                 }
                 break;
             case 4:
-                if(auto.notBusy()){
-                    auto.follower.followPath(auto.push23, false);
+                if(auto.notBusy()) {
+                    follower.setMaxPower(0.8);
+                    auto.follower.followPath(auto.moveCurve, true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if(auto.notBusy()){
-                    auto.ClawFSM.setGrabState(clawFSM.ClawGrabState.CLOSED);
-                    pathTimer.resetTimer();
+                if(auto.notBusy()) {
+                    R.liftMotor.setPower(0);
+                    R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    follower.setMaxPower(0.7);
+                    auto.follower.followPath(auto.push23, true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if(pathTimer.getElapsedTimeSeconds() > 0.5){
-                    auto.follower.followPath(auto.goal2, false);
+                if(auto.notBusy()) {
+                    auto.startSpecScore();
                     setPathState(7);
                 }
                 break;
             case 7:
-                if(auto.notBusy()){
-                    auto.startTransfer(2);
-                    setPathState(8);
-                }
-                break;
-            case 8:
-                if(auto.actionNotBusy()){
-                    auto.follower.followPath(auto.gather3, false);
-                    setPathState(9);
-                }
-                break;
-            case 9:
-                if(auto.notBusy()){
-                    auto.ClawFSM.setGrabState(clawFSM.ClawGrabState.CLOSED);
-                    pathTimer.resetTimer();
-                    setPathState(10);
-                }
-                break;
-            case 10:
-                if(pathTimer.getElapsedTimeSeconds() > 0.5){
-                    auto.follower.followPath(auto.goal3, false);
-                    setPathState(11);
-                }
-                break;
-            case 11:
-                if(auto.notBusy()){
-                    auto.startTransfer(3);
-                    setPathState(12);
-                }
-            case 12:
                 if(auto.notBusy()){
                     setPathState(-1);
                 }

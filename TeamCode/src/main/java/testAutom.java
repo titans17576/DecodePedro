@@ -17,7 +17,7 @@ public class testAutom extends OpMode {
     public int pathState = -1;
     public Auto auto;
     public robot R;
-    private final Pose startPose = new Pose(0, 0);
+    private Pose startPose = new Pose(0,0);
     public Timer pathTimer = new Timer();
 
 
@@ -27,7 +27,7 @@ public class testAutom extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
-        auto = new Auto(R, telemetry, follower, Auto.Side.BUCKET);
+        auto = new Auto(R, telemetry, follower, Auto.Side.OBSERVATION);
     }
 
     @Override

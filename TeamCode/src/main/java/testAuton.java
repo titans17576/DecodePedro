@@ -16,7 +16,8 @@ public class testAuton extends OpMode {
     public int pathState = -1;
     public Auto auto;
     public robot R;
-    private final Pose startPose = new Pose(0,0);
+    private Pose startPose = new Pose(10.500, 71.500, Math.toRadians(180));
+
     public Timer pathTimer = new Timer();
 
 
@@ -26,7 +27,7 @@ public class testAuton extends OpMode {
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
-        auto = new Auto(R, telemetry, follower, Auto.Side.BUCKET);
+        auto = new Auto(R, telemetry, follower, Auto.Side.OBSERVATION);
     }
 
     @Override
@@ -48,11 +49,11 @@ public class testAuton extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                auto.startSpecScore();
+                auto.follower.followPath(auto.scorePreload, false);
                 setPathState(2);
                 break;
             case 2:
-                if(auto.specScoreTimer.getElapsedTimeSeconds() > 10){
+                if(auto.notBusy()){
                     setPathState(-1);
                 }
         }
