@@ -91,6 +91,75 @@ public class BlueObservation extends OpMode {
                 }
                 break;
             case 7:
+                if(auto.notBusy()) {
+                    follower.setMaxPower(1);
+                    auto.follower.followPath(auto.goal2, true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+                if(auto.notBusy()) {
+                    auto.startPostSpecScore();
+                    setPathState(9);
+                }
+                break;
+            case 9:
+                if(auto.notBusy()) {
+                    follower.setMaxPower(0.9);
+                    auto.follower.followPath(auto.gather3, true);
+                    setPathState(10);
+                }
+                break;
+            case 10:
+                if(auto.notBusy()) {
+                    R.liftMotor.setPower(0);
+                    R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    auto.startSpecScore();
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                if(auto.notBusy()) {
+                    follower.setMaxPower(1);
+                    auto.follower.followPath(auto.goal3, true);
+                    setPathState(12);
+                }
+                break;
+            case 12:
+                if(auto.notBusy()) {
+                    auto.startPostSpecScore();
+                    setPathState(13);
+                }
+                break;
+            case 13:
+                if(auto.notBusy()) {
+                    follower.setMaxPower(0.9);
+                    auto.follower.followPath(auto.gather4, true);
+                    setPathState(14);
+                }
+                break;
+            case 14:
+                if(auto.notBusy()) {
+                    R.liftMotor.setPower(0);
+                    R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    auto.startSpecScore();
+                    setPathState(15);
+                }
+                break;
+            case 15:
+                if(auto.notBusy()) {
+                    follower.setMaxPower(1);
+                    auto.follower.followPath(auto.goal4, true);
+                    setPathState(16);
+                }
+                break;
+            case 16:
+                if(auto.notBusy()) {
+                    auto.startPostSpecScore();
+                    setPathState(17);
+                }
+                break;
+            case 17:
                 if(auto.notBusy()){
                     setPathState(-1);
                 }

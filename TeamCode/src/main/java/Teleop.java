@@ -124,7 +124,7 @@ public class Teleop extends OpMode {
         /*pickup-score*/
 
         /*emergency motor encoder reset*/
-        if (gamepad1.y && !previousGamepad1.y) {
+        /*if (gamepad1.y && !previousGamepad1.y) {
             R.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             R.liftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
             R.liftMotor.setPower(1);
@@ -133,7 +133,7 @@ public class Teleop extends OpMode {
             R.liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
+        }*/
 
         /* Telemetry Outputs of our Follower */
         telemetry.addData("X", follower.getPose().getX());
