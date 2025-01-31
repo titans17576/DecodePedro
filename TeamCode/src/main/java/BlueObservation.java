@@ -79,7 +79,7 @@ public class BlueObservation extends OpMode {
                 if(auto.notBusy()) {
                     R.liftMotor.setPower(0);
                     R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    follower.setMaxPower(0.7);
+                    follower.setMaxPower(0.8);
                     auto.follower.followPath(auto.push23, true);
                     setPathState(6);
                 }
@@ -160,6 +160,12 @@ public class BlueObservation extends OpMode {
                 }
                 break;
             case 17:
+                if(auto.notBusy()) {
+                    auto.follower.followPath(auto.park, true);
+                    setPathState(18);
+                }
+                break;
+            case 18:
                 if(auto.notBusy()){
                     setPathState(-1);
                 }

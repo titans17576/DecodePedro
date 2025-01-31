@@ -15,6 +15,7 @@ public class specimenFSM {
     }
     public enum ClawWristState{
         DOWN,
+        MID,
 
         UP
     }
@@ -31,6 +32,7 @@ public class specimenFSM {
     final double claw_closed_position = 0;
     final double claw_open_position = 0.33;
     final double claw_down_position = 1; // Insert a number
+    final double claw_mid_position = 0.94;
     final double claw_up_position = 0.81; // Insert a number
 
     final int position_tolerance = 15;
@@ -212,6 +214,9 @@ public class specimenFSM {
                 break;
             case UP:
                 moveWristTo(claw_up_position);
+                break;
+            case MID:
+                moveWristTo(claw_mid_position);
                 break;
         }
 

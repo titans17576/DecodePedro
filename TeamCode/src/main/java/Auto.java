@@ -40,6 +40,7 @@ public class Auto {
     public int scoreSpecState = -1;
     public int postSpecScoreState = -1;
     public int fakeTransferState = -1;
+    public int parkState = -1;
     public Path forwards, backwards;
 
 
@@ -53,7 +54,7 @@ public class Auto {
 
 
     public PathChain moveCurve, push23, gather3, gather4, goal2, goal3, goal4;
-    public Path scorePreload, push1;
+    public Path scorePreload, push1, park;
 
     public Path[][] score = new Path[5][2];
     public int DISTANCE = 1;
@@ -78,10 +79,10 @@ public class Auto {
                 break;
             case OBSERVATION:
                 startPose = new Pose(10.5, 71.5, Math.toRadians(180));
-                specimen1Pose = new Pose(35, 71.5, Math.toRadians(180));
-                specimen2Pose = new Pose(37.5,69.5,Math.toRadians(180));
-                specimen3Pose = new Pose(38, 67.5,Math.toRadians(180));
-                specimen4Pose = new Pose(38, 66.5,Math.toRadians(180));
+                specimen1Pose = new Pose(38.5, 71.5, Math.toRadians(180));
+                specimen2Pose = new Pose(38,69.5,Math.toRadians(180));
+                specimen3Pose = new Pose(38, 68.5,Math.toRadians(180));
+                specimen4Pose = new Pose(38, 67.5,Math.toRadians(180));
                 specimenControlPoint1Pose = new Pose(17, 46.5); // What is the direction on the robot?
                 specimenControlPoint2Pose = new Pose(22, 64);
                 curveControlPoint1Pose = new Pose(34.5, 33.5);
@@ -91,10 +92,11 @@ public class Auto {
                 longBack3Pose= new Pose(62, 18,Math.toRadians(0));
                 shortBack1Pose = new Pose(26.5, 60, Math.toRadians(180));
                 shift3Pose = new Pose(20, 18, Math.toRadians(0));
-                shift2Pose = new Pose(26, 25,Math.toRadians(0)) ;
-                pickup3Pose = new Pose(15, 18, Math.toRadians(0));
+                shift2Pose = new Pose(20, 25,Math.toRadians(0));
+                shift4Pose = new Pose(17, 20,Math.toRadians(180));
+                pickup3Pose = new Pose(13, 18, Math.toRadians(0));
                 pickup2Pose = new Pose(28, 25, Math.toRadians(0));
-                pickup4Pose = new Pose(15, 25, Math.toRadians(0));
+                pickup4Pose = new Pose(14, 25, Math.toRadians(0));
                 break;
         }
     }
@@ -190,6 +192,8 @@ public class Auto {
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), specimen1Pose.getHeading());
         push1 = new Path(new BezierCurve(new Point(shortBack1Pose), new Point(curveControlPoint1Pose), new Point(curveControlPoint2Pose),  new Point(longBack2Pose)));
         push1.setLinearHeadingInterpolation(shortBack1Pose.getHeading(), longBack2Pose.getHeading());
+        park = new Path(new BezierLine(new Point(specimen4Pose), new Point(shift4Pose)));
+        park.setConstantHeadingInterpolation(specimen4Pose.getHeading());
 
         forwards = new Path(new BezierLine(new Point(0,0, Point.CARTESIAN), new Point(10,0, Point.CARTESIAN)));
         forwards.setConstantHeadingInterpolation(0);
@@ -352,7 +356,7 @@ public class Auto {
                 setScoreSpecState(2);
                 break;
             case 2:
-                if(specScoreTimer.getElapsedTimeSeconds() > 1.25){
+                if(specScoreTimer.getElapsedTimeSeconds() > 0.75){
                     actionBusy = false;
                     SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
                     setScoreSpecState(3);
@@ -376,7 +380,7 @@ public class Auto {
             case 2:
                 if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
                     actionBusy = false;
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.MID);
                     SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
                     postSpecScoreTimer.resetTimer();
                     setPostSpecScoreState(3);
@@ -390,6 +394,18 @@ public class Auto {
         }
 
     }
+
+    public void park(){
+        switch(parkState){
+            case 1:
+                R.extendo.setPosition(0.38);
+                break;
+            case 2:
+                setParkState(-1);
+                break;
+        }
+    }
+
     public void setTransferState(int x) {
         transferState = x;
         telemetry.addData("Transfer", x);
@@ -414,6 +430,11 @@ public class Auto {
         telemetry.addData("PostScoreSpec", x);
     }
 
+    public void setParkState(int x){
+        parkState = x;
+        telemetry.addData("Park", x);
+    }
+
     public void startTransfer(int specimenNum) {
         if (actionNotBusy()) {
             setTransferState(1);
@@ -436,6 +457,10 @@ public class Auto {
         if (actionNotBusy()){
             setPostSpecScoreState(1);
         }
+    }
+
+    public void startPark(){
+        setParkState(1);
     }
 
 
