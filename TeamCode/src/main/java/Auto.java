@@ -39,13 +39,14 @@ public class Auto {
     public int depositState = -1;
     public int scoreSpecState = -1;
     public int postSpecScoreState = -1;
+    public int postSpecScoreState2 = -1;
     public int fakeTransferState = -1;
     public int parkState = -1;
     public Path forwards, backwards;
 
 
     public Pose startPose,
-            specimen1Pose,specimen2Pose, specimen3Pose, specimen4Pose,
+            specimen1Pose,specimen2Pose, specimen3Pose, specimen4Pose, preSpecPose,
             shortBack1Pose, longBack2Pose, longBack2_5Pose, longBack3Pose, longBack4Pose,
             shift2Pose, shift3Pose, shift4Pose,
             pickup2Pose, pickup3Pose, pickup4Pose,
@@ -80,23 +81,24 @@ public class Auto {
             case OBSERVATION:
                 startPose = new Pose(10.5, 71.5, Math.toRadians(180));
                 specimen1Pose = new Pose(38.5, 71.5, Math.toRadians(180));
-                specimen2Pose = new Pose(38,69.5,Math.toRadians(180));
-                specimen3Pose = new Pose(38, 68.5,Math.toRadians(180));
-                specimen4Pose = new Pose(38, 67.5,Math.toRadians(180));
+                specimen2Pose = new Pose(41,69.5,Math.toRadians(180));
+                specimen3Pose = new Pose(41, 68.5,Math.toRadians(180));
+                specimen4Pose = new Pose(41, 67.5,Math.toRadians(180));
+                preSpecPose = new Pose(33, 68.5,Math.toRadians(180));
                 specimenControlPoint1Pose = new Pose(17, 46.5); // What is the direction on the robot?
                 specimenControlPoint2Pose = new Pose(22, 64);
                 curveControlPoint1Pose = new Pose(34.5, 33.5);
                 curveControlPoint2Pose = new Pose(59, 41.5);
                 longBack2Pose= new Pose(66, 25, Math.toRadians(0));
-                longBack2_5Pose = new Pose(62, 25, Math.toRadians(0));
-                longBack3Pose= new Pose(62, 18,Math.toRadians(0));
+                longBack2_5Pose = new Pose(60, 25, Math.toRadians(0));
+                longBack3Pose= new Pose(60, 18,Math.toRadians(0));
                 shortBack1Pose = new Pose(26.5, 60, Math.toRadians(180));
                 shift3Pose = new Pose(20, 18, Math.toRadians(0));
                 shift2Pose = new Pose(20, 25,Math.toRadians(0));
                 shift4Pose = new Pose(17, 20,Math.toRadians(180));
-                pickup3Pose = new Pose(13, 18, Math.toRadians(0));
+                pickup3Pose = new Pose(11, 18, Math.toRadians(0));
                 pickup2Pose = new Pose(28, 25, Math.toRadians(0));
-                pickup4Pose = new Pose(14, 25, Math.toRadians(0));
+                pickup4Pose = new Pose(11.5, 25, Math.toRadians(0));
                 break;
         }
     }
@@ -129,8 +131,10 @@ public class Auto {
                     .setConstantHeadingInterpolation(pickup3Pose.getHeading())
                     .addPath(new BezierLine(new Point(shift3Pose), new Point(shift2Pose)))
                     .setConstantHeadingInterpolation(shift3Pose.getHeading())
-                    .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen2Pose)))
+                    .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(preSpecPose)))
                     .setLinearHeadingInterpolation(shift2Pose.getHeading(), specimen2Pose.getHeading())
+                    .addPath(new BezierLine(new Point(preSpecPose), new Point(specimen2Pose)))
+                    .setConstantHeadingInterpolation(preSpecPose.getHeading())
                     .build();
 
             gather3 = follower.pathBuilder()
@@ -144,8 +148,10 @@ public class Auto {
             goal3 = follower.pathBuilder()
                     .addPath(new BezierLine(new Point(pickup4Pose), new Point(shift2Pose)))
                     .setConstantHeadingInterpolation((shift2Pose.getHeading()))
-                    .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen3Pose)))
-                    .setLinearHeadingInterpolation(shift2Pose.getHeading(), specimen3Pose.getHeading())
+                    .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(preSpecPose)))
+                    .setLinearHeadingInterpolation(shift2Pose.getHeading(), preSpecPose.getHeading())
+                    .addPath(new BezierLine(new Point(preSpecPose), new Point(specimen3Pose)))
+                    .setConstantHeadingInterpolation(preSpecPose.getHeading())
                     .build();
 
             gather4 = follower.pathBuilder()
@@ -158,8 +164,10 @@ public class Auto {
             goal4 = follower.pathBuilder()
                     .addPath(new BezierLine(new Point(pickup4Pose), new Point(shift2Pose)))
                     .setConstantHeadingInterpolation((shift2Pose.getHeading()))
-                    .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(specimen4Pose)))
-                    .setLinearHeadingInterpolation(shift2Pose.getHeading(), specimen4Pose.getHeading())
+                    .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(preSpecPose)))
+                    .setLinearHeadingInterpolation(shift2Pose.getHeading(), preSpecPose.getHeading())
+                    .addPath(new BezierLine(new Point(preSpecPose), new Point(specimen4Pose)))
+                    .setConstantHeadingInterpolation(preSpecPose.getHeading())
                     .build();
 
 
@@ -217,6 +225,7 @@ public class Auto {
         fakeTransfer();
         scoreSpec();
         postSpecScore();
+        postSpecScore2();
     }
     public void transfer(){
         switch(transferState){
@@ -380,6 +389,31 @@ public class Auto {
             case 2:
                 if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
                     actionBusy = false;
+                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
+                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
+                    postSpecScoreTimer.resetTimer();
+                    setPostSpecScoreState(3);
+                }
+                break;
+            case 3:
+                if(postSpecScoreTimer.getElapsedTimeSeconds() > 1.5) {
+                    setPostSpecScoreState(-1);
+                }
+                break;
+        }
+
+    }
+    public void postSpecScore2(){
+        switch(postSpecScoreState2){
+            case 1:
+                actionBusy = true;
+                SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
+                postSpecScoreTimer.resetTimer();
+                setPostSpecScoreState(2);
+                break;
+            case 2:
+                if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
+                    actionBusy = false;
                     SpecimenFSM.setWristState(specimenFSM.ClawWristState.MID);
                     SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
                     postSpecScoreTimer.resetTimer();
@@ -429,6 +463,10 @@ public class Auto {
         postSpecScoreState = x;
         telemetry.addData("PostScoreSpec", x);
     }
+    public void setPostSpecScoreState2(int x){
+        postSpecScoreState2 = x;
+        telemetry.addData("PostScoreSpec2", x);
+    }
 
     public void setParkState(int x){
         parkState = x;
@@ -456,6 +494,11 @@ public class Auto {
     public void startPostSpecScore(){
         if (actionNotBusy()){
             setPostSpecScoreState(1);
+        }
+    }
+    public void startPostSpecScore2(){
+        if (actionNotBusy()){
+            setPostSpecScoreState2(1);
         }
     }
 
