@@ -31,7 +31,7 @@ public class Teleop extends OpMode {
 
 
     private final Pose startPose = new Pose(0,0,0);
-    private double defaultSpeed = 0.55;
+    private double defaultSpeed = 1;
     private double highSpeed = 1;
 
     /** This method is call once when init is played, it initializes the follower **/
@@ -81,7 +81,7 @@ public class Teleop extends OpMode {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
-        SpecimenFSM.teleopUpdate(currentGamepad1, previousGamepad1);
+        SpecimenFSM.testUpdate(currentGamepad1, previousGamepad1);
 
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);
@@ -97,9 +97,9 @@ public class Teleop extends OpMode {
         }
         /*score-return*/
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.arm.setPosition(0.3);
+            R.arm.setPosition(0.35);
         } else if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-            R.arm.setPosition(0.9);
+            R.arm.setPosition(0.96);
         }
         /*retract-extend*/
         if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {

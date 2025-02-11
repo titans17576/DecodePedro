@@ -82,9 +82,9 @@ public class Auto {
                 startPose = new Pose(10.5, 71.5, Math.toRadians(180));
                 specimen1Pose = new Pose(38.5, 71.5, Math.toRadians(180));
                 specimen2Pose = new Pose(41,69.5,Math.toRadians(180));
-                specimen3Pose = new Pose(41, 68.5,Math.toRadians(180));
-                specimen4Pose = new Pose(41, 67.5,Math.toRadians(180));
-                preSpecPose = new Pose(33, 68.5,Math.toRadians(180));
+                specimen3Pose = new Pose(41, 68,Math.toRadians(180));
+                specimen4Pose = new Pose(41, 67,Math.toRadians(180));
+                preSpecPose = new Pose(30, 67.5,Math.toRadians(180));
                 specimenControlPoint1Pose = new Pose(17, 46.5); // What is the direction on the robot?
                 specimenControlPoint2Pose = new Pose(22, 64);
                 curveControlPoint1Pose = new Pose(34.5, 33.5);
@@ -94,11 +94,11 @@ public class Auto {
                 longBack3Pose= new Pose(60, 18,Math.toRadians(0));
                 shortBack1Pose = new Pose(26.5, 60, Math.toRadians(180));
                 shift3Pose = new Pose(20, 18, Math.toRadians(0));
-                shift2Pose = new Pose(20, 25,Math.toRadians(0));
+                shift2Pose = new Pose(20, 28,Math.toRadians(0));
                 shift4Pose = new Pose(17, 20,Math.toRadians(180));
-                pickup3Pose = new Pose(11, 18, Math.toRadians(0));
+                pickup3Pose = new Pose(28, 18, Math.toRadians(0));
                 pickup2Pose = new Pose(28, 25, Math.toRadians(0));
-                pickup4Pose = new Pose(11.5, 25, Math.toRadians(0));
+                pickup4Pose = new Pose(11.5, 28, Math.toRadians(0));
                 break;
         }
     }
@@ -124,13 +124,13 @@ public class Auto {
                     .setConstantHeadingInterpolation(longBack2_5Pose.getHeading())
                     .addPath(new BezierLine(new Point(longBack3Pose), new Point(pickup3Pose)))
                     .setConstantHeadingInterpolation(longBack3Pose.getHeading())
+                    .addPath(new BezierLine(new Point(pickup3Pose), new Point(pickup4Pose)))
+                    .setConstantHeadingInterpolation(pickup4Pose.getHeading())
                     .build();
 
             goal2 = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(pickup3Pose), new Point(shift3Pose)))
-                    .setConstantHeadingInterpolation(pickup3Pose.getHeading())
-                    .addPath(new BezierLine(new Point(shift3Pose), new Point(shift2Pose)))
-                    .setConstantHeadingInterpolation(shift3Pose.getHeading())
+                    .addPath(new BezierLine(new Point(pickup4Pose), new Point(shift2Pose)))
+                    .setConstantHeadingInterpolation(pickup4Pose.getHeading())
                     .addPath(new BezierCurve(new Point(shift2Pose), new Point(specimenControlPoint1Pose), new Point(specimenControlPoint2Pose), new Point(preSpecPose)))
                     .setLinearHeadingInterpolation(shift2Pose.getHeading(), specimen2Pose.getHeading())
                     .addPath(new BezierLine(new Point(preSpecPose), new Point(specimen2Pose)))
