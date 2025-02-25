@@ -14,11 +14,12 @@
 
             <goBILDA5202SeriesMotor name="liftMotor" port="1"/>
 
-            <Servo name="clawServo" port="0"/>
-            <Servo name="armServo" port="1"/>
+            <Servo name="specArmServo2" port="0"/>
+            <Servo name="intakeWrist2Servo" port="1"/>
             <Servo name="specArmServo" port="2"/>
             <Servo name="intakeClawServo" port="3"/>
-            <Servo name="intakeWristServo" port="4"/>
+            <Servo name="intakeArmServo" port="4"/>
+            <Servo name="clawServo" port="5"/>
 
             <!--Configure hardware devices here-->
 
@@ -33,6 +34,7 @@
             <goBILDA5203SeriesMotor name="leftRear" port="2" />
             <goBILDA5203SeriesMotor name="leftFront" port="3" />
 
+            <Servo name="intakeWrist1Servo" port="5"/>
             <Servo name="extendoServo" port="5"/>
             <!--Configure hardware devices here-->
 

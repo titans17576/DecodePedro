@@ -14,11 +14,11 @@ import java.util.List;
  */
 @Config
 public class robot{
-    public DcMotorEx  liftMotor;
+    public DcMotorEx  liftMotor, liftMotor2;
     // public DcMotorEx leftFront, leftRear, rightRear, rightFront,
     private List<DcMotorEx> motors;
     //public CRServo claw;
-    public Servo claw, arm, extendo, intakeWrist, intakeClaw, specArm, intakeWrist2;
+    public Servo claw, intakeWrist1, intakeWrist2, extendo, intakeArm, intakeClaw, specArm, specArm2;
     public robot() {
 
     }
@@ -30,14 +30,16 @@ public class robot{
         rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
          */
-        arm = hardwareMap.get(Servo.class, "armServo");
+        intakeWrist1 = hardwareMap.get(Servo.class, "intakeWrist1Servo");
+        intakeWrist2 = hardwareMap.get(Servo.class, "intakeWrist2Servo");
         claw = hardwareMap.get(Servo.class, "clawServo");
         extendo = hardwareMap.get(Servo.class, "extendoServo");
-        intakeWrist = hardwareMap.get(Servo.class, "intakeWristServo");
+        intakeArm = hardwareMap.get(Servo.class, "intakeArmServo");
         intakeClaw = hardwareMap.get(Servo.class, "intakeClawServo");
         specArm = hardwareMap.get(Servo.class, "specArmServo");
-        /*intakeWrist2 = hardwareMap.get(Servo.class, "intakeWrist2Servo");*/
+        specArm2 = hardwareMap.get(Servo.class, "specArmServo2");
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
+        liftMotor2 = hardwareMap.get(DcMotorEx.class, "liftMotor2");
 
         /*leftFront.setPower(0);
         leftRear.setPower(0);
@@ -64,6 +66,10 @@ public class robot{
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        liftMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
+        liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 /*
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 

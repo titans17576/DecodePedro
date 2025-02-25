@@ -30,15 +30,15 @@ public class specimenFSM {
     // Position variables
 
     final double claw_closed_position = 0;
-    final double claw_open_position = 0.33;
-    final double claw_down_position = 0.97; // Insert a number
+    final double claw_open_position = 0.4;
+    final double claw_down_position = 0.92; // Insert a number
     final double claw_mid_position = 0.94;
-    final double claw_up_position = 0.81; // Insert a number
+    final double claw_up_position = 0.70; // Insert a number
 
     final int position_tolerance = 15;
     final int lift_zero_position = 0;
     final int lift_low_position = 300;
-    final int lift_mid_position = 600; // max we could reach was like 1500 ticks so idk
+    final int lift_mid_position = 1125; // max we could reach was like 1500 ticks so idk
     final int lift_high_position = 1450;
     public boolean actionBusy = false;
 
@@ -66,6 +66,9 @@ public class specimenFSM {
     }
     public void initialize() {
         R.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        R.liftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        R.specArm.setPosition(claw_down_position);
+        R.specArm2.setPosition(0.33);
     }
 
     // Method to move to a targeted position
@@ -80,6 +83,9 @@ public class specimenFSM {
             R.liftMotor.setTargetPosition(position);
             R.liftMotor.setPower(power);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            R.liftMotor2.setTargetPosition(position);
+            R.liftMotor2.setPower(power);
+            R.liftMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //R.liftMotor.setPower(0);
             actionBusy = true;
         }
@@ -153,6 +159,7 @@ public class specimenFSM {
         updateTelemetry("Test");
         if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
             setLiftState(LiftState.MID);
+            R.specArm2.setPosition(0.96);
             moveWristTo(claw_up_position);
         }
         if (currentGamepad.left_trigger >= 0.5 && previousGamepad.left_trigger < 0.5) {
@@ -164,6 +171,7 @@ public class specimenFSM {
         }
         if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
             moveWristTo(claw_down_position);
+            R.specArm2.setPosition(0.33);
             setLiftState(LiftState.ZERO);
         }
         switch (clawGrabState) {

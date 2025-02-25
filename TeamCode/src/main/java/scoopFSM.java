@@ -40,7 +40,7 @@ public class scoopFSM {
 
     // Method to move to a targeted position
     private void moveTo(Double position) {
-        R.arm.setPosition(position);
+        R.intakeWrist2.setPosition(position);
     }
 
     // Method to add encoders and status to telemetry
@@ -76,9 +76,9 @@ public class scoopFSM {
     public void testUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
         updateTelemetry("Test");
         if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
-            R.arm.setPosition(0.3);
+            R.intakeWrist2.setPosition(0.3);
         } else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
-            R.arm.setPosition(0.95);
+            R.intakeWrist2.setPosition(0.95);
         }
     }
     public void update(){

@@ -79,12 +79,12 @@ public class Auto {
             case BUCKET:
                 break;
             case OBSERVATION:
-                startPose = new Pose(10.5, 71.5, Math.toRadians(180));
-                specimen1Pose = new Pose(38.5, 71.5, Math.toRadians(180));
-                specimen2Pose = new Pose(41,69.5,Math.toRadians(180));
-                specimen3Pose = new Pose(41, 68,Math.toRadians(180));
-                specimen4Pose = new Pose(41, 67,Math.toRadians(180));
-                preSpecPose = new Pose(30, 67.5,Math.toRadians(180));
+                startPose = new Pose(10.5, 71.5, Math.toRadians(0));
+                specimen1Pose = new Pose(38.5, 71.5, Math.toRadians(0));
+                specimen2Pose = new Pose(41,69.5,Math.toRadians(0));
+                specimen3Pose = new Pose(41, 68,Math.toRadians(0));
+                specimen4Pose = new Pose(41, 67,Math.toRadians(0));
+                preSpecPose = new Pose(30, 67.5,Math.toRadians(0));
                 specimenControlPoint1Pose = new Pose(17, 46.5); // What is the direction on the robot?
                 specimenControlPoint2Pose = new Pose(22, 64);
                 curveControlPoint1Pose = new Pose(34.5, 33.5);
@@ -92,10 +92,10 @@ public class Auto {
                 longBack2Pose= new Pose(66, 25, Math.toRadians(0));
                 longBack2_5Pose = new Pose(60, 25, Math.toRadians(0));
                 longBack3Pose= new Pose(60, 18,Math.toRadians(0));
-                shortBack1Pose = new Pose(26.5, 60, Math.toRadians(180));
+                shortBack1Pose = new Pose(26.5, 60, Math.toRadians(0));
                 shift3Pose = new Pose(20, 18, Math.toRadians(0));
                 shift2Pose = new Pose(20, 28,Math.toRadians(0));
-                shift4Pose = new Pose(17, 20,Math.toRadians(180));
+                shift4Pose = new Pose(17, 20,Math.toRadians(0));
                 pickup3Pose = new Pose(28, 18, Math.toRadians(0));
                 pickup2Pose = new Pose(28, 25, Math.toRadians(0));
                 pickup4Pose = new Pose(11.5, 28, Math.toRadians(0));

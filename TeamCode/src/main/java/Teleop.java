@@ -59,9 +59,9 @@ public class Teleop extends OpMode {
     public void start() {
         follower.startTeleopDrive();
         SpecimenFSM.initialize();
-        R.intakeWrist.setPosition(0.45);
-        R.extendo.setPosition(0.16);
-
+        R.intakeArm.setPosition(0.5);
+        R.extendo.setPosition(0.14);
+        R.intakeWrist1.setPosition(0.1);
     }
 
     /** This is the main loop of the opmode and runs continuously after play **/
@@ -86,42 +86,65 @@ public class Teleop extends OpMode {
         if (R.liftMotor.getCurrentPosition() < 20 && R.liftMotor.getTargetPosition() == 0) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            R.liftMotor2.setPower(0);
+            R.liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         } else if (gamepad1.y && !previousGamepad1.y) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            R.liftMotor2.setPower(0);
+            R.liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        } else if (gamepad1.b && !previousGamepad1.b) {
+            R.liftMotor.setPower(0);
+            R.liftMotor2.setPower(0);
         }
         if (R.liftMotor.getTargetPosition() < 0) {
             R.liftMotor.setTargetPosition(0);
+            R.liftMotor2.setTargetPosition(0);
         } else if (R.liftMotor.getTargetPosition() > 3000) {
             R.liftMotor.setTargetPosition(3000);
+            R.liftMotor2.setTargetPosition(3000);
         }
-        /*score-return*/
-        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.arm.setPosition(0.35);
-        } else if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
-            R.arm.setPosition(0.96);
+
+        if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
+            R.intakeWrist2.setPosition(0.79);
+        } else if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
+            R.intakeWrist2.setPosition(0.5);
         }
         /*retract-extend*/
         if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
-            R.extendo.setPosition(0.16);
+            R.extendo.setPosition(0.14);
         } else if (gamepad2.right_bumper && !previousGamepad2.right_bumper) {
-            R.extendo.setPosition(0.38);
+            R.extendo.setPosition(0.3);
         }
         /*down-transfer-mid*/
         if (gamepad2.x && !previousGamepad2.x) {
-            R.intakeWrist.setPosition(0.09);
+            R.intakeArm.setPosition(0.62);
+            R.intakeWrist1.setPosition(0.11);
         } else if (gamepad2.y && !previousGamepad2.y) {
-            R.intakeWrist.setPosition(0.85);
+            R.intakeArm.setPosition(0.23);
+            R.intakeWrist1.setPosition(0.7);
+            R.intakeWrist2.setPosition(0.79);
+            R.specArm2.setPosition(1);
+            R.extendo.setPosition(0.3);
         } else if (gamepad2.a && !previousGamepad2.a) {
-            R.intakeWrist.setPosition(0.45);
+            R.intakeArm.setPosition(0.59);
         }
         /*close-open*/
         if (gamepad2.dpad_up && !previousGamepad2.dpad_up) {
-            R.intakeClaw.setPosition(0.2);
+            R.intakeClaw.setPosition(0.35);
         } else if (gamepad2.dpad_down && !previousGamepad2.dpad_down) {
             R.intakeClaw.setPosition(0.5);
         }
+        if (gamepad2.left_trigger >= 0.5 && previousGamepad2.left_trigger < 0.5) {
+            R.extendo.setPosition(R.extendo.getPosition()-0.01);
+        }
+
         /*pickup-score*/
+        /*if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
+            R.specArm2.setPosition(0.96);
+        } else if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
+            R.specArm2.setPosition(0.33);
+        }*/
 
         /*emergency motor encoder reset*/
         /*if (gamepad1.y && !previousGamepad1.y) {
