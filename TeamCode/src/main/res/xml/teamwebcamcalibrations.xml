@@ -10,7 +10,6 @@
         <!--This line declares the Expansion Hub. We use RS485 connection, so we declare it with a port.-->
         <LynxModule name="Expansion Hub 2" port="2">
 
-            <goBILDAPinpoint name="pinpoint" port="0" bus="3"/>
 
             <goBILDA5202SeriesMotor name="liftMotor" port="1"/>
 
@@ -28,6 +27,8 @@
 
         <!--This line declares the Control Hub and can be copy-pasted.-->
         <LynxModule name="Control Hub" port="173">
+
+            <goBILDAPinpoint name="pinpoint" port="0" bus="0"/>
 
             <goBILDA5203SeriesMotor name="rightFront" port="0" />
             <goBILDA5203SeriesMotor name="rightRear" port="1" />

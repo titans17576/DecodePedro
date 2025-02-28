@@ -14,10 +14,8 @@ import util.robot;
 @Autonomous(name="BlueObservation")
 public class BlueObservation extends OpMode {
     private Follower follower;
-
     public int pathState = -1;
     public Auto auto;
-
     public robot R;
     private Pose startPose;
     public Timer pathTimer = new Timer();
@@ -37,7 +35,6 @@ public class BlueObservation extends OpMode {
     public void start() {
         auto.start();
         setPathState(1);
-        R.extendo.setPosition(0.16);
     }
 
     @Override
@@ -63,6 +60,7 @@ public class BlueObservation extends OpMode {
                 }
                 break;
             case 3:
+                auto.startPark();
                 if(auto.notBusy()) {
                     auto.startPostSpecScore();
                     setPathState(4);

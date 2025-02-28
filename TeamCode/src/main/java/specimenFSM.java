@@ -16,7 +16,6 @@ public class specimenFSM {
     public enum ClawWristState{
         DOWN,
         MID,
-
         UP
     }
     public enum LiftState {
@@ -25,21 +24,31 @@ public class specimenFSM {
         MID,
         HIGH
     }
+    public enum SpecArmState{
+        GRAB,
+        HANG,
+        TRANSFER,
+        DEPOSIT
+    }
 
 
     // Position variables
 
     final double claw_closed_position = 0;
-    final double claw_open_position = 0.4;
+    final double claw_open_position = 0.53;
     final double claw_down_position = 0.92; // Insert a number
     final double claw_mid_position = 0.94;
     final double claw_up_position = 0.70; // Insert a number
+    final double specArm_grab_position = 0.12;
+    final double specArm_hang_position = 0.76;
+    final double specArm_transfer_position = 0.8;
+    final double specArm_deposit_position = 0.3;
 
     final int position_tolerance = 15;
     final int lift_zero_position = 0;
     final int lift_low_position = 300;
     final int lift_mid_position = 1125; // max we could reach was like 1500 ticks so idk
-    final int lift_high_position = 1450;
+    final int lift_high_position = 1950;
     public boolean actionBusy = false;
 
 
@@ -50,25 +59,27 @@ public class specimenFSM {
     Telemetry telemetry;
     ClawGrabState clawGrabState;
     ClawWristState clawWristState;
+    SpecArmState specArmState;
     LiftState liftState = LiftState.ZERO;
 
 
     // Import opmode variables when instance is created
     public specimenFSM(robot Robot, Telemetry t) {
-        this(Robot, t, ClawGrabState.CLOSED, ClawWristState.DOWN, LiftState.ZERO);
+        this(Robot, t, ClawGrabState.CLOSED, ClawWristState.DOWN, SpecArmState.HANG, LiftState.ZERO);
     }
-    public specimenFSM(robot Robot, Telemetry t, ClawGrabState cG, ClawWristState cW, LiftState lS) {
+    public specimenFSM(robot Robot, Telemetry t, ClawGrabState cG, ClawWristState cW, SpecArmState sA, LiftState lS) {
         R = Robot;
         telemetry = t;
         clawWristState = cW;
         clawGrabState = cG;
+        specArmState = sA;
         liftState = lS;
     }
     public void initialize() {
         R.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         R.liftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         R.specArm.setPosition(claw_down_position);
-        R.specArm2.setPosition(0.33);
+        R.specArm2.setPosition(specArm_grab_position);
     }
 
     // Method to move to a targeted position
@@ -77,6 +88,9 @@ public class specimenFSM {
     }
     private void moveWristTo(Double position) {
         R.specArm.setPosition(position);
+    }
+    private void moveArmTo(Double position) {
+        R.specArm2.setPosition(position);
     }
     private void moveLiftTo(int position, double power) {
         if (abs(R.liftMotor.getCurrentPosition() - position) > position_tolerance) {
@@ -156,10 +170,10 @@ public class specimenFSM {
         update();
     }
     public void testUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
-        updateTelemetry("Test");
+        /*updateTelemetry("Test");*/
         if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
             setLiftState(LiftState.MID);
-            R.specArm2.setPosition(0.96);
+            moveArmTo(specArm_hang_position);
             moveWristTo(claw_up_position);
         }
         if (currentGamepad.left_trigger >= 0.5 && previousGamepad.left_trigger < 0.5) {
@@ -171,8 +185,13 @@ public class specimenFSM {
         }
         if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
             moveWristTo(claw_down_position);
-            R.specArm2.setPosition(0.33);
+            moveArmTo(specArm_grab_position);
             setLiftState(LiftState.ZERO);
+        }
+        if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+            moveArmTo(specArm_transfer_position);
+        } else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+            moveArmTo(specArm_deposit_position);
         }
         switch (clawGrabState) {
             // Lift set to 0
@@ -223,7 +242,20 @@ public class specimenFSM {
                 moveWristTo(claw_mid_position);
                 break;
         }
-
+        switch(specArmState){
+            case GRAB:
+                moveArmTo(specArm_grab_position);
+                break;
+            case HANG:
+                moveArmTo(specArm_hang_position);
+                break;
+            case TRANSFER:
+                moveArmTo(specArm_transfer_position);
+                break;
+            case DEPOSIT:
+                moveArmTo(specArm_deposit_position);
+                break;
+        }
         switch (liftState){
             case ZERO:
                 moveLiftTo(lift_zero_position,0.8);
@@ -266,11 +298,14 @@ public class specimenFSM {
     }
 
 
-        public void setGrabState(ClawGrabState state){
-        clawGrabState = state;
+    public void setGrabState(ClawGrabState state){
+    clawGrabState = state;
     }
     public void setWristState(ClawWristState state){
         clawWristState = state;
+    }
+    public void setSpecArmState(SpecArmState state){
+        specArmState = state;
     }
     public void setLiftState(LiftState state){
         liftState = state;
