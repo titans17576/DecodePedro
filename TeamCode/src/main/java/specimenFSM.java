@@ -22,7 +22,8 @@ public class specimenFSM {
         ZERO,
         LOW,
         MID,
-        HIGH
+        HIGH,
+        BAD
     }
     public enum SpecArmState{
         GRAB,
@@ -34,14 +35,14 @@ public class specimenFSM {
 
     // Position variables
 
-    final double claw_closed_position = 0;
-    final double claw_open_position = 0.53;
-    final double claw_down_position = 0.92; // Insert a number
+    final double claw_closed_position = 0.52;
+    final double claw_open_position = 0.18;
+    final double claw_down_position = 0.94; // Insert a number
     final double claw_mid_position = 0.94;
     final double claw_up_position = 0.70; // Insert a number
     final double specArm_grab_position = 0.12;
     final double specArm_hang_position = 0.76;
-    final double specArm_transfer_position = 0.8;
+    final double specArm_transfer_position = 0.78;
     final double specArm_deposit_position = 0.3;
 
     final int position_tolerance = 15;
@@ -49,6 +50,7 @@ public class specimenFSM {
     final int lift_low_position = 300;
     final int lift_mid_position = 1125; // max we could reach was like 1500 ticks so idk
     final int lift_high_position = 1950;
+    final int lift_bad_position = -2000;
     public boolean actionBusy = false;
 
 
@@ -79,7 +81,6 @@ public class specimenFSM {
         R.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         R.liftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         R.specArm.setPosition(claw_down_position);
-        R.specArm2.setPosition(specArm_grab_position);
     }
 
     // Method to move to a targeted position
@@ -188,6 +189,9 @@ public class specimenFSM {
             moveArmTo(specArm_grab_position);
             setLiftState(LiftState.ZERO);
         }
+        if (currentGamepad.dpad_right && !previousGamepad.dpad_right) {
+            setLiftState(LiftState.BAD);
+        }
         if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
             moveArmTo(specArm_transfer_position);
         } else if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
@@ -211,14 +215,11 @@ public class specimenFSM {
                 updateTelemetry("OPEN");
                 break;
         }
-        if (currentGamepad.dpad_left && !previousGamepad.dpad_left){
-            moveWristTo(claw_up_position);
-        }
-        if (currentGamepad.dpad_right && !previousGamepad.dpad_right){
-            moveWristTo(claw_down_position);
-        }
         if (currentGamepad.x && !previousGamepad.x){
-            moveWristTo(R.specArm.getPosition() + 0.02);
+            moveWristTo(R.specArm.getPosition() + 0.04);
+        }
+        if (currentGamepad.y && !previousGamepad.y){
+            moveWristTo(R.specArm.getPosition() - 0.04);
         }
         testUpdate();
     }
@@ -269,6 +270,9 @@ public class specimenFSM {
             case HIGH:
                 moveLiftTo(lift_high_position,1);
                 break;
+            case BAD:
+                moveLiftTo(lift_bad_position,0.8);
+                break;
         }
 
     }
@@ -293,6 +297,9 @@ public class specimenFSM {
                 break;
             case HIGH:
                 moveLiftTo(lift_high_position,1);
+                break;
+            case BAD:
+                moveLiftTo(lift_bad_position,0.8);
                 break;
         }
     }

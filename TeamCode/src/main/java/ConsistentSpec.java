@@ -1,6 +1,5 @@
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -11,8 +10,9 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 import util.robot;
 
-@Autonomous(name="5_Spec")
-public class BlueObservation extends OpMode {
+@Autonomous(name="4_Spec")
+
+public class ConsistentSpec extends OpMode {
     private Follower follower;
     public int pathState = -1;
     public Auto auto;
@@ -69,7 +69,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 4:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.8);
                     auto.follower.followPath(auto.moveCurve, true);
                     setPathState(5);
                 }
@@ -91,7 +91,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 7:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.9);
                     auto.follower.followPath(auto.goal2, true);
                     setPathState(8);
                 }
@@ -104,7 +104,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 9:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(0.9);
+                    follower.setMaxPower(0.8);
                     auto.follower.followPath(auto.gather3, true);
                     setPathState(10);
                 }
@@ -119,7 +119,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 11:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.9);
                     auto.follower.followPath(auto.goal3, true);
                     setPathState(12);
                 }
@@ -132,7 +132,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 13:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(0.9);
+                    follower.setMaxPower(0.8);
                     auto.follower.followPath(auto.gather4, true);
                     setPathState(14);
                 }
@@ -147,7 +147,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 15:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(1);
+                    follower.setMaxPower(0.9);
                     auto.follower.followPath(auto.goal4, true);
                     setPathState(16);
                 }
@@ -160,8 +160,7 @@ public class BlueObservation extends OpMode {
                 break;
             case 17:
                 if(auto.notBusy()) {
-                    follower.setMaxPower(0.9);
-                    auto.follower.followPath(auto.gather5, true);
+                    auto.follower.followPath(auto.park, true);
                     setPathState(18);
                 }
                 break;
@@ -169,30 +168,10 @@ public class BlueObservation extends OpMode {
                 if(auto.notBusy()) {
                     R.liftMotor.setPower(0);
                     R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    auto.startSpecScore();
                     setPathState(19);
                 }
                 break;
             case 19:
-                if(auto.notBusy()) {
-                    follower.setMaxPower(1);
-                    auto.follower.followPath(auto.goal5, true);
-                    setPathState(20);
-                }
-                break;
-            case 20:
-                if(auto.notBusy()) {
-                    auto.startPostSpecScore();
-                    setPathState(21);
-                }
-                break;
-            case 21:
-                if(auto.notBusy()) {
-                    auto.follower.followPath(auto.park, true);
-                    setPathState(22);
-                }
-                break;
-            case 22:
                 if(auto.notBusy()){
                     setPathState(-1);
                 }

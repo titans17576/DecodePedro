@@ -89,7 +89,7 @@ public class StraightBackAndForth extends OpMode {
                 follower.followPath(forwards);
             }
         }
-        R.extendo.setPosition(0.64);
+
         telemetryA.addData("going forward", forward);
         follower.telemetryDebug(telemetryA);
     }

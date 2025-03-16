@@ -92,7 +92,7 @@ public class Teleop extends OpMode {
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             R.liftMotor2.setPower(0);
             R.liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        } else if (gamepad1.y && !previousGamepad1.y) {
+        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             R.liftMotor2.setPower(0);
@@ -101,12 +101,17 @@ public class Teleop extends OpMode {
             R.liftMotor.setPower(0);
             R.liftMotor2.setPower(0);
         }*/
-        if (R.liftMotor.getTargetPosition() < 0) {
+        /*if (R.liftMotor.getTargetPosition() < 0) {
             R.liftMotor.setTargetPosition(0);
             R.liftMotor2.setTargetPosition(0);
-        } else if (R.liftMotor.getTargetPosition() > 3000) {
+        } else */if (R.liftMotor.getTargetPosition() > 3000) {
             R.liftMotor.setTargetPosition(3000);
             R.liftMotor2.setTargetPosition(3000);
+        }
+        if (gamepad1.dpad_down && !previousGamepad1.dpad_down) {
+            IntakeFSM.setExtendoState(intakeFSM.ExtendoState.RETRACT);
+            IntakeFSM.setArmState(intakeFSM.ArmState.HOVER);
+            IntakeFSM.setVerticalWristState(intakeFSM.VerticalWristState.GRAB);
         }
 
         /*if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
@@ -150,15 +155,22 @@ public class Teleop extends OpMode {
         }*/
 
         /*emergency motor encoder reset*/
-        /*if (gamepad1.y && !previousGamepad1.y) {
+        /*if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
             R.liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             R.liftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
             R.liftMotor.setPower(1);
-        } else if (gamepad1.b && !previousGamepad1.b) {
+            R.liftMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            R.liftMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+            R.liftMotor2.setPower(1);
+        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
             R.liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             R.liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             R.liftMotor.setPower(0);
             R.liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            R.liftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            R.liftMotor2.setDirection(DcMotorSimple.Direction.FORWARD);
+            R.liftMotor2.setPower(0);
+            R.liftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }*/
 
         /* Telemetry Outputs of our Follower */

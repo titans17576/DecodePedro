@@ -10,7 +10,8 @@ import util.robot;
 public class intakeFSM {
     public enum ExtendoState{
         EXTEND,
-        RETRACT
+        RETRACT,
+        TRANSFER
     }
     public enum ClawState{
         OPEN,
@@ -33,7 +34,8 @@ public class intakeFSM {
     }
     // Position variables
 
-    final double extend_position = 0.3;
+    final double extend_position = 0.22;
+    final double extendTransfer_position = 0.24;
     final double retract_position = 0.13;
     final double open_position = 0.5;
     final double close_position = 0.35;
@@ -41,7 +43,7 @@ public class intakeFSM {
     final double hover_position = 0.52;
     final double transfer_position = 0.31;
     final double verticalWrist_grab_position = 0.11;
-    final double verticalWrist_transfer_position = 0.7;
+    final double verticalWrist_transfer_position = 0.8;
     final double horizontalWrist_LR_position = 0.79;
     final double horizontalWrist_UD_position = 0.5;
     final double horizontalWrist_diagonalL_position = 0.65;
@@ -100,8 +102,22 @@ public class intakeFSM {
                 if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
                     setExtendoState(ExtendoState.EXTEND);
                 }
+                if (currentGamepad.y && !previousGamepad.y) {
+                    setExtendoState(ExtendoState.TRANSFER);
+                }
                 break;
             case EXTEND:
+                if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+                    setExtendoState(ExtendoState.RETRACT);
+                }
+                if (currentGamepad.y && !previousGamepad.y) {
+                    setExtendoState(ExtendoState.TRANSFER);
+                }
+                break;
+            case TRANSFER:
+                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                    setExtendoState(ExtendoState.EXTEND);
+                }
                 if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                     setExtendoState(ExtendoState.RETRACT);
                 }
@@ -110,12 +126,12 @@ public class intakeFSM {
         switch (clawState) {
             case OPEN:
                 // State inputs
-                if (currentGamepad.b && !previousGamepad.b) {
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     setClawState(ClawState.CLOSE);
                 }
                 break;
             case CLOSE:
-                if (currentGamepad.b && !previousGamepad.b) {
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     setClawState(ClawState.OPEN);
                 }
                 break;
@@ -173,6 +189,9 @@ public class intakeFSM {
                 break;
             case RETRACT:
                 moveExtendoTo(retract_position);
+                break;
+            case TRANSFER:
+                moveExtendoTo(extendTransfer_position);
                 break;
         }
         switch(clawState) {
