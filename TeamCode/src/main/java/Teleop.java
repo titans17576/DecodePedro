@@ -1,14 +1,11 @@
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.util.Constants;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.constants.Constants;
 import util.robot;
 
 /**
@@ -38,8 +35,7 @@ public class Teleop extends OpMode {
     /** This method is call once when init is played, it initializes the follower **/
     @Override
     public void init() {
-        Constants.setConstants(FConstants.class,LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         currentGamepad1 = new Gamepad();
         previousGamepad1 = new Gamepad();
@@ -81,7 +77,7 @@ public class Teleop extends OpMode {
         - Robot-Centric Mode: true
         */
         double speed = (gamepad1.x) ? highSpeed:defaultSpeed;
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
+        //follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         follower.update();
 
         SpecimenFSM.testUpdate(currentGamepad1, previousGamepad1);

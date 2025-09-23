@@ -1,13 +1,13 @@
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.constants.Constants;
 import util.robot;
 
 @Autonomous(name="testAutom")
@@ -24,8 +24,7 @@ public class testAutom extends OpMode {
     @Override
     public void init() {
         R = new robot(hardwareMap);
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startPose);
         auto = new Auto(R, telemetry, follower, Auto.Side.OBSERVATION);
     }
