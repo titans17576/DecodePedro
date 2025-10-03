@@ -17,7 +17,7 @@ public class robot{
     // public DcMotorEx leftFront, leftRear, rightRear, rightFront,
     private List<DcMotorEx> motors;
     //public CRServo claw;
-    public Servo claw, intakeWrist1, intakeWrist2, extendo, intakeArm, intakeClaw, specArm, specArm2;
+    public Servo claw;
     public robot() {
 
     }

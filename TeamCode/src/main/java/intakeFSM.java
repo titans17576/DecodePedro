@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import util.robot;
-
+/*
 public class intakeFSM {
     public enum ExtendoState{
         EXTEND,
@@ -251,5 +251,5 @@ public class intakeFSM {
     public void setHorizontalWristState(HorizontalWristState state){
         horizontalWristState = state;
     }
-}
+}*/
 

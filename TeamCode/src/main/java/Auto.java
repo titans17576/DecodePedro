@@ -28,8 +28,6 @@ public class Auto {
     private robot R;
     public boolean actionBusy;
 
-    public specimenFSM SpecimenFSM;
-    public intakeFSM IntakeFSM;
 
     private Side side;
     public Timer transferTimer = new Timer();
@@ -65,8 +63,7 @@ public class Auto {
     public int DISTANCE = 1;
 
     public Auto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
-        SpecimenFSM = new specimenFSM(Robot, telemetry);
-        IntakeFSM = new intakeFSM(Robot, telemetry);
+
 
 
         this.follower = follower;
@@ -214,23 +211,14 @@ public class Auto {
 
     }
     public void start(){
-        IntakeFSM.setArmState(intakeFSM.ArmState.HOVER);
-        IntakeFSM.setExtendoState(intakeFSM.ExtendoState.RETRACT);
-        IntakeFSM.setVerticalWristState(intakeFSM.VerticalWristState.GRAB);
+
     }
     public void update(){
         follower.update();
-        SpecimenFSM.update();
-        IntakeFSM.update();
 
-
-
-        scoreSpec();
-        postSpecScore();
-        postSpecScore2();
         park();
     }
-    public void transfer(){
+    /*public void transfer(){
         switch(transferState){
             case 1:
                 actionBusy = true;
@@ -441,13 +429,12 @@ public class Auto {
                 break;
         }
 
-    }
+    }*/
 
     public void park(){
         switch(parkState){
             case 1:
-                IntakeFSM.setArmState(intakeFSM.ArmState.TRANSFER);
-                IntakeFSM.setVerticalWristState(intakeFSM.VerticalWristState.TRANSFER);
+
                 break;
             case 2:
                 setParkState(-1);

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import util.robot;
-
+/*
 public class specimenFSM {
 
     public enum ClawGrabState{
@@ -171,7 +171,7 @@ public class specimenFSM {
         update();
     }
     public void testUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
-        /*updateTelemetry("Test");*/
+
         if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
             setLiftState(LiftState.MID);
             moveArmTo(specArm_hang_position);
@@ -321,4 +321,4 @@ public class specimenFSM {
     public boolean actionNotBusy(){
         return !actionBusy;
     }
-}
+}*/

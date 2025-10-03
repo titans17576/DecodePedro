@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import util.robot;
-
+/*
 public class scoopFSM {
     public enum ScoopState{
         SCORE,
@@ -95,5 +95,5 @@ public class scoopFSM {
     public void setState(ScoopState state){
         scoopState = state;
     }
-}
+}*/
 
