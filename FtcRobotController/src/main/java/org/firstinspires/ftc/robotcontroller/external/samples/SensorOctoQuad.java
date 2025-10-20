@@ -114,7 +114,7 @@ public class SensorOctoQuad extends LinearOpMode {
             }
 
             // Read all the encoder data.  Load into local members.
-            readOdometryPods();
+            /*readOdometryPods();*/
 
             // Display the values.
             telemetry.addData("Left ", "%8d counts", posLeft);
@@ -124,7 +124,7 @@ public class SensorOctoQuad extends LinearOpMode {
         }
     }
 
-    private void readOdometryPods() {
+    /*private void readOdometryPods() {
         // For best performance, we should only perform ONE transaction with the OctoQuad each cycle.
         // Since this example only needs to read positions from a few channels, we could use either
         //   readPositionRange(idxFirst, idxLast) to get a select number of sequential channels
@@ -137,5 +137,5 @@ public class SensorOctoQuad extends LinearOpMode {
         posLeft  = positions[ODO_LEFT];
         posRight = positions[ODO_RIGHT];
         posPerp  = positions[ODO_PERP];
-    }
+    }*/
 }

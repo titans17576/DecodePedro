@@ -25,17 +25,17 @@ public class Teleop extends OpMode {
     private Gamepad previousGamepad2;
 
 
-
-
-    private final Pose startPose = new Pose(0,0,0);
+    private final Pose startPose = new Pose(0, 0, 0);
     private double defaultSpeed = 1;
     private double highSpeed = 1;
 
-    /** This method is call once when init is played, it initializes the follower **/
+    /**
+     * This method is call once when init is played, it initializes the follower
+     **/
     @Override
     public void init() {
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
+        /*follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);*/
         currentGamepad1 = new Gamepad();
         previousGamepad1 = new Gamepad();
         currentGamepad2 = new Gamepad();
@@ -45,22 +45,28 @@ public class Teleop extends OpMode {
 
     }
 
-    /** This method is called continuously after Init while waiting to be started. **/
+    /**
+     * This method is called continuously after Init while waiting to be started.
+     **/
     @Override
     public void init_loop() {
     }
 
-    /** This method is called once at the start of the OpMode. **/
+    /**
+     * This method is called once at the start of the OpMode.
+     **/
     @Override
     public void start() {
-        follower.startTeleopDrive();
+        /*follower.startTeleopDrive();*/
 
         /*R.intakeArm.setPosition(0.55);
         R.extendo.setPosition(0.14);
         R.intakeWrist1.setPosition(0.1);*/
     }
 
-    /** This is the main loop of the opmode and runs continuously after play **/
+    /**
+     * This is the main loop of the opmode and runs continuously after play
+     **/
     @Override
     public void loop() {
 
@@ -73,17 +79,17 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-        double speed = (gamepad1.x) ? highSpeed:defaultSpeed;
+        double speed = (gamepad1.x) ? highSpeed : defaultSpeed;
         //follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
-        follower.update();
+        /*follower.update();*/
 
 
-
-
-        } /*else if (gamepad1.b && !previousGamepad1.b) {
-            R.liftMotor.setPower(0);
-            R.liftMotor2.setPower(0);
-        }*/
+        if (gamepad1.b && !previousGamepad1.b) {
+            R.shooter.setPower(0.67);
+        }
+        else if (gamepad1.a && !previousGamepad1.a){
+            R.shooter.setPower(0.5);
+        }
 
 
         /* Telemetry Outputs of our Follower
@@ -92,7 +98,8 @@ public class Teleop extends OpMode {
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Lift Ticks", R.liftMotor.getCurrentPosition());
         Update Telemetry to the Driver Hub
-        telemetry.update();
+        telemetry.update();*/
         previousGamepad1.copy(currentGamepad1);
-        previousGamepad2.copy(currentGamepad2);*/
+        previousGamepad2.copy(currentGamepad2);
     }
+}

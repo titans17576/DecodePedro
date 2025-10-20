@@ -39,8 +39,8 @@ public class robot{
 
         //claw.setPower(0);
 
-        shooter.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         /*
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
