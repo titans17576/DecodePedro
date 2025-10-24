@@ -13,7 +13,8 @@ import util.robot;
 public class decodeAuto {
     public Follower follower;
     public Telemetry telemetry;
-    public enum Side{
+
+    public enum Side {
         RED,
         BLUE,
     }
@@ -38,10 +39,9 @@ public class decodeAuto {
     public int extendRetractState = -1;
 
     public Pose startPose,
-        shoot1Pose, center1Pose, release1Pose, releaseControl1Pose,
-        pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose,
-        pickup3Pose, pickup3Control1Pose, end1Pose
-    ;
+            shoot1Pose, center1Pose, release1Pose, releaseControl1Pose,
+            pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose,
+            pickup3Pose, pickup3Control1Pose, end1Pose;
 
     public Path scorePreload, end;
 
@@ -53,7 +53,6 @@ public class decodeAuto {
     public decodeAuto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
 
 
-
         this.follower = follower;
         this.telemetry = telemetry;
         this.side = side;
@@ -63,8 +62,9 @@ public class decodeAuto {
 
         init();
     }
-    public void createPose(){
-        switch(side){
+
+    public void createPose() {
+        switch (side) {
             case RED:
                 startPose = new Pose(132, 61, Math.toRadians(0));
                 shoot1Pose = new Pose(107, 108, Math.toRadians(-135));
@@ -95,8 +95,9 @@ public class decodeAuto {
                 break;
         }
     }
-    public void buildPaths(){
-        switch(side) {
+
+    public void buildPaths() {
+        switch (side) {
             case RED:
             case BLUE:
         }
@@ -137,332 +138,18 @@ public class decodeAuto {
         end = new Path(new BezierLine(shoot1Pose, end1Pose));
         end.setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading());
     }
+
     public void init() {
 
     }
-    public void start(){
+
+    public void start() {
 
     }
-    public void update(){
+
+    public void update() {
         follower.update();
 
         park();
     }
-    /*public void transfer(){
-        switch(transferState){
-            case 1:
-                actionBusy = true;
-                SpecimenFSM.setLiftState(specimenFSM.LiftState.MID);
-                setTransferState(2);
-                break;
-            case 2:
-                if(SpecimenFSM.actionNotBusy()){
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
-                    transferTimer.resetTimer();
-                    setTransferState(3);
-                }
-                break;
-            case 3:
-                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    follower.followPath(score[specimenNum][0], false);
-                    setTransferState(4);
-                }
-                break;
-            case 4:
-                if(!follower.isBusy()){
-                    SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
-                    transferTimer.resetTimer();
-                    setTransferState(5);
-            }
-                break;
-            case 5:
-                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    follower.followPath(score[specimenNum][1], false);
-                    setTransferState(6);
-                }
-                break;
-            case 6:
-                if (!follower.isBusy()){
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
-                    transferTimer.resetTimer();
-                    setTransferState(7);
-                }
-                break;
-            case 7:
-                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
-                    setTransferState(8);
-                }
-                break;
-
-            case 8:
-                if(SpecimenFSM.actionNotBusy()){
-                    actionBusy = false;
-                    specimenNum = -1;
-                    setTransferState(-1);
-
-                }
-                break;
-        }
-    }
-
-    public void fakeTransfer(){
-        switch(fakeTransferState){
-            case 1:
-                actionBusy = true;
-                SpecimenFSM.setLiftState(specimenFSM.LiftState.MID);
-                setFakeTransferState(2);
-                break;
-            case 2:
-                if(SpecimenFSM.actionNotBusy()){
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
-                    transferTimer.resetTimer();
-                    setFakeTransferState(3);
-                }
-                break;
-            case 3:
-                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
-                    transferTimer.resetTimer();
-                    setFakeTransferState(4);
-                }
-                break;
-            case 4:
-                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
-                    transferTimer.resetTimer();
-                    setFakeTransferState(5);
-                }
-                break;
-            case 5:
-                if (transferTimer.getElapsedTimeSeconds() > 0.5) {
-                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
-                    setFakeTransferState(6);
-                }
-                break;
-
-            case 6:
-                if(SpecimenFSM.actionNotBusy()){
-                    actionBusy = false;
-                    specimenNum = -1;
-                    setFakeTransferState(-1);
-
-                }
-
-        }
-
-    }
-
-    public void deposit(){
-        switch(depositState){
-            case 1:
-                actionBusy = true;
-                depositTimer.resetTimer();
-                setDepositState(2);
-                break;
-            case 2:
-                if(depositTimer.getElapsedTimeSeconds() > 1.25){
-
-                    depositTimer.resetTimer();
-                    setDepositState(3);
-                }
-                break;
-            case 3:
-                if(depositTimer.getElapsedTimeSeconds() > 4){
-                    actionBusy = false;
-                    setDepositState(-1);
-                }
-        }
-    }
-
-    public void extendSweep(){
-        switch(extendSweepState){
-            case 1:
-                actionBusy = true;
-                IntakeFSM.setExtendoState(intakeFSM.ExtendoState.EXTEND);
-                IntakeFSM.setArmState(intakeFSM.ArmState.GRAB);
-        }
-    }
-
-    public void scoreSpec(){
-        switch(scoreSpecState){
-            case 1:
-                actionBusy = true;
-                SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.CLOSED);
-                SpecimenFSM.setLiftState(specimenFSM.LiftState.MID);
-                specScoreTimer.resetTimer();
-                setScoreSpecState(2);
-                break;
-            case 2:
-                if(specScoreTimer.getElapsedTimeSeconds() > 0.3){
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.UP);
-                    SpecimenFSM.setSpecArmState(specimenFSM.SpecArmState.HANG);
-                    setScoreSpecState(3);
-                }
-                break;
-            case 3:
-                if(specScoreTimer.getElapsedTimeSeconds() > 0.7){
-                    actionBusy = false;
-                    setScoreSpecState(-1);
-                }
-        }
-    }
-
-    public void postSpecScore(){
-        switch(postSpecScoreState){
-            case 1:
-                actionBusy = true;
-                SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
-                postSpecScoreTimer.resetTimer();
-                setPostSpecScoreState(2);
-                break;
-            case 2:
-                if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.2) {
-                    actionBusy = false;
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.DOWN);
-                    SpecimenFSM.setSpecArmState(specimenFSM.SpecArmState.GRAB);
-                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
-                    postSpecScoreTimer.resetTimer();
-                    setPostSpecScoreState(3);
-                }
-                break;
-            case 3:
-                if(postSpecScoreTimer.getElapsedTimeSeconds() > 1) {
-                    setPostSpecScoreState(-1);
-                }
-                break;
-        }
-
-    }
-    public void postSpecScore2(){
-        switch(postSpecScoreState2){
-            case 1:
-                actionBusy = true;
-                SpecimenFSM.setGrabState(specimenFSM.ClawGrabState.OPEN);
-                postSpecScoreTimer.resetTimer();
-                setPostSpecScoreState(2);
-                break;
-            case 2:
-                if (postSpecScoreTimer.getElapsedTimeSeconds() > 0.5) {
-                    actionBusy = false;
-                    SpecimenFSM.setWristState(specimenFSM.ClawWristState.MID);
-                    SpecimenFSM.setSpecArmState(specimenFSM.SpecArmState.GRAB);
-                    SpecimenFSM.setLiftState(specimenFSM.LiftState.ZERO);
-                    postSpecScoreTimer.resetTimer();
-                    setPostSpecScoreState(3);
-                }
-                break;
-            case 3:
-                if(postSpecScoreTimer.getElapsedTimeSeconds() > 1.5) {
-                    setPostSpecScoreState(-1);
-                }
-                break;
-        }
-
-    }*/
-
-    public void park(){
-        switch(parkState){
-            case 1:
-
-                break;
-            case 2:
-                setParkState(-1);
-                break;
-        }
-    }
-
-    public void setTransferState(int x) {
-        transferState = x;
-        telemetry.addData("Transfer", x);
-    }
-
-    public void setFakeTransferState(int x) {
-        transferState = x;
-        telemetry.addData("Transfer", x);
-    }
-
-    public void setDepositState(int x){
-        depositState = x;
-        telemetry.addData("Deposit", x);
-    }
-    public void setScoreSpecState(int x){
-        scoreSpecState = x;
-        telemetry.addData("ScoreSpec", x);
-    }
-
-    public void setPostSpecScoreState(int x){
-        postSpecScoreState = x;
-        telemetry.addData("PostScoreSpec", x);
-    }
-    public void setPostSpecScoreState2(int x){
-        postSpecScoreState2 = x;
-        telemetry.addData("PostScoreSpec2", x);
-    }
-
-    public void setParkState(int x){
-        parkState = x;
-        telemetry.addData("Park", x);
-    }
-    public void setExtendSweepState(int x){
-        extendSweepState = x;
-        telemetry.addData("ExtendSweep", x);
-    }
-    public void setExtendRetractState(int x){
-        extendRetractState = x;
-        telemetry.addData("ExtendRetract", x);
-    }
-
-    public void startTransfer(int specimenNum) {
-        if (actionNotBusy()) {
-            setTransferState(1);
-            this.specimenNum = specimenNum;
-        }
-
-    }
-    public void startDeposit(){
-        if (actionNotBusy()) {
-            setDepositState(1);
-        }
-    }
-    public void startSpecScore(){
-        if (actionNotBusy()) {
-            setScoreSpecState(1);
-        }
-    }
-    
-    public void startPostSpecScore(){
-        if (actionNotBusy()){
-            setPostSpecScoreState(1);
-        }
-    }
-    public void startPostSpecScore2(){
-        if (actionNotBusy()){
-            setPostSpecScoreState2(1);
-        }
-    }
-    public void startExtendSweep(){
-        if (actionNotBusy()){
-            setExtendSweepState(1);
-        }
-    }
-    public void startExtendRetract(){
-        if (actionNotBusy()){
-            setExtendRetractState(1);
-        }
-    }
-
-    public void startPark(){
-        setParkState(1);
-    }
-
-
-    public boolean actionNotBusy() {
-        return !actionBusy;
-    }
-
-    public boolean notBusy() {
-        return (!follower.isBusy() && actionNotBusy());
-    }
-
 }
