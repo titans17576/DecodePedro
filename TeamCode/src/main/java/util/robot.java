@@ -13,11 +13,12 @@ import java.util.List;
  */
 
 public class robot{
-    public DcMotorEx  liftMotor, liftMotor2, shooter;
+    public DcMotorEx  liftMotor, liftMotor2, intakeLow, intakeHigh, shooter;
     // public DcMotorEx leftFront, leftRear, rightRear, rightFront,
     private List<DcMotorEx> motors;
     //public CRServo claw;
     public Servo claw;
+
     public robot() {
 
     }
@@ -35,6 +36,8 @@ public class robot{
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
         liftMotor2 = hardwareMap.get(DcMotorEx.class, "liftMotor2");
         */
+        intakeLow = hardwareMap.get(DcMotorEx.class, "intakeLow");
+        intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
 
         //claw.setPower(0);
