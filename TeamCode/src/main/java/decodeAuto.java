@@ -49,7 +49,6 @@ public class decodeAuto {
 
     public Path[][] score = new Path[5][2];
     public int DISTANCE = 1;
-
     public decodeAuto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
 
 
@@ -137,6 +136,24 @@ public class decodeAuto {
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading());
         end = new Path(new BezierLine(shoot1Pose, end1Pose));
         end.setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading());
+    }
+
+    public void intakeBalls(int numBalls) {
+        R.intakeLow.setPower(1);
+        Thread.sleep(numBalls * 500);
+        R.intakeLow.setPower(0);
+    }
+
+    public void sendBallsToShooter(int numBalls) {
+        R.intakeHigh.setPower(1);
+        Thread.sleep(numBalls * 500);
+        R.intakeHigh.setPower(0);
+    }
+
+    public void shoot(int numBalls) {
+        R.shooter.setPower(1);
+        Thread.sleep(numBalls * 500);
+        R.shooter.setPower(0);
     }
 
     public void init() {
