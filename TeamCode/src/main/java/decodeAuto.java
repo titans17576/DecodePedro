@@ -96,10 +96,6 @@ public class decodeAuto {
     }
 
     public void buildPaths() {
-        switch (side) {
-            case RED:
-            case BLUE:
-        }
         release1 = follower.pathBuilder()
                 .addPath(new BezierLine(shoot1Pose, center1Pose))
                 .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
@@ -139,6 +135,10 @@ public class decodeAuto {
     }
 
     public void intakeBalls(int numBalls) {
+        if (numBalls == 0) {
+            R.intakeLow.setPower(R.intakeLow.getPower() == 0 ? 1 : 0);
+            return;
+        }
         R.intakeLow.setPower(1);
         Thread.sleep(numBalls * 500);
         R.intakeLow.setPower(0);
@@ -152,8 +152,12 @@ public class decodeAuto {
 
     public void shoot(int numBalls) {
         R.shooter.setPower(1);
-        Thread.sleep(numBalls * 500);
+        for (int i = 0; i < numBalls; i++) {
+            sendBallsToShooter(1);
+            Thread.sleep(500);
+        }
         R.shooter.setPower(0);
+
     }
 
     public void init() {
