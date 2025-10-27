@@ -91,10 +91,16 @@ public class Teleop extends OpMode {
             R.shooter.setPower(0.6);
         }
         if (gamepad1.x && !previousGamepad1.x) {
-            R.intake.setPower(1);
+            R.intakeLow.setPower(1);
         }
         else if (gamepad1.y && !previousGamepad1.y){
-            R.intake.setPower(0);
+            R.intakeLow.setPower(0);
+        }
+        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
+            R.intakeHigh.setPower(1);
+        }
+        else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
+            R.intakeHigh.setPower(0);
         }
 
 

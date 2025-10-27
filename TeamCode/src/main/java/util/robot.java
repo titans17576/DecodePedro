@@ -39,7 +39,6 @@ public class robot{
         intakeLow = hardwareMap.get(DcMotorEx.class, "intakeLow");
         intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
 
         //claw.setPower(0);
 
@@ -47,9 +46,13 @@ public class robot{
         shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeLow.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeLow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeLow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        intakeHigh.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeHigh.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeHigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
  /*       motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 

@@ -140,13 +140,13 @@ public class decodeAuto {
             return;
         }
         R.intakeLow.setPower(1);
-        Thread.sleep(numBalls * 500);
+        //Thread.sleep(numBalls * 500);
         R.intakeLow.setPower(0);
     }
 
     public void sendBallsToShooter(int numBalls) {
         R.intakeHigh.setPower(1);
-        Thread.sleep(numBalls * 500);
+        //Thread.sleep(numBalls * 500);
         R.intakeHigh.setPower(0);
     }
 
@@ -154,7 +154,7 @@ public class decodeAuto {
         R.shooter.setPower(1);
         for (int i = 0; i < numBalls; i++) {
             sendBallsToShooter(1);
-            Thread.sleep(500);
+            //Thread.sleep(500);
         }
         R.shooter.setPower(0);
 
@@ -171,6 +171,5 @@ public class decodeAuto {
     public void update() {
         follower.update();
 
-        park();
     }
 }
