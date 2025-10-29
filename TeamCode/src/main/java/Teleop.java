@@ -1,9 +1,12 @@
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import pedroPathing.constants.Constants;
 import util.robot;
@@ -42,7 +45,6 @@ public class Teleop extends OpMode {
         previousGamepad2 = new Gamepad();
 
         R = new robot(hardwareMap);
-
     }
 
     /**
@@ -83,18 +85,24 @@ public class Teleop extends OpMode {
         //follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
         /*follower.update();*/
 
+        // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
         if (gamepad1.b && !previousGamepad1.b) {
-            R.shooter.setPower(0.64);
+            // R.shooter.setPower(0.64);
+            R.shooter.setVelocity(powerToTicksPerSecond(0.64));
         }
         else if (gamepad1.a && !previousGamepad1.a){
-            R.shooter.setPower(0.6);
+            // R.shooter.setPower(0.6);
+            R.shooter.setVelocity(powerToTicksPerSecond(0.6));
         }
+
         if (gamepad1.x && !previousGamepad1.x) {
-            R.intake.setPower(1);
+            // R.intake.setPower(1);
+            R.shooter.setVelocity(powerToTicksPerSecond(1));
         }
         else if (gamepad1.y && !previousGamepad1.y){
-            R.intake.setPower(0);
+            // R.intake.setPower(0);
+            R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
 
 
@@ -107,5 +115,9 @@ public class Teleop extends OpMode {
         telemetry.update();*/
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
+    }
+
+    private double powerToTicksPerSecond(double power) {
+        return power * ((double) 6000 / 60) * 28;
     }
 }
