@@ -14,7 +14,7 @@ import java.util.List;
 
 public class robot{
     public DcMotorEx  liftMotor, liftMotor2, intakeLow, intakeHigh, shooter;
-    // public DcMotorEx leftFront, leftRear, rightRear, rightFront,
+    public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
     //public CRServo claw;
     public Servo claw;
@@ -44,16 +44,16 @@ public class robot{
 
         shooter.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.3, 0, 0, 0));
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.3, 0, 0, 0));
 
         intakeLow.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeLow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeLow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeLow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeHigh.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeHigh.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        intakeHigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeHigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
  /*       motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 

@@ -4,9 +4,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 
 import pedroPathing.constants.Constants;
 import util.robot;
+import java.util.function.Supplier;
 
 /**
  * This is an example teleop that showcases movement and util.robot-centric driving.
@@ -23,23 +31,34 @@ public class Teleop extends OpMode {
     private Gamepad previousGamepad1;
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
-
+    private boolean automatedDrive;
+    private Supplier<PathChain> pathChain;
+    private TelemetryManager telemetryM;
 
     private final Pose startPose = new Pose(0, 0, 0);
     private double defaultSpeed = 1;
     private double highSpeed = 1;
+    private double launcher = 0.5;
+    private boolean slowMode = false;
+    private double slowModeMultiplier = 0.5;
 
     /**
      * This method is call once when init is played, it initializes the follower
      **/
     @Override
     public void init() {
-        /*follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);*/
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startPose);
+        follower.update();
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         currentGamepad1 = new Gamepad();
         previousGamepad1 = new Gamepad();
         currentGamepad2 = new Gamepad();
         previousGamepad2 = new Gamepad();
+        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .build();
 
         R = new robot(hardwareMap);
     }
@@ -56,11 +75,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void start() {
-        /*follower.startTeleopDrive();*/
-
-        /*R.intakeArm.setPosition(0.55);
-        R.extendo.setPosition(0.14);
-        R.intakeWrist1.setPosition(0.1);*/
+        follower.startTeleopDrive();
     }
 
     /**
@@ -78,43 +93,77 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-        double speed = (gamepad1.x) ? highSpeed : defaultSpeed;
-        //follower.setTeleOpMovementVectors(-gamepad1.left_stick_y*speed, -gamepad1.left_stick_x*speed, -gamepad1.right_stick_x*speed, true);
-        /*follower.update();*/
+        follower.update();
+        telemetryM.update();
+
+        if (!automatedDrive) {
+            //Make the last parameter false for field-centric
+            //In case the drivers want to use a "slowMode" you can scale the vectors
+
+            //This is the normal version to use in the TeleOp
+            if (!slowMode) follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
+                    true // Robot Centric
+            );
+
+                //This is how it looks with slowMode on
+            else follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y * slowModeMultiplier,
+                    -gamepad1.left_stick_x * slowModeMultiplier,
+                    -gamepad1.right_stick_x * slowModeMultiplier,
+                    true // Robot Centric
+            );
+        }
 
         // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
-        if (gamepad1.b && !previousGamepad1.b) {
-            // R.shooter.setPower(0.64);
-            R.shooter.setVelocity(powerToTicksPerSecond(0.64));
+        if (gamepad1.a && !previousGamepad1.a) {
+            R.shooter.setPower(launcher);
+            //R.shooter.setVelocity(powerToTicksPerSecond(0.64));
         }
-        else if (gamepad1.a && !previousGamepad1.a){
-            // R.shooter.setPower(0.6);
-            R.shooter.setVelocity(powerToTicksPerSecond(0.6));
+        else if (gamepad1.b && !previousGamepad1.b){
+            R.shooter.setPower(0);
+            //R.shooter.setVelocity(powerToTicksPerSecond(0.6));
+        }
+        else if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
+            launcher = launcher + 0.05;
+            R.shooter.setPower(launcher);
+            //R.shooter.setVelocity(powerToTicksPerSecond(0.6));
+        }
+        else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+            launcher = launcher - 0.05;
+            R.shooter.setPower(launcher);
+            //R.shooter.setVelocity(powerToTicksPerSecond(0.6));
         }
 
         if (gamepad1.x && !previousGamepad1.x) {
-            // R.intake.setPower(1);
-            R.shooter.setVelocity(powerToTicksPerSecond(1));
+            R.intakeLow.setPower(1);
+            //R.shooter.setVelocity(powerToTicksPerSecond(1));
         }
         else if (gamepad1.y && !previousGamepad1.y){
-            // R.intake.setPower(0);
-            R.shooter.setVelocity(powerToTicksPerSecond(0));
+            R.intakeLow.setPower(0);
+            //R.shooter.setVelocity(powerToTicksPerSecond(0));
+        }
+        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
+            R.intakeHigh.setPower(1);
+            //R.shooter.setVelocity(powerToTicksPerSecond(1));
+        }
+        else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
+            R.intakeHigh.setPower(0);
+            //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
 
 
-        /* Telemetry Outputs of our Follower
-        telemetry.addData("X", follower.getPose().getX());
-        telemetry.addData("Y", follower.getPose().getY());
-        telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("Lift Ticks", R.liftMotor.getCurrentPosition());
-        Update Telemetry to the Driver Hub
-        telemetry.update();*/
+
+        telemetryM.debug("position", follower.getPose());
+        telemetryM.debug("velocity", follower.getVelocity());
+        telemetryM.debug("automatedDrive", automatedDrive);
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
     }
 
-    private double powerToTicksPerSecond(double power) {
-        return power * ((double) 6000 / 60) * 28;
+    //private double powerToTicksPerSecond(double power) {
+        //return power * ((double) 6000 / 60) * 28;
     }
-}

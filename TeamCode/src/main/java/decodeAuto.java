@@ -5,9 +5,13 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import pedroPathing.constants.Constants;
 import util.robot;
 
 public class decodeAuto {
@@ -19,7 +23,7 @@ public class decodeAuto {
         BLUE,
     }
 
-    private robot R;
+    public robot R;
     public boolean actionBusy;
 
 

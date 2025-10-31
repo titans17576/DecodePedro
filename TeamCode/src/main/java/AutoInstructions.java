@@ -52,7 +52,7 @@ public class AutoInstructions extends OpMode {
                 break;
             case 2:
                 if (!auto.follower.isBusy()) {
-                    auto.shoot(1);
+                    auto.shoot(3);
                     setPathState(3);
                 }
                 break;
@@ -68,7 +68,7 @@ public class AutoInstructions extends OpMode {
                 break;
             case 5:
                 if (!auto.follower.isBusy()) {
-                    auto.shoot(1);
+                    auto.shoot(3);
                     setPathState(6);
                 }
                 break;
@@ -78,7 +78,7 @@ public class AutoInstructions extends OpMode {
                 break;
             case 7:
                 if (!auto.follower.isBusy()) {
-                    auto.shoot(1);
+                    auto.shoot(3);
                     setPathState(8);
                 }
                 break;
@@ -88,7 +88,7 @@ public class AutoInstructions extends OpMode {
                 break;
             case 9:
                 if (!auto.follower.isBusy()) {
-                    auto.shoot(1);
+                    auto.shoot(3);
                     setPathState(10);
                 }
                 break;
