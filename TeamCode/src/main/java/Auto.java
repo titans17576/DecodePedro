@@ -215,8 +215,6 @@ public class Auto {
     }
     public void update(){
         follower.update();
-
-        park();
     }
     /*public void transfer(){
         switch(transferState){

@@ -28,31 +28,19 @@ public class decodeAuto {
 
 
     private Side side;
-    public Timer transferTimer = new Timer();
-    public Timer specScoreTimer = new Timer();
-    public Timer depositTimer = new Timer();
-    public Timer postSpecScoreTimer = new Timer();
-    public int transferState = -1, specimenNum = -1;
-    public int depositState = -1;
-    public int scoreSpecState = -1;
-    public int postSpecScoreState = -1;
-    public int postSpecScoreState2 = -1;
-    public int fakeTransferState = -1;
-    public int parkState = -1;
-    public int extendSweepState = -1;
-    public int extendRetractState = -1;
+    public Timer shootTimer = new Timer();
+    public Timer intakeTimer = new Timer();
+    public int shootState = -1;
+    public int intakeState = -1;
 
     public Pose startPose,
             shoot1Pose, center1Pose, release1Pose, releaseControl1Pose,
             pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose,
             pickup3Pose, pickup3Control1Pose, end1Pose;
 
-    public Path scorePreload, end;
+    //public Path scorePreload, end;
 
-    public PathChain release1, shoot1, shoot2, shoot3;
-
-    public Path[][] score = new Path[5][2];
-    public int DISTANCE = 1;
+    public PathChain release1, shoot1, shoot2, shoot3, scorePreload, end;
     public decodeAuto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
 
 
@@ -69,32 +57,32 @@ public class decodeAuto {
     public void createPose() {
         switch (side) {
             case RED:
-                startPose = new Pose(132, 61, Math.toRadians(0));
-                shoot1Pose = new Pose(107, 108, Math.toRadians(-135));
-                center1Pose = new Pose(79, 96, Math.toRadians(-270));
-                release1Pose = new Pose(127, 72);
+                startPose = new Pose(108, 136, Math.toRadians(270));
+                shoot1Pose = new Pose(96, 96, Math.toRadians(225));
+                center1Pose = new Pose(79, 96, Math.toRadians(90));
+                release1Pose = new Pose(127, 72, Math.toRadians(0));
                 releaseControl1Pose = new Pose(78, 70);
-                pickup1Pose = new Pose(123, 84);
+                pickup1Pose = new Pose(123, 84, Math.toRadians(0));
                 pickup1Control1Pose = new Pose(47, 76);
-                pickup2Pose = new Pose(123, 60);
+                pickup2Pose = new Pose(123, 60, Math.toRadians(0));
                 pickup2Control1Pose = new Pose(82, 56);
-                pickup3Pose = new Pose(123, 36);
+                pickup3Pose = new Pose(123, 36, Math.toRadians(0));
                 pickup3Control1Pose = new Pose(79, 31);
-                end1Pose = new Pose(107, 72);
+                end1Pose = new Pose(107, 72, Math.toRadians(0));
                 break;
             case BLUE:
-                startPose = new Pose(11, 61, Math.toRadians(0));
-                shoot1Pose = new Pose(36, 108, Math.toRadians(135));
+                startPose = new Pose(36, 136, Math.toRadians(270));
+                shoot1Pose = new Pose(48, 96, Math.toRadians(135));
                 center1Pose = new Pose(64, 96, Math.toRadians(270));
-                release1Pose = new Pose(16, 72);
+                release1Pose = new Pose(16, 72, Math.toRadians(180));
                 releaseControl1Pose = new Pose(65, 70);
-                pickup1Pose = new Pose(20, 84);
+                pickup1Pose = new Pose(20, 84, Math.toRadians(180));
                 pickup1Control1Pose = new Pose(96, 76);
-                pickup2Pose = new Pose(20, 60);
+                pickup2Pose = new Pose(20, 60, Math.toRadians(180));
                 pickup2Control1Pose = new Pose(61, 56);
-                pickup3Pose = new Pose(20, 36);
+                pickup3Pose = new Pose(20, 36, Math.toRadians(180));
                 pickup3Control1Pose = new Pose(64, 31);
-                end1Pose = new Pose(36, 72);
+                end1Pose = new Pose(36, 72, Math.toRadians(180));
                 break;
         }
     }
@@ -132,36 +120,81 @@ public class decodeAuto {
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), shoot1Pose.getHeading())
                 .build();
 
-        scorePreload = new Path(new BezierLine(startPose, shoot1Pose));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading());
-        end = new Path(new BezierLine(shoot1Pose, end1Pose));
-        end.setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading());
+        scorePreload = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, shoot1Pose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading())
+                .build();
+
+        end = follower.pathBuilder()
+                .addPath(new BezierLine(shoot1Pose, end1Pose))
+                .setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading())
+                .build();
     }
 
-    public void intakeBalls(int numBalls) {
-        if (numBalls == 0) {
-            R.intakeLow.setPower(R.intakeLow.getPower() == 0 ? 1 : 0);
-            return;
+    public void intakeBalls() {
+        switch(intakeState){
+            case 1:
+                R.intakeLow.setPower(1);
+                R.intakeHigh.setPower(1);
+                shootTimer.resetTimer();
+                setIntakeState(2);
+                break;
+            case 2:
+                if (intakeTimer.getElapsedTimeSeconds() > 2) {
+                    R.intakeLow.setPower(1);
+                    R.intakeHigh.setPower(1);
+                }
+                setIntakeState(-1);
+                break;
         }
-        R.intakeLow.setPower(1);
-        //Thread.sleep(numBalls * 500);
-        R.intakeLow.setPower(0);
     }
 
-    public void sendBallsToShooter(int numBalls) {
-        R.intakeHigh.setPower(1);
-        //Thread.sleep(numBalls * 500);
-        R.intakeHigh.setPower(0);
-    }
-
-    public void shoot(int numBalls) {
-        R.shooter.setPower(1);
-        for (int i = 0; i < numBalls; i++) {
-            sendBallsToShooter(1);
-            //Thread.sleep(500);
+    public void shoot() {
+        switch(shootState){
+            case 1:
+                R.intakeHigh.setPower(1);
+                shootTimer.resetTimer();
+                setShootState(2);
+                break;
+            case 2:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    R.intakeHigh.setPower(0);
+                    shootTimer.resetTimer();
+                }
+                setShootState(3);
+                break;
+            case 3:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    R.intakeHigh.setPower(1);
+                    shootTimer.resetTimer();
+                }
+                setShootState(4);
+                break;
+            case 4:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    R.intakeHigh.setPower(0);
+                    shootTimer.resetTimer();
+                }
+                setShootState(5);
+                break;
+            case 5:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    R.intakeHigh.setPower(1);
+                    shootTimer.resetTimer();
+                }
+                setShootState(6);
+                break;
+            case 6:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    R.intakeHigh.setPower(0);
+                    shootTimer.resetTimer();
+                }
+                setShootState(7);
+                break;
+            case 7:
+                setShootState(-1);
+                break;
         }
-        R.shooter.setPower(0);
-
     }
 
     public void init() {
@@ -174,6 +207,23 @@ public class decodeAuto {
 
     public void update() {
         follower.update();
-
+    }
+    public void setShootState(int x){
+        shootState = x;
+        telemetry.addData("Shoot", x);
+    }
+    public void setIntakeState(int x){
+        intakeState = x;
+        telemetry.addData("Intake", x);
+    }
+    public void startShoot(){
+        if (!actionBusy) {
+            setShootState(1);
+        }
+    }
+    public void startIntake(){
+        if (!actionBusy) {
+            setIntakeState(1);
+        }
     }
 }

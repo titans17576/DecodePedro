@@ -58,7 +58,6 @@ public class BlueObservation extends OpMode {
                 }
                 break;
             case 3:
-                auto.startPark();
                 if(auto.notBusy()) {
                     auto.startPostSpecScore();
                     setPathState(4);

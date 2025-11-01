@@ -11,6 +11,11 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import static pedroPathing.ConfigFile.CONFIGkP;
+import static pedroPathing.ConfigFile.CONFIGkI;
+import static pedroPathing.ConfigFile.CONFIGkD;
+import static pedroPathing.ConfigFile.loopTime;
 
 import pedroPathing.constants.Constants;
 import util.robot;
@@ -41,6 +46,26 @@ public class Teleop extends OpMode {
     private double launcher = 0.5;
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.5;
+    double error;
+    private double integralSum = 0;
+    private double LOOP_TIME = loopTime;
+    private double lastError = 0;
+    private double kP, kD, kI;
+    private double pidOutput = 0; // current motor power
+    private ElapsedTime pidTimer = new ElapsedTime();
+    private double targetVelocity = 1300;
+    private boolean launcherOn = false;
+    private double runPID(double target, double current, double currentPower) {
+        error = target - current;
+
+        integralSum += error * LOOP_TIME;
+        double derivative = (error - lastError) / LOOP_TIME;
+        double deltaPower = (kP * error) + (kI * integralSum) + (kD * derivative);
+
+        lastError = error;
+
+        return currentPower + deltaPower;
+    }
 
     /**
      * This method is call once when init is played, it initializes the follower
@@ -61,6 +86,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
+        pidTimer.reset();
     }
 
     /**
@@ -96,6 +122,13 @@ public class Teleop extends OpMode {
         follower.update();
         telemetryM.update();
 
+        double currentVelocity = R.shooter.getVelocity();
+        error = targetVelocity - currentVelocity;
+
+        kP = CONFIGkP;
+        kI = CONFIGkI;
+        kD = CONFIGkD;
+
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
             //In case the drivers want to use a "slowMode" you can scale the vectors
@@ -104,7 +137,7 @@ public class Teleop extends OpMode {
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
+                    -gamepad1.right_stick_x * 0.8,
                     true // Robot Centric
             );
 
@@ -112,7 +145,7 @@ public class Teleop extends OpMode {
             else follower.setTeleOpDrive(
                     -gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
-                    -gamepad1.right_stick_x * slowModeMultiplier,
+                    -gamepad1.right_stick_x * slowModeMultiplier * 0.8,
                     true // Robot Centric
             );
         }
@@ -120,22 +153,14 @@ public class Teleop extends OpMode {
         // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
         if (gamepad1.a && !previousGamepad1.a) {
-            R.shooter.setPower(launcher);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0.64));
-        }
-        else if (gamepad1.b && !previousGamepad1.b){
-            R.shooter.setPower(0);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0.6));
+            launcher = 1300;
+            launcherOn = !launcherOn;
         }
         else if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
-            launcher = launcher + 0.05;
-            R.shooter.setPower(launcher);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0.6));
+            launcher += 50;
         }
         else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
-            launcher = launcher - 0.05;
-            R.shooter.setPower(launcher);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0.6));
+            launcher -= 50;
         }
 
         if (gamepad1.x && !previousGamepad1.x) {
@@ -154,9 +179,26 @@ public class Teleop extends OpMode {
             R.intakeHigh.setPower(0);
             //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
+        if (launcherOn) {
+            targetVelocity = launcher; // ticks/sec
+            if (pidTimer.seconds() >= LOOP_TIME) {
+                pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
+                pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
+                R.shooter.setPower(pidOutput);
+                pidTimer.reset();
+            }
+        } else {
+            R.shooter.setPower(0);
+            targetVelocity = 0;
+            pidOutput = 0;
+            integralSum = 0;
+            lastError = 0;
+        }
 
 
-
+        telemetry.addData("targetVelocity", targetVelocity);
+        telemetry.addData("launchPower", R.shooter.getPower());
+        telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetryM.debug("automatedDrive", automatedDrive);

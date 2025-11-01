@@ -24,7 +24,7 @@ public class Constants {
     .useSecondaryDrivePIDF(false)
     .centripetalScaling(0.0002)
     .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.04, 0))
-    .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
+    .headingPIDFCoefficients(new PIDFCoefficients(0.5, 0, 0.05, 0))
     .drivePIDFCoefficients(
       new FilteredPIDFCoefficients(0.013, 0, 0.00003, 0.6, 0)
     );
@@ -43,7 +43,7 @@ public class Constants {
     .useBrakeModeInTeleOp(true);
 
   public static PinpointConstants localizerConstants = new PinpointConstants()
-    .forwardPodY(6)
+    .forwardPodY(2)
     .strafePodX(-3.75)
     .distanceUnit(DistanceUnit.INCH)
     .hardwareMapName("pinpoint")
@@ -53,7 +53,7 @@ public class Constants {
     )
     .customEncoderResolution(13.26291192)
     .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-    .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+    .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
   public static PathConstraints pathConstraints = new PathConstraints(
     0.99,
