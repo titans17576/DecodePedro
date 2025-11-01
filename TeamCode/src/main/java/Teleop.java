@@ -3,6 +3,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -44,8 +45,8 @@ public class Teleop extends OpMode {
     private double defaultSpeed = 1;
     private double highSpeed = 1;
     private double launcher = 0.5;
-    private boolean slowMode = false;
-    private double slowModeMultiplier = 0.5;
+    private boolean slowMode = true;
+    private double slowModeMultiplier = 0.75;
     double error;
     private double integralSum = 0;
     private double LOOP_TIME = loopTime;
@@ -87,6 +88,8 @@ public class Teleop extends OpMode {
 
         R = new robot(hardwareMap);
         pidTimer.reset();
+        R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        R.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     /**
@@ -148,10 +151,20 @@ public class Teleop extends OpMode {
                     -gamepad1.right_stick_x * slowModeMultiplier * 0.8,
                     true // Robot Centric
             );
+
         }
 
         // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
+        /*if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
+            slowModeMultiplier -= 0.25;
+        }
+        if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
+            slowModeMultiplier += 0.25;
+        }
+        if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
+            slowMode = !slowMode;
+        }*/
         if (gamepad1.a && !previousGamepad1.a) {
             launcher = 1300;
             launcherOn = !launcherOn;

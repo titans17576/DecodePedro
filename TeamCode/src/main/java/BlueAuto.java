@@ -21,6 +21,7 @@ public class BlueAuto extends OpMode {
     public robot R;
     private Pose startPose;
     public Timer pathTimer = new Timer();
+    public boolean actionBusy;
     private double kP, kI, kD;
     double error;
 
@@ -63,6 +64,9 @@ public class BlueAuto extends OpMode {
     public void loop() {
         telemetry.addData("State: ", pathState);
         telemetry.addData("Path Timer: ", pathTimer.getElapsedTimeSeconds());
+        telemetry.addData("Current Heading", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("Shoot State", auto.shootState);
+        telemetry.addData("Action Busy", auto.actionBusy);
         auto.update();
         pathUpdate();
         double currentVelocity = R.shooter.getVelocity();
@@ -89,61 +93,61 @@ public class BlueAuto extends OpMode {
                 setPathState(2);
                 break;
             case 2:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.startShoot();
-                    setPathState(3);
+                    setPathState(4);
                 }
                 break;
             case 3:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.follower.followPath(auto.release1, true);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.follower.followPath(auto.shoot1, true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.startShoot();
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.follower.followPath(auto.shoot2, true);
                     setPathState(7);
                 }
                 break;
             case 7:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.startShoot();
                     setPathState(8);
                 }
                 break;
             case 8:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.follower.followPath(auto.shoot3, true);
                     setPathState(9);
                 }
                 break;
             case 9:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.startShoot();
                     setPathState(10);
                 }
                 break;
             case 10:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     auto.follower.followPath(auto.end, true);
                     setPathState(11);
                 }
                 break;
             case 11:
-                if (!auto.follower.isBusy()) {
+                if (auto.notBusy()) {
                     setPathState(-1);
                 }
         }
