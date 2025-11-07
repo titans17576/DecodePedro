@@ -13,7 +13,7 @@ import java.util.List;
  */
 
 public class robot{
-    public DcMotorEx  liftMotor, liftMotor2, intakeLow, intakeHigh, shooter;
+    public DcMotorEx  liftMotor, intakeLow, intakeHigh, shooter;
     public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
     //public CRServo claw;
@@ -42,7 +42,7 @@ public class robot{
 
         //claw.setPower(0);
 
-        shooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.3, 0, 0, 0));
