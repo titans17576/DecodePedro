@@ -25,6 +25,7 @@ public class decodeAuto {
 
     public robot R;
     public boolean actionBusy;
+    public intakeFSM IntakeFSM;
 
 
     private Side side;
@@ -42,6 +43,7 @@ public class decodeAuto {
 
     public PathChain release1, shoot1, shoot2, shoot3, scorePreload, end;
     public decodeAuto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
+        IntakeFSM = new intakeFSM(Robot, telemetry);
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -135,15 +137,15 @@ public class decodeAuto {
     public void intakeBalls() {
         switch(intakeState){
             case 1:
-                R.intakeLow.setPower(1);
-                R.intakeHigh.setPower(1);
-                shootTimer.resetTimer();
+                IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
+                IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
+                intakeTimer.resetTimer();
                 setIntakeState(2);
                 break;
             case 2:
                 if (intakeTimer.getElapsedTimeSeconds() > 2) {
-                    R.intakeLow.setPower(1);
-                    R.intakeHigh.setPower(1);
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                 }
                 setIntakeState(-1);
                 break;
@@ -154,41 +156,41 @@ public class decodeAuto {
         switch(shootState){
             case 1:
                 actionBusy = true;
-                R.intakeHigh.setPower(1);
+                IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                 shootTimer.resetTimer();
                 setShootState(2);
                 break;
             case 2:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    R.intakeHigh.setPower(0);
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     shootTimer.resetTimer();
                     setShootState(3);
                 }
                 break;
             case 3:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    R.intakeHigh.setPower(1);
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(4);
                 }
                 break;
             case 4:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    R.intakeHigh.setPower(0);
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     shootTimer.resetTimer();
                     setShootState(5);
                 }
                 break;
             case 5:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    R.intakeHigh.setPower(1);
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(6);
                 }
                 break;
             case 6:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    R.intakeHigh.setPower(0);
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     shootTimer.resetTimer();
                     setShootState(7);
                 }
@@ -210,6 +212,7 @@ public class decodeAuto {
 
     public void update() {
         follower.update();
+        IntakeFSM.update();
         shoot();
         intakeBalls();
     }

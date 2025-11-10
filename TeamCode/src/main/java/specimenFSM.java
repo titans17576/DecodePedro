@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import util.robot;
-/*
-public class specimenFSM {
+
+/*public class specimenFSM {
 
     public enum ClawGrabState{
         CLOSED,
@@ -98,9 +98,6 @@ public class specimenFSM {
             R.liftMotor.setTargetPosition(position);
             R.liftMotor.setPower(power);
             R.liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            R.liftMotor2.setTargetPosition(position);
-            R.liftMotor2.setPower(power);
-            R.liftMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //R.liftMotor.setPower(0);
             actionBusy = true;
         }

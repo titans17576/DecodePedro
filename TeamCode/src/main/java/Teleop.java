@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
@@ -169,6 +170,10 @@ public class Teleop extends OpMode {
             launcher = 1300;
             launcherOn = !launcherOn;
         }
+        else if (gamepad1.b && !previousGamepad1.b) {
+            launcher = 1550; /*far launch zone velocity*/
+            launcherOn = !launcherOn;
+        }
         else if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
             launcher += 50;
         }
@@ -192,6 +197,7 @@ public class Teleop extends OpMode {
             R.intakeHigh.setPower(0);
             //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
+
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
             if (pidTimer.seconds() >= LOOP_TIME) {
