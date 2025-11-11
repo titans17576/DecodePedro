@@ -4,7 +4,6 @@ import static pedroPathing.ConfigFile.CONFIGkP;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.loopTime;
-import static pedroPathing.ConfigFile.power;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;

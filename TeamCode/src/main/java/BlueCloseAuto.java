@@ -1,6 +1,7 @@
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
+import static pedroPathing.ConfigFile.loopTime;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -32,8 +33,8 @@ public class BlueCloseAuto extends OpMode {
 
     private ElapsedTime pidTimer = new ElapsedTime();
 
-    private double targetVelocity = 1250;
-    private double LOOP_TIME = 0.01;
+    private double targetVelocity = 1300;
+    private double LOOP_TIME = loopTime;
     private boolean launcherOn = false;
     private double runPID(double target, double current, double currentPower) {
         error = target - current;
@@ -51,7 +52,7 @@ public class BlueCloseAuto extends OpMode {
     public void init() {
         R = new robot(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        auto = new decodeAuto(R, telemetry, follower, decodeAuto.Side.BLUE);
+        auto = new decodeAuto(R, telemetry, follower, decodeAuto.Side.BLUECLOSE);
         startPose = auto.startPose;
         follower.setStartingPose(startPose);
     }
@@ -90,7 +91,7 @@ public class BlueCloseAuto extends OpMode {
         switch (pathState) {
             case 1:
                 follower.setMaxPower(0.8);
-                auto.follower.followPath(auto.scorePreload, true);
+                auto.follower.followPath(auto.shootPreload, true);
                 setPathState(2);
                 break;
             case 2:

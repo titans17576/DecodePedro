@@ -19,8 +19,10 @@ public class decodeAuto {
     public Telemetry telemetry;
 
     public enum Side {
-        RED,
-        BLUE,
+        REDCLOSE,
+        BLUECLOSE,
+        REDFAR,
+        BLUEFAR
     }
 
     public robot R;
@@ -35,13 +37,15 @@ public class decodeAuto {
     public int intakeState = -1;
 
     public Pose startPose,
-            shoot1Pose, center1Pose, release1Pose, releaseControl1Pose,
+            shoot1Pose, center1Pose, center2Pose, center3Pose, release1Pose, releaseControl1Pose,
             pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose,
-            pickup3Pose, pickup3Control1Pose, end1Pose;
+            pickup3Pose, pickup3Control1Pose, end1Pose,
+            shootFar1Pose, turnHPZone1Pose, pickupHPZone1Pose, turnPickupFar1Pose, turnPickupFar1ControlPose, pickupFar1Pose, farParkPose;
+    ;
 
     //public Path scorePreload, end;
 
-    public PathChain release1, shoot1, shoot2, shoot3, scorePreload, end;
+    public PathChain release1, shootPreload, shoot1, shoot2, shoot3, scorePreload, end, intake1, intake2;
     public decodeAuto(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         IntakeFSM = new intakeFSM(Robot, telemetry);
 
@@ -57,81 +61,126 @@ public class decodeAuto {
 
     public void createPose() {
         switch (side) {
-            case RED:
+            case REDCLOSE:
                 startPose = new Pose(124, 120, Math.toRadians(36));
                 shoot1Pose = new Pose(96, 96, Math.toRadians(45));
-                center1Pose = new Pose(84, 96, Math.toRadians(270));
+                center1Pose = new Pose(84, 96, Math.toRadians(90));
+                center2Pose = new Pose(84, 96, Math.toRadians(90));
+                center3Pose = new Pose(84, 96, Math.toRadians(90));
                 release1Pose = new Pose(128, 72, Math.toRadians(0));
                 releaseControl1Pose = new Pose(79, 70);
                 pickup1Pose = new Pose(124, 84, Math.toRadians(0));
-                pickup1Control1Pose = new Pose(94, 76);
                 pickup2Pose = new Pose(124, 60, Math.toRadians(0));
-                pickup2Control1Pose = new Pose(83, 56);
                 pickup3Pose = new Pose(124, 36, Math.toRadians(0));
-                pickup3Control1Pose = new Pose(80, 31);
                 end1Pose = new Pose(108, 72, Math.toRadians(0));
                 break;
-            case BLUE:
+            case BLUECLOSE:
                 startPose = new Pose(20, 124, Math.toRadians(144));
                 shoot1Pose = new Pose(48, 96, Math.toRadians(135));
-                center1Pose = new Pose(60, 96, Math.toRadians(270));
+                center1Pose = new Pose(42, 84, Math.toRadians(180));
+                center2Pose = new Pose(42, 60, Math.toRadians(180));
+                center3Pose = new Pose(42, 36, Math.toRadians(180));
                 release1Pose = new Pose(16, 72, Math.toRadians(180));
                 releaseControl1Pose = new Pose(65, 70);
                 pickup1Pose = new Pose(22, 84, Math.toRadians(180));
-                pickup1Control1Pose = new Pose(50, 82);
                 pickup2Pose = new Pose(22, 60, Math.toRadians(180));
-                pickup2Control1Pose = new Pose(61, 56);
                 pickup3Pose = new Pose(22, 36, Math.toRadians(180));
-                pickup3Control1Pose = new Pose(64, 31);
                 end1Pose = new Pose(36, 72, Math.toRadians(180));
+                break;
+            case BLUEFAR:
+                startPose = new Pose(60, 8, Math.toRadians(90));
+                shootFar1Pose = new Pose(60, 12,Math.toRadians(110));
+                turnHPZone1Pose = new Pose(28, 12, Math.toRadians(180));
+                pickupHPZone1Pose = new Pose(10, 12, Math.toRadians(180));
+                turnPickupFar1Pose = new Pose(42, 36, Math.toRadians(180));
+                turnPickupFar1ControlPose = new Pose(54, 32);
+                pickupFar1Pose = new Pose(22, 36, Math.toRadians(180));
+                farParkPose = new Pose(60, 36, Math.toRadians(90));
                 break;
         }
     }
 
     public void buildPaths() {
-        release1 = follower.pathBuilder()
-                .addPath(new BezierLine(shoot1Pose, center1Pose))
-                .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
-                .addPath(new BezierCurve(center1Pose, releaseControl1Pose, release1Pose))
-                .setLinearHeadingInterpolation(center1Pose.getHeading(), release1Pose.getHeading())
-                .build();
+        switch (side) {
+            case BLUECLOSE:
+                release1 = follower.pathBuilder()
+                    .addPath(new BezierLine(shoot1Pose, center1Pose))
+                    .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
+                    .addPath(new BezierCurve(center1Pose, releaseControl1Pose, release1Pose))
+                    .setLinearHeadingInterpolation(center1Pose.getHeading(), release1Pose.getHeading())
+                    .build();
 
-        shoot1 = follower.pathBuilder()
-                .addPath(new BezierLine(shoot1Pose, center1Pose))
-                .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
-                .addPath(new BezierCurve(center1Pose, pickup1Control1Pose, pickup1Pose))
-                .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(pickup1Pose, shoot1Pose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), shoot1Pose.getHeading())
-                .build();
+                shoot1 = follower.pathBuilder()
+                    .addPath(new BezierLine(shoot1Pose, center1Pose))
+                    .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
+                    .addPath(new BezierLine(center1Pose, pickup1Pose))
+                    .setConstantHeadingInterpolation(pickup1Pose.getHeading())
+                    .addPath(new BezierLine(pickup1Pose, shoot1Pose))
+                    .setLinearHeadingInterpolation(pickup1Pose.getHeading(), shoot1Pose.getHeading())
+                    .build();
 
-        shoot2 = follower.pathBuilder()
-                .addPath(new BezierLine(shoot1Pose, center1Pose))
-                .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
-                .addPath(new BezierCurve(center1Pose, pickup2Control1Pose, pickup2Pose))
-                .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(pickup2Pose, shoot1Pose))
-                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), shoot1Pose.getHeading())
-                .build();
+                shoot2 = follower.pathBuilder()
+                    .addPath(new BezierLine(shoot1Pose, center1Pose))
+                    .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
+                    .addPath(new BezierLine(center1Pose, pickup2Pose))
+                    .setConstantHeadingInterpolation(pickup2Pose.getHeading())
+                    .addPath(new BezierLine(pickup2Pose, shoot1Pose))
+                    .setLinearHeadingInterpolation(pickup2Pose.getHeading(), shoot1Pose.getHeading())
+                    .build();
 
-        shoot3 = follower.pathBuilder()
-                .addPath(new BezierLine(shoot1Pose, center1Pose))
-                .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
-                .addPath(new BezierCurve(center1Pose, pickup3Control1Pose, pickup3Pose))
-                .setTangentHeadingInterpolation()
-                .addPath(new BezierLine(pickup3Pose, shoot1Pose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), shoot1Pose.getHeading())
-                .build();
+                shoot3 = follower.pathBuilder()
+                    .addPath(new BezierLine(shoot1Pose, center1Pose))
+                    .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
+                    .addPath(new BezierLine(center1Pose, pickup3Pose))
+                    .setConstantHeadingInterpolation(pickup1Pose.getHeading())
+                    .addPath(new BezierLine(pickup3Pose, shoot1Pose))
+                    .setLinearHeadingInterpolation(pickup3Pose.getHeading(), shoot1Pose.getHeading())
+                    .build();
 
-        scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, shoot1Pose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading())
-                .build();
+                shootPreload = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, shoot1Pose))
+                    .setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading())
+                    .build();
 
-        end = follower.pathBuilder()
-                .addPath(new BezierLine(shoot1Pose, end1Pose))
-                .setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading())
-                .build();
+                end = follower.pathBuilder()
+                    .addPath(new BezierLine(shoot1Pose, end1Pose))
+                    .setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading())
+                    .build();
+                break;
+            case BLUEFAR:
+                shoot1 = follower.pathBuilder()
+                    .addPath(new BezierLine(startPose, shootFar1Pose))
+                    .setLinearHeadingInterpolation(startPose.getHeading(), shootFar1Pose.getHeading())
+                    .build();
+
+                intake1 = follower.pathBuilder()
+                    .addPath(new BezierLine(shootFar1Pose, turnHPZone1Pose))
+                    .setLinearHeadingInterpolation(shootFar1Pose.getHeading(), turnHPZone1Pose.getHeading())
+                    .addPath(new BezierLine(turnHPZone1Pose, pickupHPZone1Pose))
+                    .setConstantHeadingInterpolation(pickupHPZone1Pose.getHeading())
+                    .build();
+
+                shoot2 = follower.pathBuilder()
+                    .addPath(new BezierLine(pickupHPZone1Pose, shootFar1Pose))
+                    .setLinearHeadingInterpolation(pickupHPZone1Pose.getHeading(), shootFar1Pose.getHeading())
+                    .build();
+
+                intake2 = follower.pathBuilder()
+                    .addPath(new BezierCurve(shootFar1Pose, turnPickupFar1ControlPose, turnPickupFar1Pose))
+                    .setLinearHeadingInterpolation(shootFar1Pose.getHeading(), turnPickupFar1Pose.getHeading())
+                    .addPath(new BezierLine(turnPickupFar1Pose, pickupFar1Pose))
+                    .setConstantHeadingInterpolation(pickupFar1Pose.getHeading())
+                    .build();
+                shoot3 = follower.pathBuilder()
+                    .addPath(new BezierLine(pickupFar1Pose, shootFar1Pose))
+                    .setLinearHeadingInterpolation(pickupFar1Pose.getHeading(), shootFar1Pose.getHeading())
+                    .build();
+                end = follower.pathBuilder()
+                    .addPath(new BezierLine(shootFar1Pose, farParkPose))
+                    .setLinearHeadingInterpolation(shootFar1Pose.getHeading(), farParkPose.getHeading())
+                    .build();
+                break;
+        }
     }
 
     public void intakeBalls() {
