@@ -74,18 +74,6 @@ public class intakeFSM {
                 }
                 break;
         }
-        /*if (currentGamepad.y && !previousGamepad.y) {
-            setArmState(ArmState.TRANSFER);
-            setVerticalWristState(VerticalWristState.TRANSFER);
-            setHorizontalWristState(HorizontalWristState.LEFT_RIGHT);
-        } else if (currentGamepad.a && !previousGamepad.a) {
-            setArmState(ArmState.HOVER);
-            setVerticalWristState(VerticalWristState.GRAB);
-        } else if (currentGamepad.x && !previousGamepad.x) {
-            setArmState(ArmState.GRAB);
-            setVerticalWristState(VerticalWristState.GRAB);
-        }*/
-
         update();
     }
 

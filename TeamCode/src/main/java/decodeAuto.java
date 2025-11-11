@@ -58,23 +58,23 @@ public class decodeAuto {
     public void createPose() {
         switch (side) {
             case RED:
-                startPose = new Pose(108, 136, Math.toRadians(270));
-                shoot1Pose = new Pose(96, 96, Math.toRadians(225));
-                center1Pose = new Pose(79, 96, Math.toRadians(90));
-                release1Pose = new Pose(127, 72, Math.toRadians(0));
-                releaseControl1Pose = new Pose(78, 70);
-                pickup1Pose = new Pose(123, 84, Math.toRadians(0));
-                pickup1Control1Pose = new Pose(47, 76);
-                pickup2Pose = new Pose(123, 60, Math.toRadians(0));
-                pickup2Control1Pose = new Pose(82, 56);
-                pickup3Pose = new Pose(123, 36, Math.toRadians(0));
-                pickup3Control1Pose = new Pose(79, 31);
-                end1Pose = new Pose(107, 72, Math.toRadians(0));
+                startPose = new Pose(124, 120, Math.toRadians(36));
+                shoot1Pose = new Pose(96, 96, Math.toRadians(45));
+                center1Pose = new Pose(84, 96, Math.toRadians(270));
+                release1Pose = new Pose(128, 72, Math.toRadians(0));
+                releaseControl1Pose = new Pose(79, 70);
+                pickup1Pose = new Pose(124, 84, Math.toRadians(0));
+                pickup1Control1Pose = new Pose(94, 76);
+                pickup2Pose = new Pose(124, 60, Math.toRadians(0));
+                pickup2Control1Pose = new Pose(83, 56);
+                pickup3Pose = new Pose(124, 36, Math.toRadians(0));
+                pickup3Control1Pose = new Pose(80, 31);
+                end1Pose = new Pose(108, 72, Math.toRadians(0));
                 break;
             case BLUE:
-                startPose = new Pose(36, 136, Math.toRadians(270));
+                startPose = new Pose(20, 124, Math.toRadians(144));
                 shoot1Pose = new Pose(48, 96, Math.toRadians(135));
-                center1Pose = new Pose(64, 96, Math.toRadians(270));
+                center1Pose = new Pose(60, 96, Math.toRadians(270));
                 release1Pose = new Pose(16, 72, Math.toRadians(180));
                 releaseControl1Pose = new Pose(65, 70);
                 pickup1Pose = new Pose(20, 84, Math.toRadians(180));

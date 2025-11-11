@@ -14,7 +14,7 @@ import util.robot;
 
 @Autonomous(name="BlueAuto")
 
-public class BlueAuto extends OpMode {
+public class BlueCloseAuto extends OpMode {
     private Follower follower;
     public int pathState = -1;
     public decodeAuto auto;
@@ -95,6 +95,7 @@ public class BlueAuto extends OpMode {
             case 2:
                 if (auto.notBusy()) {
                     auto.startShoot();
+                    //skip gate open
                     setPathState(4);
                 }
                 break;
