@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import pedroPathing.constants.Constants;
 import util.robot;
 
-@Autonomous(name="BlueAuto")
+@Autonomous(name="BlueCloseAuto")
 
 public class BlueCloseAuto extends OpMode {
     private Follower follower;
@@ -21,6 +21,7 @@ public class BlueCloseAuto extends OpMode {
     public robot R;
     private Pose startPose;
     public Timer pathTimer = new Timer();
+    public Timer accelTimer = new Timer();
     public boolean actionBusy;
     private double kP, kI, kD;
     double error;
@@ -31,7 +32,7 @@ public class BlueCloseAuto extends OpMode {
 
     private ElapsedTime pidTimer = new ElapsedTime();
 
-    private double targetVelocity = 1300;
+    private double targetVelocity = 1250;
     private double LOOP_TIME = 0.01;
     private boolean launcherOn = false;
     private double runPID(double target, double current, double currentPower) {
@@ -94,60 +95,69 @@ public class BlueCloseAuto extends OpMode {
                 break;
             case 2:
                 if (auto.notBusy()) {
-                    auto.startShoot();
-                    //skip gate open
-                    setPathState(4);
+                    accelTimer.resetTimer();
+                    setPathState(3);
                 }
                 break;
             case 3:
-                if (auto.notBusy()) {
-                    auto.follower.followPath(auto.release1, true);
-                    setPathState(4);
+                if ((accelTimer.getElapsedTimeSeconds() > 2) && (auto.notBusy())) {
+                    auto.startShoot();
+                    //skip gate open
+                    setPathState(5);
                 }
                 break;
             case 4:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.shoot1, true);
+                    auto.follower.followPath(auto.release1, true);
                     setPathState(5);
                 }
                 break;
             case 5:
                 if (auto.notBusy()) {
-                    auto.startShoot();
+                    auto.startIntake();
+                    auto.follower.followPath(auto.shoot1, true);
                     setPathState(6);
                 }
                 break;
             case 6:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.shoot2, true);
+                    auto.startShoot();
                     setPathState(7);
                 }
                 break;
             case 7:
                 if (auto.notBusy()) {
-                    auto.startShoot();
+                    auto.startIntake();
+                    auto.follower.followPath(auto.shoot2, true);
                     setPathState(8);
                 }
                 break;
             case 8:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.shoot3, true);
+                    auto.startShoot();
                     setPathState(9);
                 }
                 break;
             case 9:
                 if (auto.notBusy()) {
-                    auto.startShoot();
+                    auto.startIntake();
+                    auto.follower.followPath(auto.shoot3, true);
                     setPathState(10);
                 }
                 break;
             case 10:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.end, true);
+                    auto.startShoot();
                     setPathState(11);
                 }
                 break;
             case 11:
+                if (auto.notBusy()) {
+                    auto.follower.followPath(auto.end, true);
+                    setPathState(12);
+                }
+                break;
+            case 12:
                 if (auto.notBusy()) {
                     setPathState(-1);
                 }
