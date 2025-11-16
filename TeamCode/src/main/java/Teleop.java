@@ -197,6 +197,12 @@ public class Teleop extends OpMode {
             R.intakeHigh.setPower(0);
             //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
+        if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
+            R.gatekeep.setPosition(0.4);
+        } else if (gamepad1.right_bumper && !previousGamepad1.right_bumper){
+            R.gatekeep.setPosition(0.3);
+        }
+
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec

@@ -24,12 +24,12 @@ public class Constants {
     .useSecondaryDrivePIDF(true)
     .centripetalScaling(0.0005)
     .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
-    .headingPIDFCoefficients(new PIDFCoefficients(0.7, 0, 0, 0.03))
+    .headingPIDFCoefficients(new PIDFCoefficients(0.73, 0, 0, 0.03))
     .drivePIDFCoefficients(
       new FilteredPIDFCoefficients(0.02, 0, 0, 0.6, 0.03)
     )
     .secondaryDrivePIDFCoefficients(
-      new FilteredPIDFCoefficients(0.15, 0, 0.005, 0.6, 0.01)
+      new FilteredPIDFCoefficients(0.02, 0, 0.005, 0.6, 0.01)
     );
 
   public static MecanumConstants driveConstants = new MecanumConstants()
@@ -46,14 +46,14 @@ public class Constants {
     .useBrakeModeInTeleOp(true);
 
   public static PinpointConstants localizerConstants = new PinpointConstants()
-    .forwardPodY(2)
+    .forwardPodY(-3)
     .strafePodX(-3.75)
     .distanceUnit(DistanceUnit.INCH)
     .hardwareMapName("pinpoint")
     .yawScalar(1.0)
     .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
     .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
-    .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD);
+    .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
   public static PathConstraints pathConstraints = new PathConstraints(
     0.99,

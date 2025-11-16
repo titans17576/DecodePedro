@@ -11,6 +11,10 @@ public class intakeFSM {
         ON,
         OFF
     }
+    public enum GatekeepState{
+        ON,
+        OFF
+    }
 
 
     // LiftState instance variable
@@ -19,22 +23,26 @@ public class intakeFSM {
     Telemetry telemetry;
     LowIntakeState lowIntakeState;
     HighIntakeState highIntakeState;
+    GatekeepState gatekeepState;
     final double lowIntakeOn_power = 1;
     final double lowIntakeOff_power = 0;
     final double highIntakeOn_power = 1;
     final double highIntakeOff_power = 0;
+    final double gatekeepOnPosition = 0.3;
+    final double gatekeepOffPosition = 0.4;
 
 
 
     // Import opmode variables when instance is created
     public intakeFSM(robot Robot, Telemetry t) {
-        this(Robot, t, LowIntakeState.OFF, HighIntakeState.OFF);
+        this(Robot, t, LowIntakeState.OFF, HighIntakeState.OFF, GatekeepState.OFF);
     }
-    public intakeFSM(robot Robot, Telemetry t, LowIntakeState lI, HighIntakeState hI) {
+    public intakeFSM(robot Robot, Telemetry t, LowIntakeState lI, HighIntakeState hI, GatekeepState gS) {
         R = Robot;
         telemetry = t;
         lowIntakeState = lI;
         highIntakeState = hI;
+        gatekeepState = gS;
     }
     public void initialize() {
         R.intakeLow.setPower(0);
@@ -44,6 +52,8 @@ public class intakeFSM {
     // Method to move to a targeted position
     private void powerLowIntake(Double power) {R.intakeLow.setPower(power);}
     private void powerHighIntake(Double power) {R.intakeHigh.setPower(power);}
+    private void setGatekeepPosition(Double position) {R.gatekeep.setPosition(position);}
+
 
     // Update method for teleop implementation
     public void teleopUpdate(Gamepad currentGamepad, Gamepad previousGamepad) {
@@ -74,6 +84,19 @@ public class intakeFSM {
                 }
                 break;
         }
+        switch (gatekeepState) {
+            case ON:
+                // State inputs
+                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                    setGatekeepState(GatekeepState.OFF);
+                }
+                break;
+            case OFF:
+                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                    setGatekeepState(GatekeepState.ON);
+                }
+                break;
+        }
         update();
     }
 
@@ -94,6 +117,14 @@ public class intakeFSM {
                 powerHighIntake(highIntakeOff_power);
                 break;
         }
+        switch(gatekeepState) {
+            case ON:
+                setGatekeepPosition(gatekeepOnPosition);
+                break;
+            case OFF:
+                setGatekeepPosition(gatekeepOffPosition);
+                break;
+        }
     }
     public void setLowIntakeState(LowIntakeState state){
         lowIntakeState = state;
@@ -101,5 +132,9 @@ public class intakeFSM {
     public void setHighIntakeState(HighIntakeState state){
         highIntakeState = state;
     }
+    public void setGatekeepState(GatekeepState state){
+        gatekeepState = state;
+    }
+
 }
 

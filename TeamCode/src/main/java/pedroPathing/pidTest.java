@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,7 +18,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "pidTest", group = "NoahIsSilly")
 public class pidTest extends OpMode {
 
-    private DcMotorEx launcher, launcher2;
+    private DcMotorEx launcher, intakeHigh;
     private FtcDashboard dashboard;
 
     private double kP, kI, kD;
@@ -34,6 +35,7 @@ public class pidTest extends OpMode {
     private boolean intakeOn = false;
     private boolean lastX = false;
     private boolean lastA = false;
+    private boolean lastB = false;
 
     private final double LOOP_TIME = loopTime;
 
@@ -44,7 +46,11 @@ public class pidTest extends OpMode {
         launcher = hardwareMap.get(DcMotorEx.class, "shooter");
         launcher.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         launcher.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        launcher.setDirection(DcMotorSimple.Direction.FORWARD);
+        launcher.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
+        intakeHigh.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeHigh.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeHigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pidTimer.reset();
     }
@@ -75,6 +81,12 @@ public class pidTest extends OpMode {
 
         if (gamepad1.x && !lastX) {
             launcherOn = !launcherOn;
+        }
+        if (gamepad1.a && !lastA) {
+            intakeHigh.setPower(1);
+        }
+        else if (gamepad1.b && !lastB) {
+            intakeHigh.setPower(0);
         }
 
 
@@ -111,6 +123,7 @@ public class pidTest extends OpMode {
 
         lastX = gamepad1.x;
         lastA = gamepad1.a;
+        lastB = gamepad1.b;
     }
 
     @Override

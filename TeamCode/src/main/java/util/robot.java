@@ -17,7 +17,7 @@ public class robot{
     public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
     //public CRServo claw;
-    public Servo claw;
+    public Servo gatekeep;
 
     public robot() {
 
@@ -27,7 +27,6 @@ public class robot{
         /*
         intakeWrist1 = hardwareMap.get(Servo.class, "intakeWrist1Servo");
         intakeWrist2 = hardwareMap.get(Servo.class, "intakeWrist2Servo");
-        claw = hardwareMap.get(Servo.class, "clawServo");
         extendo = hardwareMap.get(Servo.class, "extendoServo");
         intakeArm = hardwareMap.get(Servo.class, "intakeArmServo");
         intakeClaw = hardwareMap.get(Servo.class, "intakeClawServo");
@@ -36,6 +35,7 @@ public class robot{
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
         liftMotor2 = hardwareMap.get(DcMotorEx.class, "liftMotor2");
         */
+        gatekeep = hardwareMap.get(Servo.class, "gatekeepServo");
         intakeLow = hardwareMap.get(DcMotorEx.class, "intakeLow");
         intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
@@ -44,7 +44,7 @@ public class robot{
 
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.3, 0, 0, 0));
 
         intakeLow.setDirection(DcMotorSimple.Direction.REVERSE);
