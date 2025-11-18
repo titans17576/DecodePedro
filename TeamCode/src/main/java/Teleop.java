@@ -2,18 +2,18 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import static pedroPathing.ConfigFile.CONFIGHighkP;
+import static pedroPathing.ConfigFile.CONFIGHighkI;
+import static pedroPathing.ConfigFile.CONFIGHighkD;
 import static pedroPathing.ConfigFile.CONFIGkP;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkD;
@@ -48,26 +48,15 @@ public class Teleop extends OpMode {
     private double launcher = 0.5;
     private boolean slowMode = true;
     private double slowModeMultiplier = 0.75;
-    double error;
-    private double integralSum = 0;
-    private double LOOP_TIME = loopTime;
-    private double lastError = 0;
-    private double kP, kD, kI;
-    private double pidOutput = 0; // current motor power
-    private ElapsedTime pidTimer = new ElapsedTime();
+    private double shooterPIDOutput = 0; // current motor power
+    private double intakeHighPIDOutput = 0;
     private double targetVelocity = 1300;
+    private double intakeHighTargetVelocity = 600;
     private boolean launcherOn = false;
-    private double runPID(double target, double current, double currentPower) {
-        error = target - current;
+    private boolean intakeHighOn = false;
 
-        integralSum += error * LOOP_TIME;
-        double derivative = (error - lastError) / LOOP_TIME;
-        double deltaPower = (kP * error) + (kI * integralSum) + (kD * derivative);
-
-        lastError = error;
-
-        return currentPower + deltaPower;
-    }
+    private final PIDController shooterPID = new PIDController(CONFIGkP, CONFIGkI, CONFIGkD, loopTime);
+    private final PIDController intakeHighPID = new PIDController(CONFIGHighkP, CONFIGHighkI, CONFIGHighkD, loopTime);
 
     /**
      * This method is call once when init is played, it initializes the follower
@@ -88,9 +77,14 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
-        pidTimer.reset();
+
+        shooterPID.pidTimer.reset();
+        intakeHighPID.pidTimer.reset();
+
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         R.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        R.intakeHigh.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        R.intakeHigh.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     /**
@@ -126,12 +120,11 @@ public class Teleop extends OpMode {
         follower.update();
         telemetryM.update();
 
-        double currentVelocity = R.shooter.getVelocity();
-        error = targetVelocity - currentVelocity;
+        double shooter_currentVelocity = R.shooter.getVelocity();
+        shooterPID.error = targetVelocity - shooter_currentVelocity;
 
-        kP = CONFIGkP;
-        kI = CONFIGkI;
-        kD = CONFIGkD;
+        double intakeHigh_currentVelocity = R.intakeHigh.getVelocity();
+        intakeHighPID.error = intakeHighTargetVelocity - intakeHigh_currentVelocity;
 
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
@@ -190,12 +183,11 @@ public class Teleop extends OpMode {
             //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.intakeHigh.setPower(1);
-            //R.shooter.setVelocity(powerToTicksPerSecond(1));
+            intakeHighTargetVelocity = 600;
+            intakeHighOn = true;
         }
         else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
-            R.intakeHigh.setPower(0);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0));
+            intakeHighOn = false;
         }
         if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
             R.gatekeep.setPosition(0.4);
@@ -206,18 +198,33 @@ public class Teleop extends OpMode {
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
-            if (pidTimer.seconds() >= LOOP_TIME) {
-                pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
-                pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
-                R.shooter.setPower(pidOutput);
-                pidTimer.reset();
+            if (shooterPID.pidTimer.seconds() >= shooterPID.loopTime) {
+                shooterPIDOutput = shooterPID.runPID(targetVelocity, shooter_currentVelocity, shooterPIDOutput);
+                shooterPIDOutput = Math.max(0.0, Math.min(1.0, shooterPIDOutput)); // clamp to [0,1]
+                R.shooter.setPower(shooterPIDOutput);
+                shooterPID.pidTimer.reset();
             }
         } else {
             R.shooter.setPower(0);
             targetVelocity = 0;
-            pidOutput = 0;
-            integralSum = 0;
-            lastError = 0;
+            shooterPIDOutput = 0;
+            shooterPID.integralSum = 0;
+            shooterPID.lastError = 0;
+        }
+
+        if (intakeHighOn) {
+            if (intakeHighPID.pidTimer.seconds() >= intakeHighPID.loopTime) {
+                intakeHighPIDOutput = intakeHighPID.runPID(intakeHighTargetVelocity, intakeHigh_currentVelocity, intakeHighPIDOutput);
+                intakeHighPIDOutput = Math.max(0.0, Math.min(1.0, intakeHighPIDOutput)); // clamp to [0,1]
+                R.intakeHigh.setPower(intakeHighPIDOutput);
+                intakeHighPID.pidTimer.reset();
+            }
+        } else {
+            R.intakeHigh.setPower(0);
+            intakeHighTargetVelocity = 0;
+            intakeHighPIDOutput = 0;
+            intakeHighPID.integralSum = 0;
+            intakeHighPID.lastError = 0;
         }
 
 
