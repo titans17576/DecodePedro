@@ -4,16 +4,13 @@ import util.robot;
 
 public class intakeFSM {
     public enum LowIntakeState{
-        ON,
-        OFF
+        ON, OFF, REVERSE
     }
     public enum HighIntakeState{
-        ON,
-        OFF
+        ON, OFF, REVERSE, STALL
     }
     public enum GatekeepState{
-        ON,
-        OFF
+        ON, OFF
     }
 
 
@@ -26,8 +23,11 @@ public class intakeFSM {
     GatekeepState gatekeepState;
     final double lowIntakeOn_power = 1;
     final double lowIntakeOff_power = 0;
+    final double lowIntakeReverse_power = -1;
     final double highIntakeOn_power = 1;
     final double highIntakeOff_power = 0;
+    final double highIntakeStall_power = 0.1;
+    final double highIntakeReverse_power = -1;
     final double gatekeepOnPosition = 0.3;
     final double gatekeepOffPosition = 0.4;
 
@@ -108,6 +108,9 @@ public class intakeFSM {
             case OFF:
                 powerLowIntake(lowIntakeOff_power);
                 break;
+            case REVERSE:
+                powerLowIntake(lowIntakeReverse_power);
+                break;
         }
         switch(highIntakeState) {
             case ON:
@@ -115,6 +118,12 @@ public class intakeFSM {
                 break;
             case OFF:
                 powerHighIntake(highIntakeOff_power);
+                break;
+            case REVERSE:
+                powerHighIntake(highIntakeReverse_power);
+                break;
+            case STALL:
+                powerHighIntake(highIntakeStall_power);
                 break;
         }
         switch(gatekeepState) {

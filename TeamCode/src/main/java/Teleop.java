@@ -106,6 +106,7 @@ public class Teleop extends OpMode {
     @Override
     public void start() {
         follower.startTeleopDrive();
+        R.gatekeep.setPosition(0.3);
     }
 
     /**
@@ -141,7 +142,7 @@ public class Teleop extends OpMode {
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x * 0.8,
+                    -gamepad1.right_stick_x,
                     true // Robot Centric
             );
 
@@ -183,29 +184,26 @@ public class Teleop extends OpMode {
 
         if (gamepad1.x && !previousGamepad1.x) {
             R.intakeLow.setPower(1);
-            //R.shooter.setVelocity(powerToTicksPerSecond(1));
         }
         else if (gamepad1.y && !previousGamepad1.y){
             R.intakeLow.setPower(0);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
             R.intakeHigh.setPower(1);
-            //R.shooter.setVelocity(powerToTicksPerSecond(1));
         }
         else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
             R.intakeHigh.setPower(0);
-            //R.shooter.setVelocity(powerToTicksPerSecond(0));
         }
-        if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
+        /*if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
             R.gatekeep.setPosition(0.4);
         } else if (gamepad1.right_bumper && !previousGamepad1.right_bumper){
             R.gatekeep.setPosition(0.3);
-        }
+        }*/
 
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
+            R.gatekeep.setPosition(0.4);
             if (pidTimer.seconds() >= LOOP_TIME) {
                 pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
                 pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
@@ -218,6 +216,7 @@ public class Teleop extends OpMode {
             pidOutput = 0;
             integralSum = 0;
             lastError = 0;
+            R.gatekeep.setPosition(0.3);
         }
 
 

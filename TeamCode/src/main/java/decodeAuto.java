@@ -40,6 +40,7 @@ public class decodeAuto {
             shoot1Pose, center1Pose, center2Pose, center3Pose, release1Pose, releaseControl1Pose,
             pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose,
             pickup3Pose, pickup3Control1Pose, end1Pose,
+            return2Pose, return3Pose,
             shootFar1Pose, turnHPZone1Pose, pickupHPZone1Pose, turnPickupFar1Pose, turnPickupFar1ControlPose, pickupFar1Pose, farParkPose;
     ;
 
@@ -62,16 +63,17 @@ public class decodeAuto {
     public void createPose() {
         switch (side) {
             case REDCLOSE:
-                startPose = new Pose(124, 120, Math.toRadians(36));
-                shoot1Pose = new Pose(96, 96, Math.toRadians(45));
-                center1Pose = new Pose(84, 96, Math.toRadians(90));
-                center2Pose = new Pose(84, 96, Math.toRadians(90));
-                center3Pose = new Pose(84, 96, Math.toRadians(90));
+                startPose = new Pose(123, 123, Math.toRadians(42));
+                shoot1Pose = new Pose(96, 96, Math.toRadians(47));
+                center1Pose = new Pose(99, 84, Math.toRadians(0));
+                center2Pose = new Pose(99, 59, Math.toRadians(0));
+                center3Pose = new Pose(99, 36, Math.toRadians(0));
                 release1Pose = new Pose(128, 72, Math.toRadians(0));
                 releaseControl1Pose = new Pose(79, 70);
-                pickup1Pose = new Pose(124, 84, Math.toRadians(0));
-                pickup2Pose = new Pose(124, 60, Math.toRadians(0));
-                pickup3Pose = new Pose(124, 36, Math.toRadians(0));
+                pickup1Pose = new Pose(120, 84, Math.toRadians(0));
+                pickup2Pose = new Pose(133, 59, Math.toRadians(0));
+                return2Pose = new Pose(126, 59, Math.toRadians(0));
+                pickup3Pose = new Pose(133, 36, Math.toRadians(0));
                 end1Pose = new Pose(108, 72, Math.toRadians(0));
                 break;
             case BLUECLOSE:
@@ -84,6 +86,7 @@ public class decodeAuto {
                 releaseControl1Pose = new Pose(65, 70);
                 pickup1Pose = new Pose(24, 84, Math.toRadians(180));
                 pickup2Pose = new Pose(11, 59, Math.toRadians(180));
+                return2Pose = new Pose(18, 59, Math.toRadians(180));
                 pickup3Pose = new Pose(11, 36, Math.toRadians(180));
                 end1Pose = new Pose(36, 72, Math.toRadians(180));
                 break;
@@ -124,10 +127,10 @@ public class decodeAuto {
                     .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center2Pose.getHeading())
                     .addPath(new BezierLine(center2Pose, pickup2Pose))
                     .setConstantHeadingInterpolation(pickup2Pose.getHeading())
-                    .addPath(new BezierLine(pickup2Pose, center2Pose))
+                    .addPath(new BezierLine(pickup2Pose, return2Pose))
                     .setConstantHeadingInterpolation(pickup2Pose.getHeading())
-                    .addPath(new BezierLine(center2Pose, shoot1Pose))
-                    .setLinearHeadingInterpolation(center2Pose.getHeading(), shoot1Pose.getHeading())
+                    .addPath(new BezierLine(return2Pose, shoot1Pose))
+                    .setLinearHeadingInterpolation(return2Pose.getHeading(), shoot1Pose.getHeading())
                     .build();
 
                 shoot3 = follower.pathBuilder()
@@ -148,6 +151,53 @@ public class decodeAuto {
                     .addPath(new BezierLine(shoot1Pose, end1Pose))
                     .setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading())
                     .build();
+                break;
+            case REDCLOSE:
+                release1 = follower.pathBuilder()
+                        .addPath(new BezierLine(shoot1Pose, center1Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
+                        .addPath(new BezierCurve(center1Pose, releaseControl1Pose, release1Pose))
+                        .setLinearHeadingInterpolation(center1Pose.getHeading(), release1Pose.getHeading())
+                        .build();
+
+                shoot1 = follower.pathBuilder()
+                        .addPath(new BezierLine(shoot1Pose, center1Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
+                        .addPath(new BezierLine(center1Pose, pickup1Pose))
+                        .setConstantHeadingInterpolation(pickup1Pose.getHeading())
+                        .addPath(new BezierLine(pickup1Pose, shoot1Pose))
+                        .setLinearHeadingInterpolation(pickup1Pose.getHeading(), shoot1Pose.getHeading())
+                        .build();
+
+                shoot2 = follower.pathBuilder()
+                        .addPath(new BezierLine(shoot1Pose, center2Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center2Pose.getHeading())
+                        .addPath(new BezierLine(center2Pose, pickup2Pose))
+                        .setConstantHeadingInterpolation(pickup2Pose.getHeading())
+                        .addPath(new BezierLine(pickup2Pose, return2Pose))
+                        .setConstantHeadingInterpolation(pickup2Pose.getHeading())
+                        .addPath(new BezierLine(return2Pose, shoot1Pose))
+                        .setLinearHeadingInterpolation(return2Pose.getHeading(), shoot1Pose.getHeading())
+                        .build();
+
+                shoot3 = follower.pathBuilder()
+                        .addPath(new BezierLine(shoot1Pose, center3Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center3Pose.getHeading())
+                        .addPath(new BezierLine(center3Pose, pickup3Pose))
+                        .setConstantHeadingInterpolation(pickup1Pose.getHeading())
+                        .addPath(new BezierLine(pickup3Pose, shoot1Pose))
+                        .setLinearHeadingInterpolation(pickup3Pose.getHeading(), shoot1Pose.getHeading())
+                        .build();
+
+                shootPreload = follower.pathBuilder()
+                        .addPath(new BezierLine(startPose, shoot1Pose))
+                        .setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading())
+                        .build();
+
+                end = follower.pathBuilder()
+                        .addPath(new BezierLine(shoot1Pose, end1Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), end1Pose.getHeading())
+                        .build();
                 break;
             case BLUEFAR:
                 shoot1 = follower.pathBuilder()
@@ -189,12 +239,17 @@ public class decodeAuto {
         switch(intakeState){
             case 1:
                 IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
-                //IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
                 intakeTimer.resetTimer();
                 setIntakeState(2);
                 break;
             case 2:
-                if (intakeTimer.getElapsedTimeSeconds() > 2.5) {
+                if (intakeTimer.getElapsedTimeSeconds() > 2) {
+                    IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
+                    setIntakeState(3);
+                }
+                break;
+            case 3:
+                if (intakeTimer.getElapsedTimeSeconds() > 7) {
                     IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
                     //IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
                     setIntakeState(-1);
@@ -206,6 +261,7 @@ public class decodeAuto {
     public void shoot() {
         switch(shootState){
             case 1:
+                IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
                 actionBusy = true;
                 IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                 shootTimer.resetTimer();
@@ -214,6 +270,7 @@ public class decodeAuto {
             case 2:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(3);
                 }
@@ -228,7 +285,7 @@ public class decodeAuto {
             case 4:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
-                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
+                    //IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(5);
                 }
@@ -243,12 +300,27 @@ public class decodeAuto {
             case 6:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
-                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
                     shootTimer.resetTimer();
-                    setShootState(7);
+                    setShootState(9);
+                    //skip 4th shot attempt
                 }
                 break;
             case 7:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
+                    shootTimer.resetTimer();
+                    setShootState(8);
+                }
+                break;
+            case 8:
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
+                    shootTimer.resetTimer();
+                    setShootState(9);
+                }
+                break;
+            case 9:
                 actionBusy = false;
                 setShootState(-1);
                 break;
