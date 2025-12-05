@@ -49,15 +49,12 @@ public class Teleop extends OpMode {
     private boolean slowMode = true;
     private double slowModeMultiplier = 0.75;
     private double shooterPIDOutput = 0; // current motor power
-    private double intakeHighPIDOutput = 0;
     private double targetVelocity = 1300;
-    private double intakeHighTargetVelocity = 600;
     private boolean launcherOn = false;
     private boolean intakeHighOn = false;
     private boolean intakeLowOn = false;
 
     private final PIDController shooterPID = new PIDController(CONFIGkP, CONFIGkI, CONFIGkD, loopTime);
-    private final PIDController intakeHighPID = new PIDController(CONFIGHighkP, CONFIGHighkI, CONFIGHighkD, loopTime);
 
     /**
      * This method is call once when init is played, it initializes the follower
@@ -80,7 +77,6 @@ public class Teleop extends OpMode {
         R = new robot(hardwareMap);
 
         shooterPID.pidTimer.reset();
-        intakeHighPID.pidTimer.reset();
 
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         R.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -123,9 +119,6 @@ public class Teleop extends OpMode {
 
         double shooter_currentVelocity = R.shooter.getVelocity();
         shooterPID.error = targetVelocity - shooter_currentVelocity;
-
-        double intakeHigh_currentVelocity = R.intakeHigh.getVelocity();
-        intakeHighPID.error = intakeHighTargetVelocity - intakeHigh_currentVelocity;
 
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
@@ -178,26 +171,23 @@ public class Teleop extends OpMode {
         if (gamepad1.x && !previousGamepad1.x) { // TOGGLE LOW WITH X
             intakeLowOn = !intakeLowOn;
             R.intakeLow.setPower(intakeLowOn ? 1 : 0);
-            //R.shooter.setVelocity(powerToTicksPerSecond(1));
         }
 
-        if (gamepad1.y && !previousGamepad1.y) {
-            if (!intakeHighOn) {
-                intakeHighTargetVelocity = 600;
-                intakeHighOn = true;
-            }
-            else
-            {
-                intakeHighOn = false;
-            }
+        if (gamepad1.y) {
+            intakeHighOn = true;
+            R.intakeHigh.setPower(1);
+        } else {
+            intakeHighOn = false;
+            R.intakeHigh.setPower(0);
         }
 
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            intakeHighTargetVelocity = 600;
+            R.intakeHigh.setPower(1);
             intakeHighOn = true;
         }
         else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
             intakeHighOn = false;
+            R.intakeHigh.setPower(0);
         }
 
         if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
@@ -221,21 +211,6 @@ public class Teleop extends OpMode {
             shooterPIDOutput = 0;
             shooterPID.integralSum = 0;
             shooterPID.lastError = 0;
-        }
-
-        if (intakeHighOn) {
-            if (intakeHighPID.pidTimer.seconds() >= intakeHighPID.loopTime) {
-                intakeHighPIDOutput = intakeHighPID.runPID(intakeHighTargetVelocity, intakeHigh_currentVelocity, intakeHighPIDOutput);
-                intakeHighPIDOutput = Math.max(0.0, Math.min(1.0, intakeHighPIDOutput)); // clamp to [0,1]
-                R.intakeHigh.setPower(intakeHighPIDOutput);
-                intakeHighPID.pidTimer.reset();
-            }
-        } else {
-            R.intakeHigh.setPower(0);
-            intakeHighTargetVelocity = 0;
-            intakeHighPIDOutput = 0;
-            intakeHighPID.integralSum = 0;
-            intakeHighPID.lastError = 0;
         }
 
 
