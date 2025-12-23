@@ -1,6 +1,8 @@
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
+import static pedroPathing.ConfigFile.CONFIGkV;
+import static pedroPathing.ConfigFile.CONFIGkS;
 import static pedroPathing.ConfigFile.loopTime;
 
 import com.pedropathing.follower.Follower;
@@ -25,7 +27,7 @@ public class BlueFarAuto extends OpMode {
     public Timer accelTimer = new Timer();
     public Timer delayTimer = new Timer();
     public boolean actionBusy;
-    private double kP, kI, kD;
+    private double kP, kI, kD, kV, kS;
     double error;
 
     private double integralSum = 0;
@@ -58,7 +60,7 @@ public class BlueFarAuto extends OpMode {
         follower.setStartingPose(startPose);
         kP = 0.00002;
         kI = CONFIGkI;
-        kD = 0.000007;
+        kD = CONFIGkD;
     }
 
     @Override
@@ -83,6 +85,7 @@ public class BlueFarAuto extends OpMode {
             pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
             pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
             R.shooter.setPower(pidOutput);
+            R.shooter2.setPower(pidOutput);
             pidTimer.reset();
         } /*else {
             R.shooter.setPower(0);

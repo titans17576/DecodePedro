@@ -13,7 +13,7 @@ import java.util.List;
  */
 
 public class robot{
-    public DcMotorEx  liftMotor, intakeLow, intakeHigh, shooter;
+    public DcMotorEx intakeLow, intakeHigh, shooter, shooter2;
     public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
     //public CRServo claw;
@@ -39,6 +39,7 @@ public class robot{
         intakeLow = hardwareMap.get(DcMotorEx.class, "intakeLow");
         intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        shooter2  = hardwareMap.get(DcMotorEx.class, "shooter2");
 
         //claw.setPower(0);
 
@@ -46,6 +47,10 @@ public class robot{
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         //shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.3, 0, 0, 0));
+
+        shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
+        shooter2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeLow.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeLow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -85,9 +85,9 @@ public class decodeAuto {
                 release1Pose = new Pose(16, 72, Math.toRadians(180));
                 releaseControl1Pose = new Pose(65, 70);
                 pickup1Pose = new Pose(24, 84, Math.toRadians(180));
-                pickup2Pose = new Pose(11, 59, Math.toRadians(180));
+                pickup2Pose = new Pose(14, 59, Math.toRadians(180));
                 return2Pose = new Pose(18, 59, Math.toRadians(180));
-                pickup3Pose = new Pose(11, 36, Math.toRadians(180));
+                pickup3Pose = new Pose(14, 36, Math.toRadians(180));
                 end1Pose = new Pose(36, 72, Math.toRadians(180));
                 break;
             case BLUEFAR:
@@ -249,7 +249,7 @@ public class decodeAuto {
                 }
                 break;
             case 3:
-                if (intakeTimer.getElapsedTimeSeconds() > 7) {
+                if (intakeTimer.getElapsedTimeSeconds() > 8) {
                     IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
                     //IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
                     setIntakeState(-1);
@@ -268,7 +268,7 @@ public class decodeAuto {
                 setShootState(2);
                 break;
             case 2:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                     shootTimer.resetTimer();
@@ -276,14 +276,14 @@ public class decodeAuto {
                 }
                 break;
             case 3:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(4);
                 }
                 break;
             case 4:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     //IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                     shootTimer.resetTimer();
@@ -291,29 +291,28 @@ public class decodeAuto {
                 }
                 break;
             case 5:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(6);
                 }
                 break;
             case 6:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     shootTimer.resetTimer();
-                    setShootState(9);
-                    //skip 4th shot attempt
+                    setShootState(7);
                 }
                 break;
             case 7:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(8);
                 }
                 break;
             case 8:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
                     shootTimer.resetTimer();

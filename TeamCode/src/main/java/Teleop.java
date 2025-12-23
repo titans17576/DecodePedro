@@ -1,3 +1,6 @@
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -13,10 +16,13 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import static pedroPathing.ConfigFile.CONFIGkP;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkD;
+import static pedroPathing.ConfigFile.CONFIGkV;
+import static pedroPathing.ConfigFile.CONFIGkS;
 import static pedroPathing.ConfigFile.loopTime;
 
 import pedroPathing.constants.Constants;
@@ -41,6 +47,7 @@ public class Teleop extends OpMode {
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private TelemetryManager telemetryM;
+    private FtcDashboard dashboard;
 
     private final Pose startPose = new Pose(0, 0, 0);
     private double defaultSpeed = 1;
@@ -52,7 +59,7 @@ public class Teleop extends OpMode {
     private double integralSum = 0;
     private double LOOP_TIME = loopTime;
     private double lastError = 0;
-    private double kP, kD, kI;
+    private double kP, kI, kD, kV, kS;
     private double pidOutput = 0; // current motor power
     private ElapsedTime pidTimer = new ElapsedTime();
     private double targetVelocity = 1300;
@@ -82,6 +89,7 @@ public class Teleop extends OpMode {
         previousGamepad1 = new Gamepad();
         currentGamepad2 = new Gamepad();
         previousGamepad2 = new Gamepad();
+
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
@@ -98,6 +106,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void init_loop() {
+        dashboard = FtcDashboard.getInstance();
     }
 
     /**
@@ -107,6 +116,11 @@ public class Teleop extends OpMode {
     public void start() {
         follower.startTeleopDrive();
         R.gatekeep.setPosition(0.3);
+        kP = CONFIGkP;
+        kI = CONFIGkI;
+        kD = CONFIGkD;
+        kV = 0.02;
+        kS = CONFIGkS;
     }
 
     /**
@@ -130,9 +144,9 @@ public class Teleop extends OpMode {
         double currentVelocity = R.shooter.getVelocity();
         error = targetVelocity - currentVelocity;
 
-        kP = CONFIGkP;
+        /*kP = CONFIGkP;
         kI = CONFIGkI;
-        kD = CONFIGkD;
+        kD = CONFIGkD;*/
 
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
@@ -142,7 +156,7 @@ public class Teleop extends OpMode {
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x,
+                    -gamepad1.right_stick_x * 0.8,
                     true // Robot Centric
             );
 
@@ -168,14 +182,18 @@ public class Teleop extends OpMode {
             slowMode = !slowMode;
         }*/
         if (gamepad1.a && !previousGamepad1.a) {
+            kV = CONFIGkV;
+            kP = CONFIGkP; //was 0.000018
             launcher = 1300;
             launcherOn = !launcherOn;
         }
         else if (gamepad1.b && !previousGamepad1.b) {
+            kV = CONFIGkV;
+            kP = CONFIGkP; //was 0.000018
             launcher = 1550; /*far launch zone velocity*/
             launcherOn = !launcherOn;
         }
-        else if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
             launcher += 50;
         }
         else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
@@ -189,10 +207,10 @@ public class Teleop extends OpMode {
             R.intakeLow.setPower(0);
         }
         if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.intakeHigh.setPower(1);
+            R.intakeHigh.setVelocity(2500);
         }
         else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
-            R.intakeHigh.setPower(0);
+            R.intakeHigh.setVelocity(0);
         }
         /*if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
             R.gatekeep.setPosition(0.4);
@@ -205,24 +223,31 @@ public class Teleop extends OpMode {
             targetVelocity = launcher; // ticks/sec
             R.gatekeep.setPosition(0.4);
             if (pidTimer.seconds() >= LOOP_TIME) {
-                pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
+                pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
                 pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
                 R.shooter.setPower(pidOutput);
+                R.shooter2.setPower(pidOutput);
                 pidTimer.reset();
             }
         } else {
             R.shooter.setPower(0);
-            targetVelocity = 0;
-            pidOutput = 0;
-            integralSum = 0;
-            lastError = 0;
+            R.shooter2.setPower(0);
+            //targetVelocity = 0;
+            //pidOutput = 0;
+            //integralSum = 0;
+            //lastError = 0;
             R.gatekeep.setPosition(0.3);
         }
 
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Launcher Velocity", R.shooter.getVelocity());
+        packet.put("Target Velocity", targetVelocity);
+        dashboard.sendTelemetryPacket(packet);
 
         telemetry.addData("targetVelocity", targetVelocity);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
+        telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetryM.debug("automatedDrive", automatedDrive);

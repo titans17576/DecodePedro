@@ -24,10 +24,10 @@ public class intakeFSM {
     final double lowIntakeOn_power = 1;
     final double lowIntakeOff_power = 0;
     final double lowIntakeReverse_power = -1;
-    final double highIntakeOn_power = 1;
-    final double highIntakeOff_power = 0;
-    final double highIntakeStall_power = 0.1;
-    final double highIntakeReverse_power = -1;
+    final double highIntakeOn_velocity = 2500;
+    final double highIntakeOff_velocity = 0;
+    final double highIntakeStall_velocity = 100;
+    final double highIntakeReverse_velocity = -2500;
     final double gatekeepOnPosition = 0.3;
     final double gatekeepOffPosition = 0.4;
 
@@ -51,7 +51,7 @@ public class intakeFSM {
 
     // Method to move to a targeted position
     private void powerLowIntake(Double power) {R.intakeLow.setPower(power);}
-    private void powerHighIntake(Double power) {R.intakeHigh.setPower(power);}
+    private void powerHighIntake(Double velocity) {R.intakeHigh.setVelocity(velocity);}
     private void setGatekeepPosition(Double position) {R.gatekeep.setPosition(position);}
 
 
@@ -114,16 +114,16 @@ public class intakeFSM {
         }
         switch(highIntakeState) {
             case ON:
-                powerHighIntake(highIntakeOn_power);
+                powerHighIntake(highIntakeOn_velocity);
                 break;
             case OFF:
-                powerHighIntake(highIntakeOff_power);
+                powerHighIntake(highIntakeOff_velocity);
                 break;
             case REVERSE:
-                powerHighIntake(highIntakeReverse_power);
+                powerHighIntake(highIntakeReverse_velocity);
                 break;
             case STALL:
-                powerHighIntake(highIntakeStall_power);
+                powerHighIntake(highIntakeStall_velocity);
                 break;
         }
         switch(gatekeepState) {

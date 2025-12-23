@@ -1,6 +1,8 @@
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
+import static pedroPathing.ConfigFile.CONFIGkV;
+import static pedroPathing.ConfigFile.CONFIGkS;
 import static pedroPathing.ConfigFile.loopTime;
 
 import com.pedropathing.follower.Follower;
@@ -25,7 +27,7 @@ public class BlueCloseAuto extends OpMode {
     public Timer accelTimer = new Timer();
     public Timer delayTimer = new Timer();
     public boolean actionBusy;
-    private double kP, kI, kD;
+    private double kP, kI, kD, kV, kS;
     double error;
 
     private double integralSum = 0;
@@ -59,6 +61,8 @@ public class BlueCloseAuto extends OpMode {
         kP = CONFIGkP;
         kI = CONFIGkI;
         kD = CONFIGkD;
+        kV = CONFIGkV;
+        kS = CONFIGkS;
     }
 
     @Override
@@ -80,9 +84,10 @@ public class BlueCloseAuto extends OpMode {
 
 
         if (pidTimer.seconds() >= LOOP_TIME) {
-            pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
+            pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
             pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
             R.shooter.setPower(pidOutput);
+            R.shooter2.setPower(pidOutput);
             pidTimer.reset();
         } /*else {
             R.shooter.setPower(0);
@@ -108,7 +113,7 @@ public class BlueCloseAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 1.5) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 1) && (auto.notBusy())) {
                     auto.startShoot();
                     //skip gate open
                     setPathState(5);
@@ -122,7 +127,7 @@ public class BlueCloseAuto extends OpMode {
                 break;
             case 5:
                 if (auto.notBusy()) {
-                    follower.setMaxPower(0.9);
+                    follower.setMaxPower(1);
                     auto.startIntake();
                     auto.follower.followPath(auto.shoot1, true);
                     setPathState(6);
