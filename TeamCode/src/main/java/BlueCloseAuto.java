@@ -113,7 +113,7 @@ public class BlueCloseAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 1) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 0.5) && (auto.notBusy())) {
                     auto.startShoot();
                     //skip gate open
                     setPathState(5);

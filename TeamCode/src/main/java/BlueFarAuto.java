@@ -58,7 +58,7 @@ public class BlueFarAuto extends OpMode {
         auto = new decodeAuto(R, telemetry, follower, decodeAuto.Side.BLUEFAR);
         startPose = auto.startPose;
         follower.setStartingPose(startPose);
-        kP = 0.00002;
+        kP = CONFIGkP;
         kI = CONFIGkI;
         kD = CONFIGkD;
     }
@@ -81,8 +81,8 @@ public class BlueFarAuto extends OpMode {
         error = targetVelocity - currentVelocity;
 
 
-        if ((pidTimer.seconds() >= LOOP_TIME) && (launcherOn)) {
-            pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
+        if (pidTimer.seconds() >= LOOP_TIME) {
+            pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
             pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
             R.shooter.setPower(pidOutput);
             R.shooter2.setPower(pidOutput);
@@ -111,7 +111,7 @@ public class BlueFarAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 2.5) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 2) && (auto.notBusy())) {
                     auto.startShoot();
                     setPathState(4);
                 }
