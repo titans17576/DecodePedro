@@ -5,11 +5,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.BezierLine;
@@ -65,17 +62,10 @@ public class Teleop extends OpMode {
     private ElapsedTime pidTimer = new ElapsedTime();
     private double targetVelocity = 1300;
     private boolean launcherOn = false;
-    private double runPID(double target, double current, double currentPower) {
-        error = target - current;
+    private boolean intakeHighOn = false;
+    private boolean intakeLowOn = false;
 
-        integralSum += error * LOOP_TIME;
-        double derivative = (error - lastError) / LOOP_TIME;
-        double deltaPower = (kP * error) + (kI * integralSum) + (kD * derivative);
-
-        lastError = error;
-
-        return currentPower + deltaPower;
-    }
+    private final PIDController shooterPID = new PIDController(CONFIGkP, CONFIGkI, CONFIGkD, loopTime);
 
     /**
      * This method is call once when init is played, it initializes the follower
@@ -105,6 +95,8 @@ public class Teleop extends OpMode {
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         R.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        R.intakeHigh.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        R.intakeHigh.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     /**

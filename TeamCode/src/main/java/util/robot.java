@@ -57,7 +57,7 @@ public class robot{
         intakeLow.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeHigh.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeHigh.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeHigh.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeHigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
  /*       motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
