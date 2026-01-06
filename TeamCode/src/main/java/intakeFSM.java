@@ -35,7 +35,7 @@ public class intakeFSM {
 
     // Import opmode variables when instance is created
     public intakeFSM(robot Robot, Telemetry t) {
-        this(Robot, t, LowIntakeState.OFF, HighIntakeState.OFF, GatekeepState.OFF);
+        this(Robot, t, LowIntakeState.OFF, HighIntakeState.OFF, GatekeepState.ON);
     }
     public intakeFSM(robot Robot, Telemetry t, LowIntakeState lI, HighIntakeState hI, GatekeepState gS) {
         R = Robot;
@@ -45,8 +45,6 @@ public class intakeFSM {
         gatekeepState = gS;
     }
     public void initialize() {
-        R.intakeLow.setPower(0);
-        R.intakeHigh.setPower(0);
     }
 
     // Method to move to a targeted position
@@ -74,7 +72,7 @@ public class intakeFSM {
         switch (highIntakeState) {
             case ON:
                 // State inputs
-                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     setHighIntakeState(HighIntakeState.OFF);
                 }
                 break;
@@ -87,12 +85,12 @@ public class intakeFSM {
         switch (gatekeepState) {
             case ON:
                 // State inputs
-                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                if ((currentGamepad.a && !previousGamepad.a) || (currentGamepad.b && !previousGamepad.b) || (currentGamepad.right_bumper && !previousGamepad.right_bumper)) {
                     setGatekeepState(GatekeepState.OFF);
                 }
                 break;
             case OFF:
-                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                if ((currentGamepad.a && !previousGamepad.a) || (currentGamepad.b && !previousGamepad.b) || (currentGamepad.right_bumper && !previousGamepad.right_bumper)) {
                     setGatekeepState(GatekeepState.ON);
                 }
                 break;

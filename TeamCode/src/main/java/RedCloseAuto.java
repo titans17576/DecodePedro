@@ -84,7 +84,7 @@ public class RedCloseAuto extends OpMode {
 
 
         if (pidTimer.seconds() >= LOOP_TIME) {
-            pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
+            pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
             pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
             R.shooter.setPower(pidOutput);
             R.shooter2.setPower(pidOutput);
@@ -113,7 +113,7 @@ public class RedCloseAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 1) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 0.5) && (auto.notBusy())) {
                     auto.startShoot();
                     //skip gate open
                     setPathState(5);

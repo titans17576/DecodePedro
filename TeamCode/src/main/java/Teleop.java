@@ -45,11 +45,12 @@ public class Teleop extends OpMode {
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
     private boolean automatedDrive;
-    private Supplier<PathChain> pathChain;
+    private intakeFSM IntakeFSM;
+    private Supplier<PathChain> blueClose, redClose;
     private TelemetryManager telemetryM;
     private FtcDashboard dashboard;
 
-    private final Pose startPose = new Pose(0, 0, 0);
+    private final Pose startPose = new Pose(36, 72, Math.toRadians(180));
     private double defaultSpeed = 1;
     private double highSpeed = 1;
     private double launcher = 0.5;
@@ -90,12 +91,17 @@ public class Teleop extends OpMode {
         currentGamepad2 = new Gamepad();
         previousGamepad2 = new Gamepad();
 
-        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+        blueClose = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, follower::getPose)))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(133), 0.8))
+                .build();
+        redClose = () -> follower.pathBuilder()
+                .addPath(new Path(new BezierLine(follower::getPose, follower::getPose)))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(47), 0.8))
                 .build();
 
         R = new robot(hardwareMap);
+        IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         R.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -106,7 +112,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void init_loop() {
-        dashboard = FtcDashboard.getInstance();
+        /*dashboard = FtcDashboard.getInstance();*/ //launcher tuning
     }
 
     /**
@@ -115,11 +121,10 @@ public class Teleop extends OpMode {
     @Override
     public void start() {
         follower.startTeleopDrive();
-        R.gatekeep.setPosition(0.3);
         kP = CONFIGkP;
         kI = CONFIGkI;
         kD = CONFIGkD;
-        kV = 0.02;
+        kV = CONFIGkV;
         kS = CONFIGkS;
     }
 
@@ -140,6 +145,8 @@ public class Teleop extends OpMode {
         */
         follower.update();
         telemetryM.update();
+        IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
+
 
         double currentVelocity = R.shooter.getVelocity();
         error = targetVelocity - currentVelocity;
@@ -172,56 +179,44 @@ public class Teleop extends OpMode {
 
         // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
-        /*if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
-            slowModeMultiplier -= 0.25;
+        /*if (gamepad1.left_stick_button && !previousGamepad1.left_stick_button) {
+            follower.followPath(blueClose.get());
+            automatedDrive = true;
         }
-        if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
-            slowModeMultiplier += 0.25;
+        if (gamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
+            follower.followPath(redClose.get());
+            automatedDrive = true;
         }
-        if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
-            slowMode = !slowMode;
+
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.dpad_left && !previousGamepad1.dpad_left) || !follower.isBusy()) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
         }*/
         if (gamepad1.a && !previousGamepad1.a) {
             kV = CONFIGkV;
             kP = CONFIGkP; //was 0.000018
             launcher = 1300;
             launcherOn = !launcherOn;
+            R.gatekeep.setPosition(0.4);
         }
         else if (gamepad1.b && !previousGamepad1.b) {
             kV = CONFIGkV;
             kP = CONFIGkP; //was 0.000018
             launcher = 1550; /*far launch zone velocity*/
             launcherOn = !launcherOn;
+            R.gatekeep.setPosition(0.4);
         }
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
             launcher += 50;
         }
-        else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+        /*else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
             launcher -= 50;
-        }
-
-        if (gamepad1.x && !previousGamepad1.x) {
-            R.intakeLow.setPower(1);
-        }
-        else if (gamepad1.y && !previousGamepad1.y){
-            R.intakeLow.setPower(0);
-        }
-        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.intakeHigh.setVelocity(2500);
-        }
-        else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
-            R.intakeHigh.setVelocity(0);
-        }
-        /*if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
-            R.gatekeep.setPosition(0.4);
-        } else if (gamepad1.right_bumper && !previousGamepad1.right_bumper){
-            R.gatekeep.setPosition(0.3);
         }*/
 
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
-            R.gatekeep.setPosition(0.4);
             if (pidTimer.seconds() >= LOOP_TIME) {
                 pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
                 pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
@@ -234,20 +229,18 @@ public class Teleop extends OpMode {
             R.shooter2.setPower(0);
             //targetVelocity = 0;
             //pidOutput = 0;
-            //integralSum = 0;
-            //lastError = 0;
-            R.gatekeep.setPosition(0.3);
         }
 
-        TelemetryPacket packet = new TelemetryPacket();
+        /*TelemetryPacket packet = new TelemetryPacket();
         packet.put("Launcher Velocity", R.shooter.getVelocity());
         packet.put("Target Velocity", targetVelocity);
-        dashboard.sendTelemetryPacket(packet);
+        dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
 
         telemetry.addData("targetVelocity", targetVelocity);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
+        telemetry.addData("automatedDrive", automatedDrive);
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetryM.debug("automatedDrive", automatedDrive);
