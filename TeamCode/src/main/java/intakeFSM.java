@@ -4,16 +4,13 @@ import util.robot;
 
 public class intakeFSM {
     public enum LowIntakeState{
-        ON,
-        OFF
+        ON, OFF, REVERSE
     }
     public enum HighIntakeState{
-        ON,
-        OFF
+        ON, OFF, REVERSE, STALL
     }
     public enum GatekeepState{
-        ON,
-        OFF
+        ON, OFF
     }
 
 
@@ -26,8 +23,11 @@ public class intakeFSM {
     GatekeepState gatekeepState;
     final double lowIntakeOn_power = 1;
     final double lowIntakeOff_power = 0;
-    final double highIntakeOn_power = 1;
-    final double highIntakeOff_power = 0;
+    final double lowIntakeReverse_power = -1;
+    final double highIntakeOn_velocity = 2500;
+    final double highIntakeOff_velocity = 0;
+    final double highIntakeStall_velocity = 100;
+    final double highIntakeReverse_velocity = -2500;
     final double gatekeepOnPosition = 0.3;
     final double gatekeepOffPosition = 0.4;
 
@@ -35,7 +35,7 @@ public class intakeFSM {
 
     // Import opmode variables when instance is created
     public intakeFSM(robot Robot, Telemetry t) {
-        this(Robot, t, LowIntakeState.OFF, HighIntakeState.OFF, GatekeepState.OFF);
+        this(Robot, t, LowIntakeState.OFF, HighIntakeState.OFF, GatekeepState.ON);
     }
     public intakeFSM(robot Robot, Telemetry t, LowIntakeState lI, HighIntakeState hI, GatekeepState gS) {
         R = Robot;
@@ -45,13 +45,11 @@ public class intakeFSM {
         gatekeepState = gS;
     }
     public void initialize() {
-        R.intakeLow.setPower(0);
-        R.intakeHigh.setPower(0);
     }
 
     // Method to move to a targeted position
     private void powerLowIntake(Double power) {R.intakeLow.setPower(power);}
-    private void powerHighIntake(Double power) {R.intakeHigh.setPower(power);}
+    private void powerHighIntake(Double velocity) {R.intakeHigh.setVelocity(velocity);}
     private void setGatekeepPosition(Double position) {R.gatekeep.setPosition(position);}
 
 
@@ -74,7 +72,7 @@ public class intakeFSM {
         switch (highIntakeState) {
             case ON:
                 // State inputs
-                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     setHighIntakeState(HighIntakeState.OFF);
                 }
                 break;
@@ -87,12 +85,12 @@ public class intakeFSM {
         switch (gatekeepState) {
             case ON:
                 // State inputs
-                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                if ((currentGamepad.a && !previousGamepad.a) || (currentGamepad.b && !previousGamepad.b) || (currentGamepad.right_bumper && !previousGamepad.right_bumper)) {
                     setGatekeepState(GatekeepState.OFF);
                 }
                 break;
             case OFF:
-                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
+                if ((currentGamepad.a && !previousGamepad.a) || (currentGamepad.b && !previousGamepad.b) || (currentGamepad.right_bumper && !previousGamepad.right_bumper)) {
                     setGatekeepState(GatekeepState.ON);
                 }
                 break;
@@ -108,13 +106,22 @@ public class intakeFSM {
             case OFF:
                 powerLowIntake(lowIntakeOff_power);
                 break;
+            case REVERSE:
+                powerLowIntake(lowIntakeReverse_power);
+                break;
         }
         switch(highIntakeState) {
             case ON:
-                powerHighIntake(highIntakeOn_power);
+                powerHighIntake(highIntakeOn_velocity);
                 break;
             case OFF:
-                powerHighIntake(highIntakeOff_power);
+                powerHighIntake(highIntakeOff_velocity);
+                break;
+            case REVERSE:
+                powerHighIntake(highIntakeReverse_velocity);
+                break;
+            case STALL:
+                powerHighIntake(highIntakeStall_velocity);
                 break;
         }
         switch(gatekeepState) {

@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "pidTest", group = "NoahIsSilly")
 public class pidTest extends OpMode {
 
-    private DcMotorEx launcher, intakeHigh;
+    private DcMotorEx launcher, launcher2, intakeHigh;
     private FtcDashboard dashboard;
 
     private double kP, kI, kD;
@@ -47,10 +47,14 @@ public class pidTest extends OpMode {
         launcher.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         launcher.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         launcher.setDirection(DcMotorSimple.Direction.REVERSE);
+        launcher2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        launcher2.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
         intakeHigh.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeHigh.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeHigh.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcher.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        launcher2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         pidTimer.reset();
     }
@@ -92,15 +96,17 @@ public class pidTest extends OpMode {
 
 
         if (launcherOn) {
-            targetVelocity = 1300; // ticks/sec
+            targetVelocity = 1550; // ticks/sec
             if (pidTimer.seconds() >= LOOP_TIME) {
                 pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
                 pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
                 launcher.setPower(pidOutput);
+                launcher2.setPower(pidOutput);
                 pidTimer.reset();
             }
         } else {
             launcher.setPower(0);
+            launcher2.setPower(0);
             targetVelocity = 0;
             pidOutput = 0;
             integralSum = 0;
@@ -129,5 +135,6 @@ public class pidTest extends OpMode {
     @Override
     public void stop() {
         launcher.setPower(0);
+        launcher2.setPower(0);
     }
 }

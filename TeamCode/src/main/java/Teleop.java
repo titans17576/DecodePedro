@@ -1,3 +1,6 @@
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -10,13 +13,13 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-
-import static pedroPathing.ConfigFile.CONFIGHighkP;
-import static pedroPathing.ConfigFile.CONFIGHighkI;
-import static pedroPathing.ConfigFile.CONFIGHighkD;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import static pedroPathing.ConfigFile.CONFIGkP;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkD;
+import static pedroPathing.ConfigFile.CONFIGkV;
+import static pedroPathing.ConfigFile.CONFIGkS;
 import static pedroPathing.ConfigFile.loopTime;
 
 import pedroPathing.constants.Constants;
@@ -39,16 +42,24 @@ public class Teleop extends OpMode {
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
     private boolean automatedDrive;
-    private Supplier<PathChain> pathChain;
+    private intakeFSM IntakeFSM;
+    private Supplier<PathChain> blueClose, redClose;
     private TelemetryManager telemetryM;
+    private FtcDashboard dashboard;
 
-    private final Pose startPose = new Pose(0, 0, 0);
+    private final Pose startPose = new Pose(36, 72, Math.toRadians(180));
     private double defaultSpeed = 1;
     private double highSpeed = 1;
     private double launcher = 0.5;
     private boolean slowMode = true;
     private double slowModeMultiplier = 0.75;
-    private double shooterPIDOutput = 0; // current motor power
+    double error;
+    private double integralSum = 0;
+    private double LOOP_TIME = loopTime;
+    private double lastError = 0;
+    private double kP, kI, kD, kV, kS;
+    private double pidOutput = 0; // current motor power
+    private ElapsedTime pidTimer = new ElapsedTime();
     private double targetVelocity = 1300;
     private boolean launcherOn = false;
     private boolean intakeHighOn = false;
@@ -69,15 +80,19 @@ public class Teleop extends OpMode {
         previousGamepad1 = new Gamepad();
         currentGamepad2 = new Gamepad();
         previousGamepad2 = new Gamepad();
-        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+
+        blueClose = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, follower::getPose)))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(133), 0.8))
+                .build();
+        redClose = () -> follower.pathBuilder()
+                .addPath(new Path(new BezierLine(follower::getPose, follower::getPose)))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(47), 0.8))
                 .build();
 
         R = new robot(hardwareMap);
-
-        shooterPID.pidTimer.reset();
-
+        IntakeFSM = new intakeFSM(R, telemetry);
+        pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         R.shooter.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         R.intakeHigh.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -89,6 +104,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void init_loop() {
+        /*dashboard = FtcDashboard.getInstance();*/ //launcher tuning
     }
 
     /**
@@ -97,6 +113,11 @@ public class Teleop extends OpMode {
     @Override
     public void start() {
         follower.startTeleopDrive();
+        kP = CONFIGkP;
+        kI = CONFIGkI;
+        kD = CONFIGkD;
+        kV = CONFIGkV;
+        kS = CONFIGkS;
     }
 
     /**
@@ -116,9 +137,15 @@ public class Teleop extends OpMode {
         */
         follower.update();
         telemetryM.update();
+        IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
-        double shooter_currentVelocity = R.shooter.getVelocity();
-        shooterPID.error = targetVelocity - shooter_currentVelocity;
+
+        double currentVelocity = R.shooter.getVelocity();
+        error = targetVelocity - currentVelocity;
+
+        /*kP = CONFIGkP;
+        kI = CONFIGkI;
+        kD = CONFIGkD;*/
 
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
@@ -144,79 +171,68 @@ public class Teleop extends OpMode {
 
         // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
-        /*if (gamepad2.dpad_left && !previousGamepad2.dpad_left) {
-            slowModeMultiplier -= 0.25;
+        /*if (gamepad1.left_stick_button && !previousGamepad1.left_stick_button) {
+            follower.followPath(blueClose.get());
+            automatedDrive = true;
         }
-        if (gamepad2.dpad_right && !previousGamepad2.dpad_right) {
-            slowModeMultiplier += 0.25;
+        if (gamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
+            follower.followPath(redClose.get());
+            automatedDrive = true;
         }
-        if (gamepad2.left_bumper && !previousGamepad2.left_bumper) {
-            slowMode = !slowMode;
+
+        //Stop automated following if the follower is done
+        if (automatedDrive && (gamepad1.dpad_left && !previousGamepad1.dpad_left) || !follower.isBusy()) {
+            follower.startTeleopDrive();
+            automatedDrive = false;
         }*/
         if (gamepad1.a && !previousGamepad1.a) {
+            kV = CONFIGkV;
+            kP = CONFIGkP; //was 0.000018
             launcher = 1300;
             launcherOn = !launcherOn;
+            R.gatekeep.setPosition(0.4);
         }
         else if (gamepad1.b && !previousGamepad1.b) {
+            kV = CONFIGkV;
+            kP = CONFIGkP; //was 0.000018
             launcher = 1550; /*far launch zone velocity*/
             launcherOn = !launcherOn;
+            R.gatekeep.setPosition(0.4);
         }
-        else if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
             launcher += 50;
         }
-        else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+        /*else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
             launcher -= 50;
-        }
-
-        if (gamepad1.x && !previousGamepad1.x) { // TOGGLE LOW WITH X
-            intakeLowOn = !intakeLowOn;
-            R.intakeLow.setPower(intakeLowOn ? 1 : 0);
-        }
-
-        if (gamepad1.y) {
-            intakeHighOn = true;
-            R.intakeHigh.setPower(1);
-        } else {
-            intakeHighOn = false;
-            R.intakeHigh.setPower(0);
-        }
-
-        if (gamepad1.dpad_up && !previousGamepad1.dpad_up) {
-            R.intakeHigh.setPower(1);
-            intakeHighOn = true;
-        }
-        else if (gamepad1.dpad_down && !previousGamepad1.dpad_down){
-            intakeHighOn = false;
-            R.intakeHigh.setPower(0);
-        }
-
-        if (gamepad1.left_bumper && !previousGamepad1.left_bumper){
-            R.gatekeep.setPosition(0.4);
-        } else if (gamepad1.right_bumper && !previousGamepad1.right_bumper){
-            R.gatekeep.setPosition(0.3);
-        }
+        }*/
 
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
-            if (shooterPID.pidTimer.seconds() >= shooterPID.loopTime) {
-                shooterPIDOutput = shooterPID.runPID(targetVelocity, shooter_currentVelocity, shooterPIDOutput);
-                shooterPIDOutput = Math.max(0.0, Math.min(1.0, shooterPIDOutput)); // clamp to [0,1]
-                R.shooter.setPower(shooterPIDOutput);
-                shooterPID.pidTimer.reset();
+            if (pidTimer.seconds() >= LOOP_TIME) {
+                pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
+                pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
+                R.shooter.setPower(pidOutput);
+                R.shooter2.setPower(pidOutput);
+                pidTimer.reset();
             }
         } else {
             R.shooter.setPower(0);
-            targetVelocity = 0;
-            shooterPIDOutput = 0;
-            shooterPID.integralSum = 0;
-            shooterPID.lastError = 0;
+            R.shooter2.setPower(0);
+            //targetVelocity = 0;
+            //pidOutput = 0;
         }
 
+        /*TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Launcher Velocity", R.shooter.getVelocity());
+        packet.put("Target Velocity", targetVelocity);
+        dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
 
         telemetry.addData("targetVelocity", targetVelocity);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
+        telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
+        telemetry.addData("automatedDrive", automatedDrive);
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetryM.debug("automatedDrive", automatedDrive);

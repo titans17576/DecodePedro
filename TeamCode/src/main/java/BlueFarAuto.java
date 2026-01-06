@@ -1,6 +1,8 @@
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
+import static pedroPathing.ConfigFile.CONFIGkV;
+import static pedroPathing.ConfigFile.CONFIGkS;
 import static pedroPathing.ConfigFile.loopTime;
 
 import com.pedropathing.follower.Follower;
@@ -23,8 +25,9 @@ public class BlueFarAuto extends OpMode {
     private Pose startPose;
     public Timer pathTimer = new Timer();
     public Timer accelTimer = new Timer();
+    public Timer delayTimer = new Timer();
     public boolean actionBusy;
-    private double kP, kI, kD;
+    private double kP, kI, kD, kV, kS;
     double error;
 
     private double integralSum = 0;
@@ -55,6 +58,9 @@ public class BlueFarAuto extends OpMode {
         auto = new decodeAuto(R, telemetry, follower, decodeAuto.Side.BLUEFAR);
         startPose = auto.startPose;
         follower.setStartingPose(startPose);
+        kP = CONFIGkP;
+        kI = CONFIGkI;
+        kD = CONFIGkD;
     }
 
     @Override
@@ -74,29 +80,27 @@ public class BlueFarAuto extends OpMode {
         double currentVelocity = R.shooter.getVelocity();
         error = targetVelocity - currentVelocity;
 
-        kP = 0.00002;
-        kI = CONFIGkI;
-        kD = 0.000007;
 
-        if ((pidTimer.seconds() >= LOOP_TIME) && (launcherOn)) {
-            pidOutput = runPID(targetVelocity, currentVelocity, pidOutput);
+        if (pidTimer.seconds() >= LOOP_TIME) {
+            pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
             pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
             R.shooter.setPower(pidOutput);
+            R.shooter2.setPower(pidOutput);
             pidTimer.reset();
-        } else {
+        } /*else {
             R.shooter.setPower(0);
             targetVelocity = 0;
             pidOutput = 0;
             integralSum = 0;
             lastError = 0;
-        }
+        }*/
 
         telemetry.update();
     }
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                follower.setMaxPower(1);
+                follower.setMaxPower(0.9);
                 auto.follower.followPath(auto.shoot1, true);
                 setPathState(2);
                 break;
@@ -107,7 +111,7 @@ public class BlueFarAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 2.5) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 2) && (auto.notBusy())) {
                     auto.startShoot();
                     setPathState(4);
                 }
@@ -115,13 +119,13 @@ public class BlueFarAuto extends OpMode {
             case 4:
                 if (auto.notBusy()) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.intake1, true);
+                    auto.follower.followPath(auto.intake2, true);
                     setPathState(5);
                 }
                 break;
             case 5:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.shoot2, true);
+                    auto.follower.followPath(auto.shoot3, true);
                     setPathState(6);
                 }
                 break;
@@ -134,13 +138,13 @@ public class BlueFarAuto extends OpMode {
             case 7:
                 if (auto.notBusy()) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.intake2, true);
+                    auto.follower.followPath(auto.intake1, true);
                     setPathState(8);
                 }
                 break;
             case 8:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.shoot3, true);
+                    auto.follower.followPath(auto.shoot2, true);
                     setPathState(9);
                 }
                 break;
@@ -153,7 +157,7 @@ public class BlueFarAuto extends OpMode {
             case 10:
                 if (auto.notBusy()) {
                     auto.follower.followPath(auto.end, true);
-                    launcherOn = false;
+                    //launcherOn = false;
                     setPathState(11);
                 }
                 break;
