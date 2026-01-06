@@ -1,25 +1,6 @@
-import static pedroPathing.ConfigFile.CONFIGHighkD;
-import static pedroPathing.ConfigFile.CONFIGHighkI;
-import static pedroPathing.ConfigFile.CONFIGHighkP;
-import static pedroPathing.ConfigFile.CONFIGkD;
-import static pedroPathing.ConfigFile.CONFIGkI;
-import static pedroPathing.ConfigFile.CONFIGkP;
-import static pedroPathing.ConfigFile.loopTime;
-
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.function.Supplier;
 
