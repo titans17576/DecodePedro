@@ -1,6 +1,3 @@
-import static pedroPathing.ConfigFile.CONFIGHighkD;
-import static pedroPathing.ConfigFile.CONFIGHighkI;
-import static pedroPathing.ConfigFile.CONFIGHighkP;
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
@@ -65,7 +62,7 @@ public class ColorSensorTEst extends OpMode {
      **/
     @Override
     public void loop() {
-        telemetry.addData("digital 0", pin0.getState()); // IS PRUPLE
+        telemetry.addData("digital 0", pin0.getState()); // IS PURPLE
         telemetry.addData("digital 1", pin1.getState()); // IS GREEN
         telemetry.update();
     }
