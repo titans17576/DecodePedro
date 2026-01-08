@@ -1,21 +1,20 @@
+package colorsensor;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
-import java.util.function.Supplier;
-
-import pedroPathing.constants.Constants;
 import util.robot;
 
 /**
  * HOW TO USE IT::::
  *
  * PLUG SENSOR INTO I2C
- * then run the ConfigureColorRangefinder TeleOp
+ * then run the colorsensor.ConfigureColorRangefinder TeleOp
  * then remove the sensor and plug it into Digital 0-1, finally run this TeleOp
  */
 
-@TeleOp(name = "ColorSensorTEst")
+@TeleOp(name = "colorsensor.ColorSensorTEst")
 public class ColorSensorTEst extends OpMode {
     private robot R;
     DigitalChannel pin0;
