@@ -106,7 +106,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void init_loop() {
-        /*dashboard = FtcDashboard.getInstance();*/ //launcher tuning
+        dashboard = FtcDashboard.getInstance(); //launcher tuning
     }
 
     /**
@@ -146,10 +146,6 @@ public class Teleop extends OpMode {
 
         double currentVelocity = R.shooter.getVelocity();
         error = targetVelocity - currentVelocity;
-
-        /*kP = CONFIGkP;
-        kI = CONFIGkI;
-        kD = CONFIGkD;*/
 
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
@@ -206,9 +202,9 @@ public class Teleop extends OpMode {
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
             launcher += 50;
         }
-        /*else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+        else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
             launcher -= 50;
-        }*/
+        }
 
 
         if (launcherOn) {
@@ -227,10 +223,10 @@ public class Teleop extends OpMode {
             //pidOutput = 0;
         }
 
-        /*TelemetryPacket packet = new TelemetryPacket();
+        TelemetryPacket packet = new TelemetryPacket();
         packet.put("Launcher Velocity", R.shooter.getVelocity());
         packet.put("Target Velocity", targetVelocity);
-        dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
+        dashboard.sendTelemetryPacket(packet); // launcher tuning
 
         telemetry.addData("targetVelocity", targetVelocity);
         telemetry.addData("launchPower", R.shooter.getPower());

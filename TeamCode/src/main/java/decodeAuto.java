@@ -272,6 +272,24 @@ public class decodeAuto {
                 break;
         }
     }
+    public void intakeRamp() {
+        switch(intakeState){
+            case 1:
+                IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
+                IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
+                actionBusy = true;
+                intakeTimer.resetTimer();
+                setIntakeState(2);
+                break;
+            case 2:
+                if (intakeTimer.getElapsedTimeSeconds() > 2) {
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
+                    actionBusy = false;
+                    setIntakeState(-1);
+                }
+                break;
+        }
+    }
 
     public void shoot() {
         switch(shootState){
@@ -309,7 +327,7 @@ public class decodeAuto {
                 if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
-                    setShootState(8);
+                    setShootState(8); //skip extra transfer attempt (6-7)
                 }
                 break;
             case 6:
