@@ -30,7 +30,7 @@ import util.robot;
 /*
 1. create new auto aimer
 2. call start when starting to go
-3. call update with whether it should be active or not, and don't send conflicting commands to the follower
+3. call update with whether it should be active or not, and don't send conflicting commands to the follower while active
 4. it will turn towards the april tag while also localizing the position of the robot
  */
 public class AutoAimer {
@@ -98,7 +98,7 @@ public class AutoAimer {
         //builder.enableLiveView(true);
 
         // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+        builder.setStreamFormat(VisionPortal.StreamFormat.MJPEG);
 
         // Choose whether or not LiveView stops if no processors are enabled.
         // If set "true", monitor shows solid orange screen if no processors enabled.
@@ -121,7 +121,7 @@ public class AutoAimer {
             // vision.resumeStreaming(); documentation says that doing this takes a few seconds, so commented it out
         }
 
-        follower.update();
+        // follower.update(); temporarily disabled
 
         //This uses the aprilTag to relocalize your robot
         //You can also create a custom AprilTag fusion Localizer for the follower if you want to use this by default for all your autos
@@ -129,7 +129,7 @@ public class AutoAimer {
         if (newCamPose != null) follower.setPose(newCamPose);
 
         //if you're not using limelight you can follow the same steps: build an offset pose, put your heading offset, and generate a path etc
-        if (!following) {
+        if (!following && false) {
             follower.followPath(
                     follower.pathBuilder()
                             .addPath(new BezierLine(follower.getPose(), targetLocation))
@@ -176,6 +176,8 @@ public class AutoAimer {
                     FTCCoordinates.INSTANCE
             ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
         }
+
+        t.update();
 
         if (targetPose != null) targetLocation = targetPose;
 
