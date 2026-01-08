@@ -34,6 +34,7 @@ import util.robot;
 4. it will turn towards the april tag while also localizing the position of the robot
  */
 public class AutoAimer {
+    private final boolean SHOULD_TURN_TO_POINT_WHEN_ACTIVE = false;// temporarily dissabled
     private final robot r;
     private final Telemetry t;
     private AprilTagProcessor aprilTag; //any camera here
@@ -121,15 +122,13 @@ public class AutoAimer {
             // vision.resumeStreaming(); documentation says that doing this takes a few seconds, so commented it out
         }
 
-        // follower.update(); temporarily disabled
-
         //This uses the aprilTag to relocalize your robot
         //You can also create a custom AprilTag fusion Localizer for the follower if you want to use this by default for all your autos
         Pose newCamPose = getRobotPoseFromCamera(); // can return null when no april tags detected
         if (newCamPose != null) follower.setPose(newCamPose);
 
         //if you're not using limelight you can follow the same steps: build an offset pose, put your heading offset, and generate a path etc
-        if (!following && false) {
+        if (!following && SHOULD_TURN_TO_POINT_WHEN_ACTIVE) {
             follower.followPath(
                     follower.pathBuilder()
                             .addPath(new BezierLine(follower.getPose(), targetLocation))
@@ -176,8 +175,6 @@ public class AutoAimer {
                     FTCCoordinates.INSTANCE
             ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
         }
-
-        t.update();
 
         if (targetPose != null) targetLocation = targetPose;
 
