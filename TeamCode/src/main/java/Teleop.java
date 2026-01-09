@@ -1,6 +1,5 @@
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -55,18 +54,12 @@ public class Teleop extends OpMode {
     private boolean slowMode = true;
     private double slowModeMultiplier = 0.75;
     double error;
-    private double integralSum = 0;
     private double LOOP_TIME = loopTime;
-    private double lastError = 0;
     private double kP, kI, kD, kV, kS;
     private double pidOutput = 0; // current motor power
     private ElapsedTime pidTimer = new ElapsedTime();
     private double targetVelocity = 0;
     private boolean launcherOn = false;
-    private boolean intakeHighOn = false;
-    private boolean intakeLowOn = false;
-
-    private final PIDController shooterPID = new PIDController(CONFIGkP, CONFIGkI, CONFIGkD, loopTime);
 
     /**
      * This method is call once when init is played, it initializes the follower
@@ -92,7 +85,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
-        aimer = new AutoAimer(R, follower, telemetry);
+        aimer = new AutoAimer(R);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -114,7 +107,6 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void start() {
-        aimer.start();
         follower.startTeleopDrive();
         kP = CONFIGkP;
         kI = CONFIGkI;
@@ -124,13 +116,30 @@ public class Teleop extends OpMode {
     }
 
     /**
+     * Called once at the end of the OpMode
+     */
+    @Override
+    public void stop() {
+        aimer.stop();
+    }
+
+    /**
      * This is the main loop of the opmode and runs continuously after play
      **/
     @Override
     public void loop() {
-
         currentGamepad1.copy(gamepad1);
         currentGamepad2.copy(gamepad2);
+
+        follower.update();
+        telemetryM.update();
+        IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
+
+        boolean aimerActive = gamepad1.left_bumper;
+        aimer.setActive(aimerActive);
+
+        double currentVelocity = R.shooter.getVelocity();
+        error = targetVelocity - currentVelocity;
 
         /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
@@ -138,24 +147,21 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-        follower.update();
-        telemetryM.update();
-        aimer.update(true);
-        IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
-
-
-        double currentVelocity = R.shooter.getVelocity();
-        error = targetVelocity - currentVelocity;
-
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
             //In case the drivers want to use a "slowMode" you can scale the vectors
+
+            double turn = -gamepad1.right_stick_x * 0.8;
+
+            if (aimer.hasTarget() && aimerActive) {
+                turn = aimer.getHeadingError() * 0.8; // adjust constant as needed to reduce bad movement
+            }
 
             //This is the normal version to use in the TeleOp
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
-                    -gamepad1.right_stick_x * 0.8,
+                    turn,
                     true // Robot Centric
             );
 
@@ -163,13 +169,11 @@ public class Teleop extends OpMode {
             else follower.setTeleOpDrive(
                     -gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
-                    -gamepad1.right_stick_x * slowModeMultiplier * 0.8,
+                    turn * (aimerActive ? 1 : slowModeMultiplier), // don't slow down auto aimer
                     true // Robot Centric
             );
 
         }
-
-        // ticks_per_second = power * (max_rpm / 60) * ticks_per_revolution
 
         /*if (gamepad1.left_stick_button && !previousGamepad1.left_stick_button) {
             follower.followPath(blueClose.get());
@@ -191,18 +195,16 @@ public class Teleop extends OpMode {
             launcher = 1200;
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
-        }
-        else if (gamepad1.b && !previousGamepad1.b) {
+        } else if (gamepad1.b && !previousGamepad1.b) {
             kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
             launcher = 1500; /*far launch zone velocity*/
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
-        if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
             targetVelocity += 20;
-        }
-        else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
+        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
             targetVelocity -= 20;
         }
 
@@ -239,7 +241,4 @@ public class Teleop extends OpMode {
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
     }
-
-    //private double powerToTicksPerSecond(double power) {
-        //return power * ((double) 6000 / 60) * 28;
-    }
+}

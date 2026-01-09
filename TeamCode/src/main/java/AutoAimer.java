@@ -2,24 +2,17 @@ import android.util.Size;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.FTCCoordinates;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
@@ -28,35 +21,28 @@ import pedroPathing.constants.Constants;
 import util.robot;
 
 /*
-1. create new auto aimer
+1. create new auto aimer, creating vision portal takes time so do it early
 2. call start when starting to go
-3. call update with whether it should be active or not, and don't send conflicting commands to the follower while active
-4. it will turn towards the april tag while also localizing the position of the robot
+3. call get error heading to use that to turn towards the tag
+4. call stop to stop memory leak
  */
 public class AutoAimer {
-    private final boolean SHOULD_TURN_TO_POINT_WHEN_ACTIVE = false;// temporarily dissabled
     private final robot r;
-    private final Telemetry t;
     private AprilTagProcessor aprilTag; //any camera here
     private VisionPortal vision;
-    private final Follower follower;
-    private boolean following = false;
 
-    //Put the target location here. default is BLUE GOAL, but this should be immediately changed based on current april tag
-    private Pose targetLocation = new Pose(0, 144);
-
+    // X: distance forward from the robot's center
+    // Y: distance right and left of the robot's center
+    // Z: distance up from the ground
     private final Position cameraPosition = new Position(DistanceUnit.INCH,
             0, 0, 0, 0);
+    // (0,0,0) means exactly forward
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, -90, 0, 0);
+            0, 0, 0, 0);
 
-    public AutoAimer(robot r, Follower follower, Telemetry t) {
+    public AutoAimer(robot r) {
         this.r = r;
-        this.t = t;
-        this.follower = follower;
-    }
 
-    public void start() {
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
 
@@ -65,14 +51,14 @@ public class AutoAimer {
                 //.setDrawCubeProjection(false)
                 //.setDrawTagOutline(true)
                 //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                //.setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
                 .setCameraPose(cameraPosition, cameraOrientation)
 
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
+                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for HBV CAM W20217 V22
                 // ... these parameters are fx, fy, cx, cy.
 
                 .build();
@@ -113,71 +99,46 @@ public class AutoAimer {
         vision = builder.build();
     }
 
-    public void update(boolean isActive) {
-        vision.setProcessorEnabled(aprilTag, isActive);
-        if (!isActive) {
-            // vision.stopStreaming(); documentation says that doing this takes a few seconds, so commented it out
-            return;
-        } else {
-            // vision.resumeStreaming(); documentation says that doing this takes a few seconds, so commented it out
-        }
-
-        //This uses the aprilTag to relocalize your robot
-        //You can also create a custom AprilTag fusion Localizer for the follower if you want to use this by default for all your autos
-        Pose newCamPose = getRobotPoseFromCamera(); // can return null when no april tags detected
-        if (newCamPose != null) follower.setPose(newCamPose);
-
-        //if you're not using limelight you can follow the same steps: build an offset pose, put your heading offset, and generate a path etc
-        if (!following && SHOULD_TURN_TO_POINT_WHEN_ACTIVE) {
-            follower.followPath(
-                    follower.pathBuilder()
-                            .addPath(new BezierLine(follower.getPose(), targetLocation))
-                            .setLinearHeadingInterpolation(follower.getHeading(), targetLocation.minus(follower.getPose()).getAsVector().getTheta())
-                            .build()
-            );
-        }
-
-        if (following && !follower.isBusy()) following = false;
+    public void stop() {
+        vision.close();
     }
 
-    // get robot pos if possible, and set target position if visible as a side effect
-    private Pose getRobotPoseFromCamera() {
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+    public void setActive(boolean active) {
+        vision.setProcessorEnabled(aprilTag, active);
+    }
 
-        Pose robotPose = null;
-        Pose targetPose = null;
+    public boolean hasTarget() {
+        return getBestDetection() != null;
+    }
 
-        for (AprilTagDetection detection : currentDetections) {
-            robotPose = new Pose(
-                    detection.robotPose.getPosition().x,
-                    detection.robotPose.getPosition().y,
-                    detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES),
-                    FTCCoordinates.INSTANCE
-            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+    // returns bearing error in radians
+    public double getHeadingError() {
+        AprilTagDetection bestTag = getBestDetection();
 
-            t.addLine(String.format("\n==== (ID %d)", detection.id));
-            t.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)",
-                    detection.robotPose.getPosition().x,
-                    detection.robotPose.getPosition().y,
-                    detection.robotPose.getPosition().z));
-
-            t.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)",
-                    detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
-                    detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
-                    detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
-
-            if (!(detection.id == 20 || detection.id == 24)) continue; // only look at the goal tags to actually point towards
-
-            targetPose = new Pose(
-                    detection.ftcPose.x,
-                    detection.ftcPose.y,
-                    0,
-                    FTCCoordinates.INSTANCE
-            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+        if (bestTag != null) {
+            return Math.toRadians(bestTag.ftcPose.bearing);
         }
+        return 0;
+    }
 
-        if (targetPose != null) targetLocation = targetPose;
+    private AprilTagDetection getBestDetection() {
+        List<AprilTagDetection> detections = aprilTag.getFreshDetections();
+        if (detections == null || detections.isEmpty()) return null; // no fresh data
 
-        return robotPose;
+        AprilTagDetection best = null;
+        double minBearing = Double.MAX_VALUE;
+
+        for (AprilTagDetection detection : detections) {
+            if (detection.metadata == null || detection.decisionMargin < 35) continue;
+
+            // id 20, 24 are for goals
+            if (detection.id == 20 || detection.id == 24) {
+                if (Math.abs(detection.ftcPose.bearing) < minBearing) {
+                    minBearing = Math.abs(detection.ftcPose.bearing);
+                    best = detection;
+                }
+            }
+        }
+        return best;
     }
 }
