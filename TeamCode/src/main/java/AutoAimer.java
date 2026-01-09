@@ -98,7 +98,8 @@ public class AutoAimer {
     }
 
     public boolean hasTarget() {
-        return getBestDetection() != null;
+        List<AprilTagDetection> detections = aprilTag.getDetections();
+        return detections == null || detections.isEmpty();
     }
 
     // returns bearing error in radians
