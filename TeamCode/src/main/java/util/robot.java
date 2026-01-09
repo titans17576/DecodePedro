@@ -45,12 +45,12 @@ public class robot{
 
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         //shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(0.3, 0, 0, 0));
 
         shooter2.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         intakeLow.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeLow.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

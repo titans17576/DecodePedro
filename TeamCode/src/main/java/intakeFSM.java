@@ -28,8 +28,8 @@ public class intakeFSM {
     final double highIntakeOff_velocity = 0;
     final double highIntakeStall_velocity = 100;
     final double highIntakeReverse_velocity = -2500;
-    final double gatekeepOnPosition = 0.3;
-    final double gatekeepOffPosition = 0.4;
+    final double gatekeepOnPosition = 0.2;
+    final double gatekeepOffPosition = 0.34;
 
 
 
@@ -61,11 +61,20 @@ public class intakeFSM {
                 // State inputs
                 if (currentGamepad.x && !previousGamepad.x) {
                     setLowIntakeState(LowIntakeState.OFF);
+                } else if (currentGamepad.y && !previousGamepad.y) {
+                    setLowIntakeState(LowIntakeState.REVERSE);
                 }
                 break;
             case OFF:
                 if (currentGamepad.x && !previousGamepad.x) {
                     setLowIntakeState(LowIntakeState.ON);
+                } else if (currentGamepad.y && !previousGamepad.y) {
+                    setLowIntakeState(LowIntakeState.REVERSE);
+                }
+                break;
+            case REVERSE:
+                if (currentGamepad.x && !previousGamepad.x) {
+                    setLowIntakeState(LowIntakeState.OFF);
                 }
                 break;
         }
@@ -74,10 +83,21 @@ public class intakeFSM {
                 // State inputs
                 if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
                     setHighIntakeState(HighIntakeState.OFF);
+                } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+                    setHighIntakeState(HighIntakeState.REVERSE);
                 }
                 break;
             case OFF:
                 if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                    setHighIntakeState(HighIntakeState.ON);
+                } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+                    setHighIntakeState(HighIntakeState.REVERSE);
+                }
+                break;
+            case REVERSE:
+                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+                    setHighIntakeState(HighIntakeState.OFF);
+                } else if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     setHighIntakeState(HighIntakeState.ON);
                 }
                 break;
@@ -85,12 +105,12 @@ public class intakeFSM {
         switch (gatekeepState) {
             case ON:
                 // State inputs
-                if ((currentGamepad.a && !previousGamepad.a) || (currentGamepad.b && !previousGamepad.b) || (currentGamepad.right_bumper && !previousGamepad.right_bumper)) {
+                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
                     setGatekeepState(GatekeepState.OFF);
                 }
                 break;
             case OFF:
-                if ((currentGamepad.a && !previousGamepad.a) || (currentGamepad.b && !previousGamepad.b) || (currentGamepad.right_bumper && !previousGamepad.right_bumper)) {
+                if (currentGamepad.right_bumper && !previousGamepad.right_bumper) {
                     setGatekeepState(GatekeepState.ON);
                 }
                 break;

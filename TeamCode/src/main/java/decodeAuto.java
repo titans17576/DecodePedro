@@ -266,7 +266,7 @@ public class decodeAuto {
             case 3:
                 if (intakeTimer.getElapsedTimeSeconds() > 8) {
                     IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
-                    //IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
+                    IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
                     setIntakeState(-1);
                 }
                 break;
@@ -301,11 +301,11 @@ public class decodeAuto {
                 setShootState(2);
                 break;
             case 2:
-                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
+                if (shootTimer.getElapsedTimeSeconds() > 1) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
                     IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                     shootTimer.resetTimer();
-                    setShootState(3);
+                    setShootState(5); //rapid fire
                 }
                 break;
             case 3:
@@ -324,7 +324,7 @@ public class decodeAuto {
                 }
                 break;
             case 5:
-                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
+                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(8); //skip extra transfer attempt (6-7)
@@ -346,7 +346,7 @@ public class decodeAuto {
                 break;
             case 8:
                 if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
+                    //IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
                     shootTimer.resetTimer();
                     setShootState(9);
                 }

@@ -60,7 +60,7 @@ public class Teleop extends OpMode {
     private double kP, kI, kD, kV, kS;
     private double pidOutput = 0; // current motor power
     private ElapsedTime pidTimer = new ElapsedTime();
-    private double targetVelocity = 1300;
+    private double targetVelocity = 0;
     private boolean launcherOn = false;
     private boolean intakeHighOn = false;
     private boolean intakeLowOn = false;
@@ -182,24 +182,24 @@ public class Teleop extends OpMode {
             automatedDrive = false;
         }*/
         if (gamepad1.a && !previousGamepad1.a) {
-            kV = CONFIGkV;
+            kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
-            launcher = 1300;
+            launcher = 1200;
             launcherOn = !launcherOn;
-            R.gatekeep.setPosition(0.4);
+            IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
         else if (gamepad1.b && !previousGamepad1.b) {
-            kV = CONFIGkV;
+            kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
-            launcher = 1550; /*far launch zone velocity*/
+            launcher = 1500; /*far launch zone velocity*/
             launcherOn = !launcherOn;
-            R.gatekeep.setPosition(0.4);
+            IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right){
-            launcher += 50;
+            targetVelocity += 20;
         }
         else if (gamepad1.dpad_left && !previousGamepad1.dpad_left){
-            launcher -= 50;
+            targetVelocity -= 20;
         }
 
 
