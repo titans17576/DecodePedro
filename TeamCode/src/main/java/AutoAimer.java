@@ -1,11 +1,5 @@
 import android.util.Size;
 
-import com.pedropathing.follower.Follower;
-import com.pedropathing.ftc.FTCCoordinates;
-import com.pedropathing.geometry.PedroCoordinates;
-import com.pedropathing.geometry.Pose;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
@@ -17,7 +11,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-import pedroPathing.constants.Constants;
 import util.robot;
 
 /*
@@ -27,7 +20,6 @@ import util.robot;
 4. call stop to stop memory leak
  */
 public class AutoAimer {
-    private final robot r;
     private AprilTagProcessor aprilTag; //any camera here
     private VisionPortal vision;
 
@@ -41,8 +33,6 @@ public class AutoAimer {
             0, 0, 0, 0);
 
     public AutoAimer(robot r) {
-        this.r = r;
-
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
 

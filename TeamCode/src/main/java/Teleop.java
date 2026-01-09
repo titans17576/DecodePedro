@@ -12,14 +12,12 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import static pedroPathing.ConfigFile.CONFIGkP;
-import static pedroPathing.ConfigFile.CONFIGkI;
-import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkV;
 import static pedroPathing.ConfigFile.CONFIGkS;
-import static pedroPathing.ConfigFile.loopTime;
+import static pedroPathing.ConfigFile.LOOPTIME;
 
 import pedroPathing.constants.Constants;
 import util.robot;
@@ -54,8 +52,7 @@ public class Teleop extends OpMode {
     private boolean slowMode = true;
     private double slowModeMultiplier = 0.75;
     double error;
-    private double LOOP_TIME = loopTime;
-    private double kP, kI, kD, kV, kS;
+    private double kP, kV, kS, loopTime;
     private double pidOutput = 0; // current motor power
     private ElapsedTime pidTimer = new ElapsedTime();
     private double targetVelocity = 0;
@@ -109,10 +106,9 @@ public class Teleop extends OpMode {
     public void start() {
         follower.startTeleopDrive();
         kP = CONFIGkP;
-        kI = CONFIGkI;
-        kD = CONFIGkD;
         kV = CONFIGkV;
         kS = CONFIGkS;
+        loopTime = LOOPTIME;
     }
 
     /**
@@ -211,7 +207,7 @@ public class Teleop extends OpMode {
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
-            if (pidTimer.seconds() >= LOOP_TIME) {
+            if (pidTimer.seconds() >= loopTime) {
                 pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
                 pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
                 R.shooter.setPower(pidOutput);
