@@ -46,6 +46,7 @@ public class Teleop extends OpMode {
     private Supplier<PathChain> blueClose, redClose;
     private TelemetryManager telemetryM;
     private FtcDashboard dashboard;
+    private AutoAimer aimer;
 
     private final Pose startPose = new Pose(36, 72, Math.toRadians(180));
     private double defaultSpeed = 1;
@@ -91,6 +92,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
+        aimer = new AutoAimer(R, follower, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -112,6 +114,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void start() {
+        aimer.start();
         follower.startTeleopDrive();
         kP = CONFIGkP;
         kI = CONFIGkI;
@@ -137,6 +140,7 @@ public class Teleop extends OpMode {
         */
         follower.update();
         telemetryM.update();
+        aimer.update(true);
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
 

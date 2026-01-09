@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 import java.util.List;
 
 /*
@@ -18,6 +20,7 @@ public class robot{
     private List<DcMotorEx> motors;
     //public CRServo claw;
     public Servo gatekeep;
+    public WebcamName camera;
 
     public robot() {
 
@@ -35,6 +38,7 @@ public class robot{
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
         liftMotor2 = hardwareMap.get(DcMotorEx.class, "liftMotor2");
         */
+        camera = hardwareMap.get(WebcamName.class, "camera");
         gatekeep = hardwareMap.get(Servo.class, "gatekeepServo");
         intakeLow = hardwareMap.get(DcMotorEx.class, "intakeLow");
         intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
