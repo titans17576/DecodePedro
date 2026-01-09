@@ -3,7 +3,7 @@ import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
 import static pedroPathing.ConfigFile.CONFIGkV;
 import static pedroPathing.ConfigFile.CONFIGkS;
-import static pedroPathing.ConfigFile.loopTime;
+import static pedroPathing.ConfigFile.LOOPTIME;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -37,7 +37,7 @@ public class BlueCloseAuto extends OpMode {
     private ElapsedTime pidTimer = new ElapsedTime();
 
     private double targetVelocity = 1300;
-    private double LOOP_TIME = loopTime;
+    private double LOOP_TIME = LOOPTIME;
     private boolean launcherOn = true;
     private double runPID(double target, double current, double currentPower) {
         error = target - current;

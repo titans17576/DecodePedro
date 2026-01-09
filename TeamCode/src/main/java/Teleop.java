@@ -38,23 +38,23 @@ public class Teleop extends OpMode {
     private Gamepad previousGamepad1;
     private Gamepad currentGamepad2;
     private Gamepad previousGamepad2;
+
     private boolean automatedDrive;
-    private intakeFSM IntakeFSM;
     private Supplier<PathChain> blueClose, redClose;
+
     private TelemetryManager telemetryM;
     private FtcDashboard dashboard;
+    private intakeFSM IntakeFSM;
     private AutoAimer aimer;
 
     private final Pose startPose = new Pose(36, 72, Math.toRadians(180));
-    private double defaultSpeed = 1;
-    private double highSpeed = 1;
+    private final ElapsedTime pidTimer = new ElapsedTime();
     private double launcher = 0.5;
     private boolean slowMode = true;
     private double slowModeMultiplier = 0.75;
     double error;
     private double kP, kV, kS, loopTime;
-    private double pidOutput = 0; // current motor power
-    private ElapsedTime pidTimer = new ElapsedTime();
+
     private double targetVelocity = 0;
     private boolean launcherOn = false;
 
@@ -82,7 +82,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
-        aimer = new AutoAimer(R);
+        aimer = new AutoAimer(R, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -129,10 +129,14 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
+        aimer.update();
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
-        boolean aimerActive = gamepad1.left_bumper;
+        boolean aimerActive = gamepad1.right_trigger > 0.5;
         aimer.setActive(aimerActive);
+
+        telemetry.addData("serial", R.camera.getSerialNumber());
+        telemetry.addData("deviceName", R.camera.getUsbDeviceNameIfAttached());
 
         double currentVelocity = R.shooter.getVelocity();
         error = targetVelocity - currentVelocity;
@@ -150,7 +154,8 @@ public class Teleop extends OpMode {
             double turn = -gamepad1.right_stick_x * 0.8;
 
             if (aimer.hasTarget() && aimerActive) {
-                turn = aimer.getHeadingError() * 0.8; // adjust constant as needed to reduce bad movement
+                turn = aimer.getAverageHeadingError() * 0.7;
+                turn += Math.signum(turn) + 0.05; // base power to fight against friction
             }
 
             //This is the normal version to use in the TeleOp
@@ -208,7 +213,7 @@ public class Teleop extends OpMode {
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
             if (pidTimer.seconds() >= loopTime) {
-                pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
+                double pidOutput = ((kV * targetVelocity) + (kP * (targetVelocity - R.shooter.getVelocity())) + kS);
                 pidOutput = Math.max(0.0, Math.min(1.0, pidOutput)); // clamp to [0,1]
                 R.shooter.setPower(pidOutput);
                 R.shooter2.setPower(pidOutput);

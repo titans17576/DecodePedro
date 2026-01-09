@@ -3,7 +3,7 @@ package pedroPathing;
 import static pedroPathing.ConfigFile.CONFIGkP;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkD;
-import static pedroPathing.ConfigFile.loopTime;
+import static pedroPathing.ConfigFile.LOOPTIME;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -37,7 +37,7 @@ public class pidTest extends OpMode {
     private boolean lastA = false;
     private boolean lastB = false;
 
-    private final double LOOP_TIME = loopTime;
+    private final double LOOP_TIME = LOOPTIME;
 
     @Override
     public void init() {

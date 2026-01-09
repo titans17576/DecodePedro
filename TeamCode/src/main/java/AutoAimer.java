@@ -1,5 +1,6 @@
 import android.util.Size;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
@@ -20,6 +21,7 @@ import util.robot;
 4. call stop to stop memory leak
  */
 public class AutoAimer {
+    private Telemetry telemetry;
     private AprilTagProcessor aprilTag; //any camera here
     private VisionPortal vision;
 
@@ -32,7 +34,12 @@ public class AutoAimer {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, 0, 0, 0);
 
-    public AutoAimer(robot r) {
+    private AprilTagDetection bestTag;
+    private double averageBearingError = 0;
+
+    public AutoAimer(robot r, Telemetry telemetry) {
+        this.telemetry = telemetry;
+
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
 
@@ -42,13 +49,13 @@ public class AutoAimer {
                 //.setDrawTagOutline(true)
                 //.setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                 .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
-                .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .setCameraPose(cameraPosition, cameraOrientation)
 
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for HBV CAM W20217 V22
+                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for HBV CAM W20217 V22 at 1280x720 res
                 // ... these parameters are fx, fy, cx, cy.
 
                 .build();
@@ -69,7 +76,7 @@ public class AutoAimer {
         builder.setCamera(r.camera);
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        builder.setCameraResolution(new Size(1280, 720));
+        builder.setCameraResolution(new Size(1280, 720)); // this should be lowered to reduce bandwith
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);
@@ -89,30 +96,48 @@ public class AutoAimer {
         vision = builder.build();
     }
 
+    // stop memory leaks on subsequent init
     public void stop() {
         vision.close();
     }
 
-    public void setActive(boolean active) {
-        vision.setProcessorEnabled(aprilTag, active);
-    }
-
-    public boolean hasTarget() {
-        List<AprilTagDetection> detections = aprilTag.getDetections();
-        return detections == null || detections.isEmpty();
-    }
-
-    // returns bearing error in radians
-    public double getHeadingError() {
-        AprilTagDetection bestTag = getBestDetection();
+    // calculates a continuous average to smooth bearing results
+    public void update() {
+        bestTag = getBestDetection();
 
         if (bestTag != null) {
-            return Math.toRadians(bestTag.ftcPose.bearing);
+            final double alpha = 0.7; // Higher: trust new data more, Lower: smoother but slower to react
+            averageBearingError = (alpha * bestTag.ftcPose.bearing) + (1 - alpha) * averageBearingError;
+        } else {
+            averageBearingError *= 0.9; // "Forget" older values
+        }
+    }
+
+    // use to prevent wasted camera resources
+    public void setActive(boolean active) {
+        vision.setProcessorEnabled(aprilTag, active);
+        if (!active) averageBearingError = 0;
+    }
+
+    // returns true if a april tag target is detected
+    public boolean hasTarget() {
+        return bestTag != null;
+    }
+
+    // Returns the raw current bearing if there is a current target, otherwise returning 0
+    public double getRawHeadingError() {
+        if (bestTag != null) {
+            return bestTag.ftcPose.bearing;
         }
         return 0;
     }
 
-    private AprilTagDetection getBestDetection() {
+    // returns average bearing error in radians
+    public double getAverageHeadingError() {
+        return averageBearingError;
+    }
+
+    private  AprilTagDetection getBestDetection() {
         List<AprilTagDetection> detections = aprilTag.getFreshDetections();
         if (detections == null || detections.isEmpty()) return null; // no fresh data
 
@@ -120,7 +145,7 @@ public class AutoAimer {
         double minBearing = Double.MAX_VALUE;
 
         for (AprilTagDetection detection : detections) {
-            if (detection.metadata == null || detection.decisionMargin < 35) continue;
+            if (detection.decisionMargin < 35) continue;
 
             // id 20, 24 are for goals
             if (detection.id == 20 || detection.id == 24) {
