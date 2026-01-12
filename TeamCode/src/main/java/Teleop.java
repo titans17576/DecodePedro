@@ -135,9 +135,6 @@ public class Teleop extends OpMode {
         boolean aimerActive = gamepad1.right_trigger > 0.5;
         aimer.setActive(aimerActive);
 
-        telemetry.addData("serial", R.camera.getSerialNumber());
-        telemetry.addData("deviceName", R.camera.getUsbDeviceNameIfAttached());
-
         double currentVelocity = R.shooter.getVelocity();
         error = targetVelocity - currentVelocity;
 
@@ -153,9 +150,10 @@ public class Teleop extends OpMode {
 
             double turn = -gamepad1.right_stick_x * 0.8;
 
-            if (aimer.hasTarget() && aimerActive) {
-                turn = aimer.getAverageHeadingError() * 0.7;
-                turn += Math.signum(turn) + 0.05; // base power to fight against friction
+            if (aimerActive) {
+                turn = aimer.getAverageMotorPower();
+                telemetry.addData("hasTarget",  aimer.hasTarget());
+                telemetry.addData("turn",  turn);
             }
 
             //This is the normal version to use in the TeleOp
@@ -231,6 +229,7 @@ public class Teleop extends OpMode {
         packet.put("Target Velocity", targetVelocity);
         dashboard.sendTelemetryPacket(packet); // launcher tuning
 
+        telemetry.addLine();
         telemetry.addData("targetVelocity", targetVelocity);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());

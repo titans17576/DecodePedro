@@ -21,9 +21,9 @@ import util.robot;
 4. call stop to stop memory leak
  */
 public class AutoAimer {
-    private Telemetry telemetry;
-    private AprilTagProcessor aprilTag; //any camera here
-    private VisionPortal vision;
+    private final Telemetry telemetry;
+    private final AprilTagProcessor aprilTag; //any camera here
+    private final VisionPortal vision;
 
     // X: distance forward from the robot's center
     // Y: distance right and left of the robot's center
@@ -35,7 +35,7 @@ public class AutoAimer {
             0, 0, 0, 0);
 
     private AprilTagDetection bestTag;
-    private double averageBearingError = 0;
+    private double averageMotorPower = 0;
 
     public AutoAimer(robot r, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -105,18 +105,28 @@ public class AutoAimer {
     public void update() {
         bestTag = getBestDetection();
 
+        telemetry.addData("cameraState", vision.getCameraState());
+
         if (bestTag != null) {
-            final double alpha = 0.7; // Higher: trust new data more, Lower: smoother but slower to react
-            averageBearingError = (alpha * bestTag.ftcPose.bearing) + (1 - alpha) * averageBearingError;
+            final double newBearing = bestTag.ftcPose.bearing;
+            // final double distance = bestTag.ftcPose.range;
+
+            final double alpha = Math.min(0.9, Math.max(0.2, Math.abs(newBearing - averageMotorPower) / Math.PI));
+            averageMotorPower = (alpha * newBearing) + (1 - alpha) * averageMotorPower;
+
+            /* averageMotorPower *= distance / 150;
+             * TODO: Angles get smaller at larger distances, figure out some way to scale by distance
+             *  or just end up implementing a full PID controller anyway
+             */
         } else {
-            averageBearingError *= 0.9; // "Forget" older values
+            averageMotorPower *= 0.9; // "Forget" older values
         }
     }
 
     // use to prevent wasted camera resources
     public void setActive(boolean active) {
         vision.setProcessorEnabled(aprilTag, active);
-        if (!active) averageBearingError = 0;
+        if (!active) averageMotorPower = 0;
     }
 
     // returns true if a april tag target is detected
@@ -125,7 +135,7 @@ public class AutoAimer {
     }
 
     // Returns the raw current bearing if there is a current target, otherwise returning 0
-    public double getRawHeadingError() {
+    public double getHeadingError() {
         if (bestTag != null) {
             return bestTag.ftcPose.bearing;
         }
@@ -133,8 +143,8 @@ public class AutoAimer {
     }
 
     // returns average bearing error in radians
-    public double getAverageHeadingError() {
-        return averageBearingError;
+    public double getAverageMotorPower() {
+        return averageMotorPower;
     }
 
     private  AprilTagDetection getBestDetection() {
@@ -145,7 +155,7 @@ public class AutoAimer {
         double minBearing = Double.MAX_VALUE;
 
         for (AprilTagDetection detection : detections) {
-            if (detection.decisionMargin < 35) continue;
+            if (detection.decisionMargin < 25) continue;
 
             // id 20, 24 are for goals
             if (detection.id == 20 || detection.id == 24) {
