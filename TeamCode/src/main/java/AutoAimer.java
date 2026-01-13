@@ -34,8 +34,10 @@ public class AutoAimer {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, 0, 0, 0);
 
+    private final PIDController pid = new PIDController(0.2, 0, 0);
     private AprilTagDetection bestTag;
-    private double averageMotorPower = 0;
+    private int updatesLostTarget = 0;
+    private double averageBearingError = 0;
 
     public AutoAimer(robot r, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -55,7 +57,7 @@ public class AutoAimer {
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for HBV CAM W20217 V22 at 1280x720 res
+                .setLensIntrinsics(502.2, 502.2, 320.0, 180.0) // Values for ardu cam
                 // ... these parameters are fx, fy, cx, cy.
 
                 .build();
@@ -76,7 +78,7 @@ public class AutoAimer {
         builder.setCamera(r.camera);
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        builder.setCameraResolution(new Size(1280, 720)); // this should be lowered to reduce bandwith
+        builder.setCameraResolution(new Size(640, 360)); // this should be lowered to reduce bandwith
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);
@@ -96,6 +98,10 @@ public class AutoAimer {
         vision = builder.build();
     }
 
+    public void start() {
+        pid.reset();
+    }
+
     // stop memory leaks on subsequent init
     public void stop() {
         vision.close();
@@ -109,24 +115,25 @@ public class AutoAimer {
 
         if (bestTag != null) {
             final double newBearing = bestTag.ftcPose.bearing;
-            // final double distance = bestTag.ftcPose.range;
 
-            final double alpha = Math.min(0.9, Math.max(0.2, Math.abs(newBearing - averageMotorPower) / Math.PI));
-            averageMotorPower = (alpha * newBearing) + (1 - alpha) * averageMotorPower;
-
-            /* averageMotorPower *= distance / 150;
-             * TODO: Angles get smaller at larger distances, figure out some way to scale by distance
-             *  or just end up implementing a full PID controller anyway
-             */
+            final double alpha = Math.min(0.9, Math.max(0.1, Math.abs(newBearing - averageBearingError) / Math.PI));
+            averageBearingError = (alpha * newBearing) + (1 - alpha) * averageBearingError;
         } else {
-            averageMotorPower *= 0.9; // "Forget" older values
+            updatesLostTarget++;
+            if (updatesLostTarget > 20) { // lost target for too long, so reset
+                averageBearingError = 0;
+                pid.reset();
+            }
         }
     }
 
     // use to prevent wasted camera resources
     public void setActive(boolean active) {
         vision.setProcessorEnabled(aprilTag, active);
-        if (!active) averageMotorPower = 0;
+        if (!active) {
+            averageBearingError = 0;
+            pid.reset();
+        }
     }
 
     // returns true if a april tag target is detected
@@ -134,17 +141,19 @@ public class AutoAimer {
         return bestTag != null;
     }
 
-    // Returns the raw current bearing if there is a current target, otherwise returning 0
-    public double getHeadingError() {
-        if (bestTag != null) {
-            return bestTag.ftcPose.bearing;
-        }
-        return 0;
+    // Returns the turn power to minimize bearing error
+    public double getTurnPower() {
+        if (Math.abs(averageBearingError) < 0.02) return 0;
+
+        double power = pid.calculate(0, averageBearingError);
+        power += Math.signum(power) * 0.05;
+
+        return Math.max(Math.min(power, 0.7), -0.7);
     }
 
     // returns average bearing error in radians
-    public double getAverageMotorPower() {
-        return averageMotorPower;
+    public double getAverageBearingError() {
+        return averageBearingError;
     }
 
     private  AprilTagDetection getBestDetection() {

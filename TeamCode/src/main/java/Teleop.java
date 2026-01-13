@@ -104,6 +104,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void start() {
+        aimer.start();
         follower.startTeleopDrive();
         kP = CONFIGkP;
         kV = CONFIGkV;
@@ -151,9 +152,9 @@ public class Teleop extends OpMode {
             double turn = -gamepad1.right_stick_x * 0.8;
 
             if (aimerActive) {
-                turn = aimer.getAverageMotorPower();
+                turn = aimer.getTurnPower();
                 telemetry.addData("hasTarget",  aimer.hasTarget());
-                telemetry.addData("turn",  turn);
+                telemetry.addData("bearingError",  aimer.getAverageBearingError());
             }
 
             //This is the normal version to use in the TeleOp

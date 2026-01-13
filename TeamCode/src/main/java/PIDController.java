@@ -1,34 +1,42 @@
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+// This is a positional PID
 public class PIDController {
-    double error;
+    double kP, kI, kD;
     double lastError = 0;
     double integralSum = 0;
+    public ElapsedTime timer = new ElapsedTime();
 
-    double kP;
-    double kI;
-    double kD;
-
-    public ElapsedTime pidTimer = new ElapsedTime();
-
-    double loopTime;
-
-    public PIDController(double kP, double kI, double kD, double loopTime) {
+    public PIDController(double kP, double kI, double kD) {
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
-        this.loopTime = loopTime;
+        timer.reset();
     }
 
-    public double runPID(double target, double current, double currentPower) {
-        error = target - current;
+    public double calculate(double target, double current) {
+        double error = target - current;
+        double dt = timer.seconds();
+        timer.reset();
 
-        integralSum += error * loopTime;
-        double derivative = (error - lastError) / loopTime;
-        double deltaPower = (kP * error) + (kI * integralSum) + (kD * derivative);
+        if (dt == 0) dt = 0.01;
+
+        double p = kP * error;
+
+        integralSum += error * dt;
+        double i = kI * integralSum;
+
+        double derivative = (error - lastError) / dt;
+        double d = kD * derivative;
 
         lastError = error;
 
-        return currentPower + deltaPower;
+        return p + i + d;
+    }
+
+    public void reset() {
+        timer.reset();
+        lastError = 0;
+        integralSum = 0;
     }
 }
