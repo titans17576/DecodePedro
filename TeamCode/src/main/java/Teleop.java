@@ -152,9 +152,10 @@ public class Teleop extends OpMode {
             double turn = -gamepad1.right_stick_x * 0.8;
 
             if (aimerActive) {
-                turn = aimer.getTurnPower();
+                turn = -aimer.getTurnPower();
                 telemetry.addData("hasTarget",  aimer.hasTarget());
                 telemetry.addData("bearingError",  aimer.getAverageBearingError());
+                telemetry.addData("turnPower", turn);
             }
 
             //This is the normal version to use in the TeleOp

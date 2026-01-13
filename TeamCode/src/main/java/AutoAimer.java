@@ -1,5 +1,7 @@
 import android.util.Size;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -24,7 +26,8 @@ public class AutoAimer {
     protected final Telemetry telemetry;
     protected final AprilTagProcessor aprilTag; //any camera here
     protected final VisionPortal vision;
-    private final PIDController pid = new PIDController(0.2, 0, 0);
+    private final PIDController pid = new PIDController(0.7, 0.009, 0.2);
+    private final ElapsedTime lostTargetTimer = new ElapsedTime();
 
     // X: distance forward from the robot's center
     // Y: distance right and left of the robot's center
@@ -36,7 +39,6 @@ public class AutoAimer {
             0, 0, 0, 0);
 
     private AprilTagDetection bestTag;
-    private int updatesLostTarget = 0;
     private double averageBearingError = 0;
 
     public AutoAimer(robot r, Telemetry telemetry) {
@@ -57,7 +59,7 @@ public class AutoAimer {
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                .setLensIntrinsics(502.2, 502.2, 320.0, 180.0) // Values for ardu cam
+                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for ardu cam
                 // ... these parameters are fx, fy, cx, cy.
 
                 .build();
@@ -78,7 +80,7 @@ public class AutoAimer {
         builder.setCamera(r.camera);
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        builder.setCameraResolution(new Size(640, 360)); // this should be lowered to reduce bandwith
+        builder.setCameraResolution(new Size(1280, 720));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);
@@ -100,6 +102,7 @@ public class AutoAimer {
 
     public void start() {
         pid.reset();
+        lostTargetTimer.reset();
     }
 
     // stop memory leaks on subsequent init
@@ -118,9 +121,10 @@ public class AutoAimer {
 
             final double alpha = Math.min(0.9, Math.max(0.1, Math.abs(newBearing - averageBearingError) / Math.PI));
             averageBearingError = (alpha * newBearing) + (1 - alpha) * averageBearingError;
+
+            lostTargetTimer.reset();
         } else {
-            updatesLostTarget++;
-            if (updatesLostTarget > 20) { // lost target for too long, so reset
+            if (lostTargetTimer.seconds() > 0.25) { // lost target for too long, so reset
                 averageBearingError = 0;
                 pid.reset();
             }
@@ -143,12 +147,7 @@ public class AutoAimer {
 
     // Returns the turn power to minimize bearing error
     public double getTurnPower() {
-        if (Math.abs(averageBearingError) < 0.02) return 0;
-
-        double power = pid.calculate(0, averageBearingError);
-        power += Math.signum(power) * 0.05;
-
-        return Math.max(Math.min(power, 0.7), -0.7);
+        return Math.max(Math.min(pid.calculate(0, averageBearingError), 0.7), -0.7);
     }
 
     // returns average bearing error in radians
