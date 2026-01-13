@@ -1,5 +1,11 @@
 import android.util.Size;
 
+import com.pedropathing.control.LowPassFilter;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.CoordinateSystem;
+import com.pedropathing.geometry.PedroCoordinates;
+import com.pedropathing.geometry.Pose;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -21,10 +27,14 @@ import util.robot;
 4. call stop to stop memory leak
  */
 public class AutoAimer {
-    protected final Telemetry telemetry;
-    protected final AprilTagProcessor aprilTag; //any camera here
-    protected final VisionPortal vision;
-    private final PIDController pid = new PIDController(0.2, 0, 0);
+    private final Telemetry telemetry;
+    private final AprilTagProcessor aprilTag; //any camera here
+    private final VisionPortal vision;
+    private final Follower follower;
+
+    private final LowPassFilter xFilter = new LowPassFilter(0.2);
+    private final LowPassFilter yFilter = new LowPassFilter(0.2);
+    private final LowPassFilter headingFilter = new LowPassFilter(0.2);
 
     // X: distance forward from the robot's center
     // Y: distance right and left of the robot's center
@@ -35,11 +45,10 @@ public class AutoAimer {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, 0, 0, 0);
 
-    private AprilTagDetection bestTag;
-    private int updatesLostTarget = 0;
-    private double averageBearingError = 0;
+    private Pose targetPose;
 
-    public AutoAimer(robot r, Telemetry telemetry) {
+    public AutoAimer(robot r, Follower follower, Telemetry telemetry) {
+        this.follower = follower;
         this.telemetry = telemetry;
 
         // Create the AprilTag processor.
@@ -98,10 +107,6 @@ public class AutoAimer {
         vision = builder.build();
     }
 
-    public void start() {
-        pid.reset();
-    }
-
     // stop memory leaks on subsequent init
     public void stop() {
         vision.close();
@@ -109,54 +114,63 @@ public class AutoAimer {
 
     // calculates a continuous average to smooth bearing results
     public void update() {
-        bestTag = getBestDetection();
+        AprilTagDetection bestTag = getBestDetection();
 
-        telemetry.addData("cameraState", vision.getCameraState());
+        if (bestTag != null && bestTag.metadata != null) {
+            Pose rawPose = new Pose(
+                    bestTag.robotPose.getPosition().x,
+                    bestTag.robotPose.getPosition().y,
+                    bestTag.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
+            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
 
-        if (bestTag != null) {
-            final double newBearing = bestTag.ftcPose.bearing;
-
-            final double alpha = Math.min(0.9, Math.max(0.1, Math.abs(newBearing - averageBearingError) / Math.PI));
-            averageBearingError = (alpha * newBearing) + (1 - alpha) * averageBearingError;
-        } else {
-            updatesLostTarget++;
-            if (updatesLostTarget > 20) { // lost target for too long, so reset
-                averageBearingError = 0;
-                pid.reset();
+            double distanceToNewDetection = rawPose.distanceFrom(follower.getPose());
+            if (distanceToNewDetection > 15) {
+                // other two values not used in LowPassFilter
+                xFilter.reset(rawPose.getX(), 0, 0);
+                yFilter.reset(rawPose.getY(), 0, 0);
+                headingFilter.reset(rawPose.getHeading(), 0, 0);
+            } else {
+                // updateProjection not used but still required for all filters??
+                xFilter.update(rawPose.getX(), 0);
+                yFilter.update(rawPose.getY(), 0);
+                headingFilter.update(rawPose.getHeading(), 0);
             }
+
+            follower.setPose(new Pose(xFilter.getState(), yFilter.getState(), headingFilter.getState()));
+
+            targetPose = new Pose(
+                    bestTag.metadata.fieldPosition.get(0),
+                    bestTag.metadata.fieldPosition.get(1)
+            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
         }
     }
 
     // use to prevent wasted camera resources
     public void setActive(boolean active) {
         vision.setProcessorEnabled(aprilTag, active);
-        if (!active) {
-            averageBearingError = 0;
-            pid.reset();
-        }
-    }
-
-    // returns true if a april tag target is detected
-    public boolean hasTarget() {
-        return bestTag != null;
     }
 
     // Returns the turn power to minimize bearing error
     public double getTurnPower() {
-        if (Math.abs(averageBearingError) < 0.02) return 0;
+        if (targetPose == null) return 0;
 
-        double power = pid.calculate(0, averageBearingError);
-        power += Math.signum(power) * 0.05;
+        Pose currentPose = follower.getPose();
 
-        return Math.max(Math.min(power, 0.7), -0.7);
+        double angleToTarget = Math.atan2(
+                targetPose.getY() - currentPose.getY(),
+                targetPose.getX() - currentPose.getX()
+        );
+
+        double angleError = angleToTarget - currentPose.getHeading();
+        while (angleError > Math.PI) angleError -= 2 * Math.PI;
+        while (angleError < -Math.PI) angleError += 2 * Math.PI;
+        if (Math.abs(angleError) < 0.02) angleError = 0;
+
+        double power = angleError * 0.5;
+        return Math.max(-1.0, Math.min(1.0, power));
     }
 
-    // returns average bearing error in radians
-    public double getAverageBearingError() {
-        return averageBearingError;
-    }
-
-    protected AprilTagDetection getBestDetection() {
+    private AprilTagDetection getBestDetection() {
         List<AprilTagDetection> detections = aprilTag.getFreshDetections();
         if (detections == null || detections.isEmpty()) return null; // no fresh data
 

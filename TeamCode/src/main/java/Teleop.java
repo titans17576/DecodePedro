@@ -82,7 +82,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
-        aimer = new AutoAimer(R, telemetry);
+        aimer = new AutoAimer(R, follower, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -104,7 +104,6 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void start() {
-        aimer.start();
         follower.startTeleopDrive();
         kP = CONFIGkP;
         kV = CONFIGkV;
@@ -153,8 +152,6 @@ public class Teleop extends OpMode {
 
             if (aimerActive) {
                 turn = aimer.getTurnPower();
-                telemetry.addData("hasTarget",  aimer.hasTarget());
-                telemetry.addData("bearingError",  aimer.getAverageBearingError());
             }
 
             //This is the normal version to use in the TeleOp
