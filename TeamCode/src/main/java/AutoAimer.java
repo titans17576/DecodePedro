@@ -17,13 +17,14 @@ import util.robot;
 /*
 1. create new auto aimer, creating vision portal takes time so do it early
 2. call start when starting to go
-3. call get error heading to use that to turn towards the tag
+3. call get motor power to use that to turn towards the tag
 4. call stop to stop memory leak
  */
 public class AutoAimer {
-    private final Telemetry telemetry;
-    private final AprilTagProcessor aprilTag; //any camera here
-    private final VisionPortal vision;
+    protected final Telemetry telemetry;
+    protected final AprilTagProcessor aprilTag; //any camera here
+    protected final VisionPortal vision;
+    private final PIDController pid = new PIDController(0.2, 0, 0);
 
     // X: distance forward from the robot's center
     // Y: distance right and left of the robot's center
@@ -34,7 +35,6 @@ public class AutoAimer {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, 0, 0, 0);
 
-    private final PIDController pid = new PIDController(0.2, 0, 0);
     private AprilTagDetection bestTag;
     private int updatesLostTarget = 0;
     private double averageBearingError = 0;
@@ -156,7 +156,7 @@ public class AutoAimer {
         return averageBearingError;
     }
 
-    private  AprilTagDetection getBestDetection() {
+    protected AprilTagDetection getBestDetection() {
         List<AprilTagDetection> detections = aprilTag.getFreshDetections();
         if (detections == null || detections.isEmpty()) return null; // no fresh data
 
