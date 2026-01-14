@@ -1,10 +1,10 @@
 import android.util.Size;
 
-import com.pedropathing.control.LowPassFilter;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.CoordinateSystem;
+import com.pedropathing.ftc.FTCCoordinates;
 import com.pedropathing.geometry.PedroCoordinates;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -31,10 +31,7 @@ public class AutoAimer {
     private final AprilTagProcessor aprilTag; //any camera here
     private final VisionPortal vision;
     private final Follower follower;
-
-    private final LowPassFilter xFilter = new LowPassFilter(0.2);
-    private final LowPassFilter yFilter = new LowPassFilter(0.2);
-    private final LowPassFilter headingFilter = new LowPassFilter(0.2);
+    private final ElapsedTime lastDetectionTimer = new ElapsedTime();
 
     // X: distance forward from the robot's center
     // Y: distance right and left of the robot's center
@@ -45,7 +42,8 @@ public class AutoAimer {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, 0, 0, 0);
 
-    private Pose targetPose;
+    private Pose localTargetPose = null;
+    private final double TARGET_TIMEOUT = 0.65; // Seconds to remember the tag
 
     public AutoAimer(robot r, Follower follower, Telemetry telemetry) {
         this.follower = follower;
@@ -66,7 +64,7 @@ public class AutoAimer {
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                .setLensIntrinsics(502.2, 502.2, 320.0, 180.0) // Values for ardu cam
+                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for ardu cam
                 // ... these parameters are fx, fy, cx, cy.
 
                 .build();
@@ -87,7 +85,7 @@ public class AutoAimer {
         builder.setCamera(r.camera);
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        builder.setCameraResolution(new Size(640, 360)); // this should be lowered to reduce bandwith
+        builder.setCameraResolution(new Size(1280, 720)); // this should be lowered to reduce bandwith
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);
@@ -112,36 +110,27 @@ public class AutoAimer {
         vision.close();
     }
 
-    // calculates a continuous average to smooth bearing results
+    // calculates target pose if availiable
     public void update() {
         AprilTagDetection bestTag = getBestDetection();
 
-        if (bestTag != null && bestTag.metadata != null) {
-            Pose rawPose = new Pose(
-                    bestTag.robotPose.getPosition().x,
-                    bestTag.robotPose.getPosition().y,
-                    bestTag.robotPose.getOrientation().getYaw(AngleUnit.RADIANS)
-            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+        if (bestTag != null && bestTag.ftcPose != null) {
+            Pose currentPose = follower.getPose();
 
-            double distanceToNewDetection = rawPose.distanceFrom(follower.getPose());
-            if (distanceToNewDetection > 15) {
-                // other two values not used in LowPassFilter
-                xFilter.reset(rawPose.getX(), 0, 0);
-                yFilter.reset(rawPose.getY(), 0, 0);
-                headingFilter.reset(rawPose.getHeading(), 0, 0);
-            } else {
-                // updateProjection not used but still required for all filters??
-                xFilter.update(rawPose.getX(), 0);
-                yFilter.update(rawPose.getY(), 0);
-                headingFilter.update(rawPose.getHeading(), 0);
-            }
+            // Calculate the goal's position relative to the robot's current internal world
+            // Note: If it spins the wrong way, change the '+' to a '-'
+            double angleToTag = currentPose.getHeading() + bestTag.ftcPose.bearing;
 
-            follower.setPose(new Pose(xFilter.getState(), yFilter.getState(), headingFilter.getState()));
+            double goalX = currentPose.getX() + Math.cos(angleToTag) * bestTag.ftcPose.range;
+            double goalY = currentPose.getY() + Math.sin(angleToTag) * bestTag.ftcPose.range;
 
-            targetPose = new Pose(
-                    bestTag.metadata.fieldPosition.get(0),
-                    bestTag.metadata.fieldPosition.get(1)
-            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+            localTargetPose = new Pose(goalX, goalY);
+            lastDetectionTimer.reset(); // We saw it! Restart the clock.
+        }
+
+        // Auto-null the target if we haven't seen a tag in a while
+        if (lastDetectionTimer.seconds() > TARGET_TIMEOUT) {
+            localTargetPose = null;
         }
     }
 
@@ -152,22 +141,28 @@ public class AutoAimer {
 
     // Returns the turn power to minimize bearing error
     public double getTurnPower() {
-        if (targetPose == null) return 0;
+        // If the timer expired or we never saw a tag, don't turn
+        if (localTargetPose == null) return 0;
 
         Pose currentPose = follower.getPose();
 
-        double angleToTarget = Math.atan2(
-                targetPose.getY() - currentPose.getY(),
-                targetPose.getX() - currentPose.getX()
+        // Calculate heading to the "remembered" local target
+        double targetHeading = Math.atan2(
+                localTargetPose.getY() - currentPose.getY(),
+                localTargetPose.getX() - currentPose.getX()
         );
 
-        double angleError = angleToTarget - currentPose.getHeading();
-        while (angleError > Math.PI) angleError -= 2 * Math.PI;
-        while (angleError < -Math.PI) angleError += 2 * Math.PI;
-        if (Math.abs(angleError) < 0.02) angleError = 0;
+        double angleError = AngleUnit.normalizeRadians(targetHeading - currentPose.getHeading());
 
-        double power = angleError * 0.5;
-        return Math.max(-1.0, Math.min(1.0, power));
+        // Proportional gain - start low (e.g., 0.5) and increase until it's snappy
+        double kP = 0.7;
+        double power = angleError * kP;
+
+        // Deadzone to prevent motor "hum" when almost aligned
+        if (Math.abs(angleError) < Math.toRadians(1.5)) return 0;
+
+        // Clip power for safety
+        return Math.max(-0.5, Math.min(0.5, power));
     }
 
     private AprilTagDetection getBestDetection() {
