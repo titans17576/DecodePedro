@@ -145,13 +145,6 @@ public class Teleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-        follower.update();
-        telemetryM.update();
-        IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
-
-
-        double currentVelocity = R.shooter.getVelocity();
-        error = targetVelocity - currentVelocity;
         if (!automatedDrive) {
             //Make the last parameter false for field-centric
             //In case the drivers want to use a "slowMode" you can scale the vectors

@@ -36,13 +36,8 @@ public class RedCloseAuto extends OpMode {
 
     private ElapsedTime pidTimer = new ElapsedTime();
 
-<<<<<<< Updated upstream
-    private double targetVelocity = 1300;
     private double LOOP_TIME = LOOPTIME;
-=======
     private double targetVelocity = 1140;
-    private double LOOP_TIME = loopTime;
->>>>>>> Stashed changes
     private boolean launcherOn = true;
     private double runPID(double target, double current, double currentPower) {
         error = target - current;
