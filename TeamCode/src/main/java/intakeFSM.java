@@ -81,7 +81,7 @@ public class intakeFSM {
         switch (highIntakeState) {
             case ON:
                 // State inputs
-                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     setHighIntakeState(HighIntakeState.OFF);
                 } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                     setHighIntakeState(HighIntakeState.REVERSE);
@@ -95,10 +95,8 @@ public class intakeFSM {
                 }
                 break;
             case REVERSE:
-                if (currentGamepad.dpad_down && !previousGamepad.dpad_down) {
+                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     setHighIntakeState(HighIntakeState.OFF);
-                } else if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
-                    setHighIntakeState(HighIntakeState.ON);
                 }
                 break;
         }

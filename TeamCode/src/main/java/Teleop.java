@@ -189,7 +189,7 @@ public class Teleop extends OpMode {
         if (gamepad1.a && !previousGamepad1.a) {
             kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
-            launcher = 1200;
+            launcher = 1140;
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         } else if (gamepad1.b && !previousGamepad1.b) {

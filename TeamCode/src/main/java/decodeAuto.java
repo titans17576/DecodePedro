@@ -297,20 +297,22 @@ public class decodeAuto {
                 IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
                 actionBusy = true;
                 IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
+                IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                 shootTimer.resetTimer();
                 setShootState(2);
                 break;
             case 2:
                 if (shootTimer.getElapsedTimeSeconds() > 1) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
-                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
                     shootTimer.resetTimer();
-                    setShootState(5); //rapid fire
+                    setShootState(3);
                 }
                 break;
             case 3:
                 if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
                     shootTimer.resetTimer();
                     setShootState(4);
                 }
@@ -318,48 +320,12 @@ public class decodeAuto {
             case 4:
                 if (shootTimer.getElapsedTimeSeconds() > 0.4) {
                     IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
-                    //IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.ON);
+                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
                     shootTimer.resetTimer();
                     setShootState(5);
                 }
                 break;
             case 5:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
-                    shootTimer.resetTimer();
-                    setShootState(8); //skip extra transfer attempt (6-7)
-                }
-                break;
-            case 6:
-                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
-                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
-                    shootTimer.resetTimer();
-                    setShootState(7);
-                }
-                break;
-            case 7:
-                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
-                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.ON);
-                    shootTimer.resetTimer();
-                    setShootState(8);
-                }
-                break;
-            case 8:
-                if (shootTimer.getElapsedTimeSeconds() > 0.5) {
-                    //IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
-                    shootTimer.resetTimer();
-                    setShootState(9);
-                }
-                break;
-            case 9:
-                if (shootTimer.getElapsedTimeSeconds() > 0.4) {
-                    IntakeFSM.setHighIntakeState(intakeFSM.HighIntakeState.OFF);
-                    IntakeFSM.setLowIntakeState(intakeFSM.LowIntakeState.OFF);
-                    shootTimer.resetTimer();
-                    setShootState(10);
-                }
-                break;
-            case 10:
                 actionBusy = false;
                 setShootState(-1);
                 break;
