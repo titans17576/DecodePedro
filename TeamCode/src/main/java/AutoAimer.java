@@ -1,5 +1,7 @@
 import android.util.Size;
 
+import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.FTCCoordinates;
 import com.pedropathing.geometry.PedroCoordinates;
@@ -7,8 +9,10 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -18,6 +22,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
+import pedroPathing.constants.Constants;
 import util.robot;
 
 /*
@@ -42,8 +47,8 @@ public class AutoAimer {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, 0, 0, 0);
 
-    private Pose localTargetPose = null;
-    private final double TARGET_TIMEOUT = 0.65; // Seconds to remember the tag
+    private PIDFController pidController = new PIDFController(Constants.followerConstants.coefficientsHeadingPIDF);
+    private Pose targetPose = new Pose(0, 144);
 
     public AutoAimer(robot r, Follower follower, Telemetry telemetry) {
         this.follower = follower;
@@ -110,59 +115,57 @@ public class AutoAimer {
         vision.close();
     }
 
+    public void setActive(boolean state) {
+        if (!state) pidController.reset();
+    }
+
     // calculates target pose if availiable
     public void update() {
         AprilTagDetection bestTag = getBestDetection();
 
-        if (bestTag != null && bestTag.ftcPose != null) {
-            Pose currentPose = follower.getPose();
+        telemetry.addData("rPose", follower.getPose());
+        telemetry.addData("tPose", targetPose);
 
-            // Calculate the goal's position relative to the robot's current internal world
-            // Note: If it spins the wrong way, change the '+' to a '-'
-            double angleToTag = currentPose.getHeading() + bestTag.ftcPose.bearing;
+        if (bestTag != null && bestTag.robotPose != null) {
+            Pose3D robotPose = bestTag.robotPose;
+            Pose rPose = new Pose(
+                    robotPose.getPosition().x,
+                    robotPose.getPosition().y,
+                    robotPose.getOrientation().getYaw(AngleUnit.RADIANS),
+                    FTCCoordinates.INSTANCE
+            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+            follower.setPose(rPose);
 
-            double goalX = currentPose.getX() + Math.cos(angleToTag) * bestTag.ftcPose.range;
-            double goalY = currentPose.getY() + Math.sin(angleToTag) * bestTag.ftcPose.range;
-
-            localTargetPose = new Pose(goalX, goalY);
-            lastDetectionTimer.reset(); // We saw it! Restart the clock.
+            if (bestTag.metadata != null && bestTag.metadata.fieldPosition != null)
+            {
+                VectorF pos = bestTag.metadata.fieldPosition;
+                targetPose = new Pose(
+                        pos.get(0),
+                        pos.get(1),
+                        0,
+                        FTCCoordinates.INSTANCE
+                ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
+            }
         }
-
-        // Auto-null the target if we haven't seen a tag in a while
-        if (lastDetectionTimer.seconds() > TARGET_TIMEOUT) {
-            localTargetPose = null;
-        }
-    }
-
-    // use to prevent wasted camera resources
-    public void setActive(boolean active) {
-        vision.setProcessorEnabled(aprilTag, active);
     }
 
     // Returns the turn power to minimize bearing error
     public double getTurnPower() {
         // If the timer expired or we never saw a tag, don't turn
-        if (localTargetPose == null) return 0;
+        if (targetPose == null) return 0;
 
         Pose currentPose = follower.getPose();
 
         // Calculate heading to the "remembered" local target
         double targetHeading = Math.atan2(
-                localTargetPose.getY() - currentPose.getY(),
-                localTargetPose.getX() - currentPose.getX()
+                targetPose.getY() - currentPose.getY(),
+                targetPose.getX() - currentPose.getX()
         );
 
         double angleError = AngleUnit.normalizeRadians(targetHeading - currentPose.getHeading());
 
-        // Proportional gain - start low (e.g., 0.5) and increase until it's snappy
-        double kP = 0.7;
-        double power = angleError * kP;
-
-        // Deadzone to prevent motor "hum" when almost aligned
-        if (Math.abs(angleError) < Math.toRadians(1.5)) return 0;
-
-        // Clip power for safety
-        return Math.max(-0.5, Math.min(0.5, power));
+        pidController.updateError(angleError);
+        return pidController.run();
     }
 
     private AprilTagDetection getBestDetection() {
