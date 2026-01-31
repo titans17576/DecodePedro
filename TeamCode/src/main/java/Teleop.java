@@ -82,7 +82,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
-        aimer = new AutoAimer(R, telemetry);
+        //aimer = new AutoAimer(R, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -104,7 +104,7 @@ public class Teleop extends OpMode {
      **/
     @Override
     public void start() {
-        aimer.start();
+        //aimer.start();
         follower.startTeleopDrive();
         kP = CONFIGkP;
         kV = CONFIGkV;
@@ -117,7 +117,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
-        aimer.stop();
+        //aimer.stop();
     }
 
     /**
@@ -130,14 +130,14 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
-        aimer.update();
+        //aimer.update();
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
         boolean aimerActive = gamepad1.right_trigger > 0.5;
-        aimer.setActive(aimerActive);
+        //aimer.setActive(aimerActive);
 
         double currentVelocity = R.shooter.getVelocity();
-        error = targetVelocity - currentVelocity;
+        //error = targetVelocity - currentVelocity;
 
         /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
@@ -199,14 +199,14 @@ public class Teleop extends OpMode {
         } else if (gamepad1.b && !previousGamepad1.b) {
             kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
-            launcher = 1500; /*far launch zone velocity*/
+            launcher = 1460; /*far launch zone velocity*/
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
-            targetVelocity += 20;
+            launcher += 20;
         } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
-            targetVelocity -= 20;
+            launcher -= 20;
         }
 
 
@@ -232,7 +232,7 @@ public class Teleop extends OpMode {
         dashboard.sendTelemetryPacket(packet); // launcher tuning
 
         telemetry.addLine();
-        telemetry.addData("targetVelocity", targetVelocity);
+        telemetry.addData("targetVelocity", launcher);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());

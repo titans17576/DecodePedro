@@ -26,17 +26,17 @@ public class AutoAimer {
     protected final Telemetry telemetry;
     protected final AprilTagProcessor aprilTag; //any camera here
     protected final VisionPortal vision;
-    private final PIDController pid = new PIDController(0.7, 0.009, 0.2);
+    private final PIDController pid = new PIDController(0.75, 0.009, 0.2);
     private final ElapsedTime lostTargetTimer = new ElapsedTime();
 
     // X: distance forward from the robot's center
     // Y: distance right and left of the robot's center
     // Z: distance up from the ground
     private final Position cameraPosition = new Position(DistanceUnit.INCH,
-            0, 0, 0, 0);
+            0, -3, 0, 0);
     // (0,0,0) means exactly forward
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, 0, 0, 0);
+            15, -90, 0, 0);
 
     private AprilTagDetection bestTag;
     private double averageBearingError = 0;
