@@ -1,6 +1,7 @@
 import android.util.Size;
 
-import com.pedropathing.control.PIDFCoefficients;
+import androidx.annotation.NonNull;
+
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ftc.FTCCoordinates;
@@ -26,12 +27,10 @@ import pedroPathing.constants.Constants;
 import util.robot;
 
 /*
-1. create new auto aimer, creating vision portal takes time so do it early
-2. call start when starting to go
-3. call get motor power to use that to turn towards the tag
-4. call stop to stop memory leak
+ * create new auto aimer, creating vision portal takes time so do it early
+ * if only using for localization, just call update, not having to call get turn power
  */
-public class AutoAimer {
+public class VisionController {
     private final Telemetry telemetry;
     private final AprilTagProcessor aprilTag; //any camera here
     private final VisionPortal vision;
@@ -50,7 +49,7 @@ public class AutoAimer {
     private PIDFController pidController = new PIDFController(Constants.followerConstants.coefficientsHeadingPIDF);
     private Pose targetPose = new Pose(0, 144);
 
-    public AutoAimer(robot r, Follower follower, Telemetry telemetry) {
+    public VisionController(@NonNull robot r, Follower follower, Telemetry telemetry) {
         this.follower = follower;
         this.telemetry = telemetry;
 
@@ -119,7 +118,7 @@ public class AutoAimer {
         if (!state) pidController.reset();
     }
 
-    // calculates target pose if availiable
+    // calculates target pose if available
     public void update() {
         AprilTagDetection bestTag = getBestDetection();
 
@@ -135,28 +134,25 @@ public class AutoAimer {
                     FTCCoordinates.INSTANCE
             ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
             follower.setPose(rPose);
+        }
 
-            if (bestTag.metadata != null && bestTag.metadata.fieldPosition != null)
-            {
-                VectorF pos = bestTag.metadata.fieldPosition;
-                targetPose = new Pose(
-                        pos.get(0),
-                        pos.get(1),
-                        0,
-                        FTCCoordinates.INSTANCE
-                ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-            }
+        if (bestTag != null && bestTag.metadata != null && bestTag.metadata.fieldPosition != null) {
+            VectorF pos = bestTag.metadata.fieldPosition;
+            targetPose = new Pose(
+                    pos.get(0),
+                    pos.get(1),
+                    0,
+                    FTCCoordinates.INSTANCE
+            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
         }
     }
 
     // Returns the turn power to minimize bearing error
     public double getTurnPower() {
-        // If the timer expired or we never saw a tag, don't turn
         if (targetPose == null) return 0;
 
         Pose currentPose = follower.getPose();
 
-        // Calculate heading to the "remembered" local target
         double targetHeading = Math.atan2(
                 targetPose.getY() - currentPose.getY(),
                 targetPose.getX() - currentPose.getX()
@@ -165,7 +161,7 @@ public class AutoAimer {
         double angleError = AngleUnit.normalizeRadians(targetHeading - currentPose.getHeading());
 
         pidController.updateError(angleError);
-        return pidController.run();
+        return Math.min(Math.max(pidController.run(), 0.7), -0.7);
     }
 
     private AprilTagDetection getBestDetection() {
@@ -176,7 +172,7 @@ public class AutoAimer {
         double minBearing = Double.MAX_VALUE;
 
         for (AprilTagDetection detection : detections) {
-            if (detection.decisionMargin < 25) continue;
+            if (detection.decisionMargin < 35) continue;
 
             // id 20, 24 are for goals
             if (detection.id == 20 || detection.id == 24) {

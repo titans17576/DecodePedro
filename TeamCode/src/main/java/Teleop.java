@@ -45,7 +45,7 @@ public class Teleop extends OpMode {
     private TelemetryManager telemetryM;
     private FtcDashboard dashboard;
     private intakeFSM IntakeFSM;
-    private AutoAimer aimer;
+    private VisionController aimer;
 
     private final Pose startPose = new Pose(36, 72, Math.toRadians(180));
     private final ElapsedTime pidTimer = new ElapsedTime();
@@ -82,7 +82,7 @@ public class Teleop extends OpMode {
                 .build();
 
         R = new robot(hardwareMap);
-        aimer = new AutoAimer(R, follower, telemetry);
+        aimer = new VisionController(R, follower, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
