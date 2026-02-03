@@ -63,6 +63,8 @@ public class intakeFSM {
                     setLowIntakeState(LowIntakeState.OFF);
                 } else if (currentGamepad.y && !previousGamepad.y) {
                     setLowIntakeState(LowIntakeState.REVERSE);
+                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                    setLowIntakeState(LowIntakeState.OFF);
                 }
                 break;
             case OFF:
@@ -70,6 +72,8 @@ public class intakeFSM {
                     setLowIntakeState(LowIntakeState.ON);
                 } else if (currentGamepad.y && !previousGamepad.y) {
                     setLowIntakeState(LowIntakeState.REVERSE);
+                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                    setLowIntakeState(LowIntakeState.ON);
                 }
                 break;
             case REVERSE:
@@ -85,6 +89,8 @@ public class intakeFSM {
                     setHighIntakeState(HighIntakeState.OFF);
                 } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                     setHighIntakeState(HighIntakeState.REVERSE);
+                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                    setHighIntakeState(HighIntakeState.OFF);
                 }
                 break;
             case OFF:
@@ -92,6 +98,8 @@ public class intakeFSM {
                     setHighIntakeState(HighIntakeState.ON);
                 } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                     setHighIntakeState(HighIntakeState.REVERSE);
+                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                    setHighIntakeState(HighIntakeState.ON);
                 }
                 break;
             case REVERSE:
