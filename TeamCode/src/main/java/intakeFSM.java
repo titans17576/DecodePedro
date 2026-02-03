@@ -28,8 +28,8 @@ public class intakeFSM {
     final double highIntakeOff_velocity = 0;
     final double highIntakeStall_velocity = 100;
     final double highIntakeReverse_velocity = -2500;
-    final double gatekeepOnPosition = 0.2;
-    final double gatekeepOffPosition = 0.34;
+    final double gatekeepOnPosition = 0.26;
+    final double gatekeepOffPosition = 0.42;
 
 
 

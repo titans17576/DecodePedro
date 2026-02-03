@@ -128,7 +128,7 @@ public class BlueCloseAuto extends OpMode {
                 if (auto.notBusy()) {
                     follower.setMaxPower(1);
                     auto.startIntake();
-                    auto.follower.followPath(auto.shoot1, true);
+                    auto.follower.followPath(auto.shoot2, true);
                     setPathState(6);
                 }
                 break;
@@ -141,20 +141,19 @@ public class BlueCloseAuto extends OpMode {
             case 7:
                 if (auto.notBusy()) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.shoot2, true);
+                    auto.follower.followPath(auto.release1, true);
+                    delayTimer.resetTimer();
                     setPathState(8);
                 }
                 break;
             case 8:
                 if (auto.notBusy()) {
-                    auto.startShoot();
+                    delayTimer.resetTimer();
                     setPathState(9);
                 }
-                break;
             case 9:
-                if (auto.notBusy()) {
-                    auto.startIntake();
-                    auto.follower.followPath(auto.shoot3, true);
+                if ((delayTimer.getElapsedTimeSeconds() > 3) && (auto.notBusy())) {
+                    auto.follower.followPath(auto.shootGate, true);
                     setPathState(10);
                 }
                 break;
@@ -166,11 +165,37 @@ public class BlueCloseAuto extends OpMode {
                 break;
             case 11:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.end, true);
+                    auto.startIntake();
+                    auto.follower.followPath(auto.shoot1, true);
                     setPathState(12);
                 }
                 break;
             case 12:
+                if (auto.notBusy()) {
+                    auto.startShoot();
+                    setPathState(13);
+                }
+                break;
+            case 13:
+                if (auto.notBusy()) {
+                    auto.startIntake();
+                    auto.follower.followPath(auto.shoot3, true);
+                    setPathState(14);
+                }
+                break;
+            case 14:
+                if (auto.notBusy()) {
+                    auto.startShoot();
+                    setPathState(15);
+                }
+                break;
+            case 15:
+                if (auto.notBusy()) {
+                    auto.follower.followPath(auto.end, true);
+                    setPathState(16);
+                }
+                break;
+            case 16:
                 if (auto.notBusy()) {
                     setPathState(-1);
                 }

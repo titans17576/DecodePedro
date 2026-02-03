@@ -116,7 +116,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
-        aimer.stop();
+        //aimer.stop();
     }
 
     /**
@@ -195,14 +195,14 @@ public class Teleop extends OpMode {
         } else if (gamepad1.b && !previousGamepad1.b) {
             kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
-            launcher = 1500; /*far launch zone velocity*/
+            launcher = 1460; /*far launch zone velocity*/
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
         if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
-            targetVelocity += 20;
+            launcher += 20;
         } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
-            targetVelocity -= 20;
+            launcher -= 20;
         }
 
 
@@ -228,7 +228,7 @@ public class Teleop extends OpMode {
         dashboard.sendTelemetryPacket(packet); // launcher tuning
 
         telemetry.addLine();
-        telemetry.addData("targetVelocity", targetVelocity);
+        telemetry.addData("targetVelocity", launcher);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
