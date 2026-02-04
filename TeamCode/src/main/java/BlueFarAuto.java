@@ -36,7 +36,7 @@ public class BlueFarAuto extends OpMode {
 
     private ElapsedTime pidTimer = new ElapsedTime();
 
-    private double targetVelocity = 1550;
+    private double targetVelocity = 1460;
     private double LOOP_TIME = LOOPTIME;
     private boolean launcherOn = true;
     private double runPID(double target, double current, double currentPower) {
