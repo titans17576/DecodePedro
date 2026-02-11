@@ -57,12 +57,12 @@ public class Constants {
     .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
   public static PathConstraints pathConstraints = new PathConstraints(
-    0.99,
+    0.995,
     100,
     1.3,
-    2
+    2.5
   );
-
+// brakingStrength was 1.3, brakingStart was 2
   public static Follower createFollower(HardwareMap hardwareMap) {
     return new FollowerBuilder(followerConstants, hardwareMap)
       .mecanumDrivetrain(driveConstants)

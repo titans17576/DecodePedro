@@ -222,6 +222,7 @@ public class Teleop extends OpMode {
         } else {
             R.shooter.setPower(0);
             R.shooter2.setPower(0);
+            IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
             //targetVelocity = 0;
             //pidOutput = 0;
         }

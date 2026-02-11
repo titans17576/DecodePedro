@@ -1,8 +1,6 @@
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
-import static pedroPathing.ConfigFile.CONFIGkV;
-import static pedroPathing.ConfigFile.CONFIGkS;
 import static pedroPathing.ConfigFile.LOOPTIME;
 
 import com.pedropathing.follower.Follower;
@@ -20,7 +18,7 @@ import util.robot;
 public class BlueFarAuto extends OpMode {
     private Follower follower;
     public int pathState = -1;
-    public decodeAuto auto;
+    public autoConfig auto;
     public robot R;
     private Pose startPose;
     public Timer pathTimer = new Timer();
@@ -55,7 +53,7 @@ public class BlueFarAuto extends OpMode {
     public void init() {
         R = new robot(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        auto = new decodeAuto(R, telemetry, follower, decodeAuto.Side.BLUEFAR);
+        auto = new autoConfig(R, telemetry, follower, autoConfig.Side.BLUEFAR);
         startPose = auto.startPose;
         follower.setStartingPose(startPose);
         kP = CONFIGkP;

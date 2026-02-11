@@ -17,6 +17,7 @@ import java.util.List;
 import util.robot;
 
 /*
+CURRENTLY DEPRECATED DUE TO LACK OF SOLUTION FOR APRILTAG FLICKERING
 1. create new auto aimer, creating vision portal takes time so do it early
 2. call start when starting to go
 3. call get motor power to use that to turn towards the tag
