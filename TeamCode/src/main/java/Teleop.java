@@ -151,23 +151,18 @@ public class Teleop extends OpMode {
 
             double turn = -gamepad1.right_stick_x * 0.8;
 
-            if (aimerActive) {
+            /*if (aimerActive) {
                 turn = -aimer.getTurnPower();
                 telemetry.addData("hasTarget",  aimer.hasTarget());
                 telemetry.addData("bearingError",  aimer.getAverageBearingError());
                 telemetry.addData("turnPower", turn);
-            }
-
-            //This is the normal version to use in the TeleOp
+            }*/
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     turn,
                     true // Robot Centric
-            );
-
-            //This is how it looks with slowMode on
-            else follower.setTeleOpDrive(
+            ); else follower.setTeleOpDrive(
                     -gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
                     turn * (aimerActive ? 1 : slowModeMultiplier), // don't slow down auto aimer
@@ -191,15 +186,15 @@ public class Teleop extends OpMode {
             automatedDrive = false;
         }*/
         if (gamepad1.a && !previousGamepad1.a) {
-            kV = CONFIGkV; //for tuning purposes
-            kP = CONFIGkP; //was 0.000018
-            launcher = 1140;
+            /*kV = CONFIGkV; //for tuning purposes
+            kP = CONFIGkP; //was 0.000018*/
+            launcher = 1140; //close launch zone velocity
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         } else if (gamepad1.b && !previousGamepad1.b) {
-            kV = CONFIGkV; //for tuning purposes
+            /*kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP; //was 0.000018
-            launcher = 1460; /*far launch zone velocity*/
+            launcher = 1460; //far launch zone velocity*/
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
@@ -227,20 +222,20 @@ public class Teleop extends OpMode {
             //pidOutput = 0;
         }
 
-        TelemetryPacket packet = new TelemetryPacket();
+        /*TelemetryPacket packet = new TelemetryPacket();
         packet.put("Launcher Velocity", R.shooter.getVelocity());
         packet.put("Target Velocity", targetVelocity);
-        dashboard.sendTelemetryPacket(packet); // launcher tuning
+        dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
 
-        telemetry.addLine();
+        /*telemetry.addLine();
         telemetry.addData("targetVelocity", launcher);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
-        telemetry.addData("automatedDrive", automatedDrive);
-        telemetryM.debug("position", follower.getPose());
+        telemetry.addData("automatedDrive", automatedDrive);*/
+        /*telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
-        telemetryM.debug("automatedDrive", automatedDrive);
+        telemetryM.debug("automatedDrive", automatedDrive);*/
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
     }

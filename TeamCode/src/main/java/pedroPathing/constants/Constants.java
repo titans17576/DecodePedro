@@ -27,7 +27,7 @@ public class Constants {
     .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0, 0.03))
     .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1, 0,0.01, 0.03))
     .drivePIDFCoefficients(
-      new FilteredPIDFCoefficients(0.02, 0, 0, 0.6, 0.03)
+      new FilteredPIDFCoefficients(0.02, 0, 0.004, 0.6, 0.03)
     )
     .secondaryDrivePIDFCoefficients(
       new FilteredPIDFCoefficients(0.02, 0, 0.005, 0.6, 0.01)
@@ -60,7 +60,7 @@ public class Constants {
     0.995,
     100,
     1.3,
-    2.5
+    2
   );
 // brakingStrength was 1.3, brakingStart was 2
   public static Follower createFollower(HardwareMap hardwareMap) {

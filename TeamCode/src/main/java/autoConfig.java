@@ -32,10 +32,10 @@ public class autoConfig {
     public int intakeState = -1;
 
     public Pose startPose,
-            shoot1Pose, center1Pose, center2Pose, center3Pose, release1Pose, release2Pose, releaseControl1Pose,
-            pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose,
-            pickup3Pose, pickup3Control1Pose, end1Pose, endShootPose,
-            return2Pose, return3Pose, returnShootPose,
+            shoot1Pose, center1Pose, center2Pose, center3Pose, release1Pose, release2Pose, releaseControl1Pose, releaseControl2Pose,
+            pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose, pickup2Control2Pose,
+            pickup3Pose, pickup3Control1Pose, pickup3Control2Pose, end1Pose, endShootPose,
+            return2Pose,
             shootFar1Pose, turnHPZone1Pose, pickupHPZone1Pose, turnPickupFar1Pose, turnPickupFar1ControlPose, pickupFar1Pose, farParkPose;
     ;
 
@@ -58,7 +58,7 @@ public class autoConfig {
     public void createPose() {
         switch (side) {
             case REDCLOSE:
-                startPose = new Pose(123, 123, Math.toRadians(42));
+                startPose = new Pose(123, 123, Math.toRadians(42)); //mirrored field is 141.5 inches - blue, not 144 inches
                 shoot1Pose = new Pose(96, 96, Math.toRadians(47));
                 center1Pose = new Pose(99, 84, Math.toRadians(0));
                 center2Pose = new Pose(99, 59, Math.toRadians(0));
@@ -76,16 +76,16 @@ public class autoConfig {
             case BLUECLOSE:
                 startPose = new Pose(21, 123, Math.toRadians(138));
                 shoot1Pose = new Pose(48, 96, Math.toRadians(133));
-                center1Pose = new Pose(45, 84, Math.toRadians(180));
-                center2Pose = new Pose(45, 60, Math.toRadians(180));
-                center3Pose = new Pose(45, 36, Math.toRadians(180));
-                release1Pose = new Pose(30, 62, Math.toRadians(180));
-                release2Pose = new Pose(6,62, Math.toRadians(160)); //was 6, 61
-                releaseControl1Pose = new Pose(50, 78);
-                pickup1Pose = new Pose(22, 84, Math.toRadians(180)); //was 20
-                pickup2Pose = new Pose(18, 60, Math.toRadians(180)); //was 16
-                return2Pose = new Pose(32, 60, Math.toRadians(180));
+                release2Pose = new Pose(12,61, Math.toRadians(160)); //was 6, 61
+                releaseControl1Pose = new Pose(45, 56);
+                pickup1Pose = new Pose(20, 84, Math.toRadians(180));
+                pickup1Control1Pose = new Pose(45, 82);
+                pickup2Pose = new Pose(18, 60, Math.toRadians(190)); //was 16, 180 degrees
+                pickup2Control1Pose = new Pose(52, 55); //was 58, 55
+                pickup2Control2Pose = new Pose(43, 60);
                 pickup3Pose = new Pose(16, 36, Math.toRadians(180)); //was 12
+                pickup3Control1Pose = new Pose(55, 26);
+                pickup3Control2Pose = new Pose(43, 35);
                 end1Pose = new Pose(52, 104, Math.toRadians(125));
                 endShootPose = new Pose(40, 108, Math.toRadians(145));
                 break;
@@ -115,27 +115,24 @@ public class autoConfig {
     public void buildPaths() {
         switch (side) {
             case BLUECLOSE:
+                shootPreload = follower.pathBuilder()
+                        .addPath(new BezierLine(startPose, shoot1Pose))
+                        .setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading())
+                        .build();
+
                 release1 = follower.pathBuilder()
-                        .addPath(new BezierLine(shoot1Pose, return2Pose))
-                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), return2Pose.getHeading())
-                        .addPath(new BezierLine(return2Pose, release1Pose))
-                        .setLinearHeadingInterpolation(return2Pose.getHeading(), release1Pose.getHeading())
-                        .addPath(new BezierLine(release1Pose, release2Pose))
-                        .setLinearHeadingInterpolation(release1Pose.getHeading(), release2Pose.getHeading())
+                        .addPath(new BezierCurve(shoot1Pose, releaseControl1Pose, release2Pose))
+                        .setConstantHeadingInterpolation(shoot1Pose.getHeading())
                         .build();
 
                 shootGate = follower.pathBuilder()
-                        .addPath(new BezierLine(release2Pose, center2Pose))
-                        .setLinearHeadingInterpolation(release2Pose.getHeading(), center2Pose.getHeading())
-                        .addPath(new BezierLine(center2Pose, shoot1Pose))
-                        .setLinearHeadingInterpolation(center2Pose.getHeading(), shoot1Pose.getHeading())
+                        .addPath(new BezierCurve(release2Pose, releaseControl1Pose, shoot1Pose))
+                        .setConstantHeadingInterpolation(shoot1Pose.getHeading())
                         .build();
 
                 intake1 = follower.pathBuilder()
-                        .addPath(new BezierLine(shoot1Pose, center1Pose))
-                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center1Pose.getHeading())
-                        .addPath(new BezierLine(center1Pose, pickup1Pose))
-                        .setConstantHeadingInterpolation(pickup1Pose.getHeading())
+                        .addPath(new BezierCurve(shoot1Pose, pickup1Control1Pose, pickup1Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), pickup1Pose.getHeading())
                         .build();
 
                 shoot1 = follower.pathBuilder()
@@ -144,34 +141,23 @@ public class autoConfig {
                         .build();
 
                 intake2 = follower.pathBuilder()
-                        .addPath(new BezierLine(shoot1Pose, center2Pose))
-                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center2Pose.getHeading())
-                        .addPath(new BezierLine(center2Pose, pickup2Pose))
-                        .setConstantHeadingInterpolation(pickup2Pose.getHeading())
+                        .addPath(new BezierCurve(shoot1Pose, pickup2Control1Pose, pickup2Control2Pose, pickup2Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), pickup2Pose.getHeading())
                         .build();
 
                 shoot2 = follower.pathBuilder()
-                        .addPath(new BezierLine(pickup2Pose, return2Pose))
-                        .setConstantHeadingInterpolation(return2Pose.getHeading())
-                        .addPath(new BezierLine(return2Pose, shoot1Pose))
+                        .addPath(new BezierCurve(pickup2Pose, pickup2Control2Pose, pickup2Control1Pose, shoot1Pose))
                         .setConstantHeadingInterpolation(shoot1Pose.getHeading())
                         .build();
 
                 intake3 = follower.pathBuilder()
-                        .addPath(new BezierLine(shoot1Pose, center3Pose))
-                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), center3Pose.getHeading())
-                        .addPath(new BezierLine(center3Pose, pickup3Pose))
-                        .setConstantHeadingInterpolation(pickup1Pose.getHeading())
+                        .addPath(new BezierCurve(shoot1Pose, pickup3Control1Pose, pickup3Control2Pose, pickup3Pose))
+                        .setLinearHeadingInterpolation(shoot1Pose.getHeading(), pickup3Pose.getHeading())
                         .build();
 
                 shoot3 = follower.pathBuilder()
                         .addPath(new BezierLine(pickup3Pose, shoot1Pose))
                         .setConstantHeadingInterpolation(shoot1Pose.getHeading())
-                        .build();
-
-                shootPreload = follower.pathBuilder()
-                        .addPath(new BezierLine(startPose, shoot1Pose))
-                        .setLinearHeadingInterpolation(startPose.getHeading(), shoot1Pose.getHeading())
                         .build();
 
                 end = follower.pathBuilder()

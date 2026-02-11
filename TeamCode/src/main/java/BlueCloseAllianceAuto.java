@@ -1,8 +1,8 @@
 import static pedroPathing.ConfigFile.CONFIGkD;
 import static pedroPathing.ConfigFile.CONFIGkI;
 import static pedroPathing.ConfigFile.CONFIGkP;
-import static pedroPathing.ConfigFile.CONFIGkV;
 import static pedroPathing.ConfigFile.CONFIGkS;
+import static pedroPathing.ConfigFile.CONFIGkV;
 import static pedroPathing.ConfigFile.LOOPTIME;
 
 import com.pedropathing.follower.Follower;
@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import pedroPathing.constants.Constants;
 import util.robot;
 
-@Autonomous(name="BlueCloseAuto")
+@Autonomous(name="BlueCloseAllianceAuto")
 
-public class BlueCloseAuto extends OpMode {
+public class BlueCloseAllianceAuto extends OpMode {
     private Follower follower;
     public int pathState = -1;
     public autoConfig auto;
@@ -101,7 +101,7 @@ public class BlueCloseAuto extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                follower.setMaxPower(0.8);
+                //follower.setMaxPower(0.8);
                 auto.follower.followPath(auto.shootPreload, true);
                 setPathState(2);
                 break;
@@ -112,7 +112,7 @@ public class BlueCloseAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 0.5) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 0.1) && (auto.notBusy())) {
                     auto.startShoot();
                     //skip gate open
                     setPathState(5);
@@ -126,9 +126,9 @@ public class BlueCloseAuto extends OpMode {
                 break;*/
             case 5:
                 if (auto.notBusy()) {
-                    follower.setMaxPower(1);
+                    //follower.setMaxPower(1);
                     auto.startIntake();
-                    auto.follower.followPath(auto.intake2, true);
+                    auto.follower.followPath(auto.intake2, false);
                     setPathState(6);
                 }
                 break;
@@ -180,50 +180,91 @@ public class BlueCloseAuto extends OpMode {
             case 13:
                 if (auto.notBusy()) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.intake1, true);
+                    auto.follower.followPath(auto.release1, true);
                     setPathState(14);
                 }
                 break;
             case 14:
                 if (auto.notBusy()) {
-                    auto.stopIntake();
-                    auto.follower.followPath(auto.shoot1, true);
+                    delayTimer.resetTimer();
                     setPathState(15);
                 }
             case 15:
-                if (auto.notBusy()) {
-                    auto.startShoot();
+                if ((delayTimer.getElapsedTimeSeconds() > 1) && (auto.notBusy())) {
+                    auto.follower.followPath(auto.shootGate, true);
+                    delayTimer.resetTimer();
                     setPathState(16);
                 }
                 break;
             case 16:
                 if (auto.notBusy()) {
-                    auto.startIntake();
-                    auto.follower.followPath(auto.intake3, true);
+                    auto.startShoot();
                     setPathState(17);
                 }
                 break;
             case 17:
-                if (auto.notBusy()) {
+                if (delayTimer.getElapsedTimeSeconds() > 0.5) {
                     auto.stopIntake();
-                    //follower.setMaxPower(0.8);
-                    auto.follower.followPath(auto.shoot3, true);
                     setPathState(18);
                 }
                 break;
             case 18:
                 if (auto.notBusy()) {
-                    auto.startShoot();
+                    auto.startIntake();
+                    auto.follower.followPath(auto.release1, true);
                     setPathState(19);
                 }
                 break;
             case 19:
                 if (auto.notBusy()) {
-                    auto.follower.followPath(auto.end, true);
+                    delayTimer.resetTimer();
                     setPathState(20);
                 }
-                break;
             case 20:
+                if ((delayTimer.getElapsedTimeSeconds() > 1) && (auto.notBusy())) {
+                    auto.follower.followPath(auto.shootGate, true);
+                    delayTimer.resetTimer();
+                    setPathState(21);
+                }
+                break;
+            case 21:
+                if (delayTimer.getElapsedTimeSeconds() > 0.5) {
+                    auto.stopIntake();
+                    setPathState(22);
+                }
+                break;
+            case 22:
+                if (auto.notBusy()) {
+                    auto.startShoot();
+                    setPathState(23);
+                }
+                break;
+            case 23:
+                if (auto.notBusy()) {
+                    auto.startIntake();
+                    auto.follower.followPath(auto.intake1, false);
+                    setPathState(24);
+                }
+                break;
+            case 24:
+                if (auto.notBusy()) {
+                    auto.stopIntake();
+                    auto.follower.followPath(auto.shoot1, true);
+                    setPathState(25);
+                }
+            case 25:
+                if (auto.notBusy()) {
+                    auto.startShoot();
+                    setPathState(26);
+                }
+                break;
+            case 26:
+                if (auto.notBusy()) {
+                    auto.follower.followPath(auto.end, true);
+                    setPathState(27);
+                }
+                break;
+            case 27:
                 if (auto.notBusy()) {
                     setPathState(-1);
                 }
