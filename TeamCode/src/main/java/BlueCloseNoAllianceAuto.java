@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import pedroPathing.constants.Constants;
 import util.robot;
 
-@Autonomous(name="BlueCloseAllianceAuto")
+@Autonomous(name="BlueCloseNoAllianceAuto")
 
-public class BlueCloseAllianceAuto extends OpMode {
+public class BlueCloseNoAllianceAuto extends OpMode {
     private Follower follower;
     public int pathState = -1;
     public autoConfig auto;
@@ -218,68 +218,62 @@ public class BlueCloseAllianceAuto extends OpMode {
             case 17:
                 if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.release1, true);
+                    auto.follower.followPath(auto.intake1, true);
                     failsafeTimer.resetTimer();
                     setPathState(18);
                 }
                 break;
             case 18:
-                if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
+                if (((auto.notBusy())) || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
+                    auto.follower.followPath(auto.shoot1, true);
                     delayTimer.resetTimer();
                     failsafeTimer.resetTimer();
                     setPathState(19);
                 }
+                break;
             case 19:
-                if (((delayTimer.getElapsedTimeSeconds() > 1) && (auto.notBusy())) || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
-                    auto.follower.followPath(auto.shootGate, true);
-                    delayTimer.resetTimer();
+                if ((delayTimer.getElapsedTimeSeconds() > 0.5) || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
+                    auto.stopIntake();
                     failsafeTimer.resetTimer();
                     setPathState(20);
                 }
                 break;
             case 20:
-                if ((delayTimer.getElapsedTimeSeconds() > 0.5) || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
-                    auto.stopIntake();
+                if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
+                    auto.startShoot();
                     failsafeTimer.resetTimer();
                     setPathState(21);
                 }
                 break;
             case 21:
                 if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
-                    auto.startShoot();
+                    auto.startIntake();
+                    auto.follower.followPath(auto.intake3, false);
                     failsafeTimer.resetTimer();
                     setPathState(22);
                 }
                 break;
             case 22:
                 if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
-                    auto.startIntake();
-                    auto.follower.followPath(auto.intake1, false);
+                    auto.stopIntake();
+                    auto.follower.followPath(auto.shoot3, true);
                     failsafeTimer.resetTimer();
                     setPathState(23);
                 }
-                break;
             case 23:
-                if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
-                    auto.stopIntake();
-                    auto.follower.followPath(auto.shoot1, true);
-                    failsafeTimer.resetTimer();
-                    setPathState(24);
-                }
-            case 24:
                 if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
                     auto.startShoot();
                     failsafeTimer.resetTimer();
+                    setPathState(24);
+                }
+                break;
+            case 24:
+                if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
+                    auto.follower.followPath(auto.end, true);
                     setPathState(25);
                 }
                 break;
             case 25:
-                if (auto.notBusy() || (failsafeTimer.getElapsedTimeSeconds() > 5)) {
-                    auto.follower.followPath(auto.end, true);
-                    setPathState(26);
-                }
-                break;
-            case 26:
                 if (auto.notBusy()) {
                     setPathState(-1);
                 }

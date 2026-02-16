@@ -15,9 +15,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import pedroPathing.constants.Constants;
 import util.robot;
 
-@Autonomous(name="BlueCloseAllianceAuto")
+@Autonomous(name="RedCloseAllianceAuto")
 
-public class BlueCloseAllianceAuto extends OpMode {
+public class RedCloseAllianceAuto extends OpMode {
     private Follower follower;
     public int pathState = -1;
     public autoConfig auto;
@@ -55,7 +55,7 @@ public class BlueCloseAllianceAuto extends OpMode {
     public void init() {
         R = new robot(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        auto = new autoConfig(R, telemetry, follower, autoConfig.Side.BLUECLOSE);
+        auto = new autoConfig(R, telemetry, follower, autoConfig.Side.REDCLOSE);
         startPose = auto.startPose;
         follower.setStartingPose(startPose);
         kP = CONFIGkP;

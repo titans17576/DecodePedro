@@ -7,7 +7,7 @@ public class intakeFSM {
         ON, OFF, REVERSE
     }
     public enum HighIntakeState{
-        ON, OFF, REVERSE
+        ON, OFF, SLOW, REVERSE
     }
     public enum GatekeepState{
         ON, OFF
@@ -24,7 +24,8 @@ public class intakeFSM {
     final double lowIntakeOn_power = 1;
     final double lowIntakeOff_power = 0;
     final double lowIntakeReverse_power = -1;
-    final double highIntakeOn_velocity = 1900; //was 1750
+    final double highIntakeOn_velocity = 1750;
+    final double highIntakeSlow_velocity = 1100;
     final double highIntakeOff_velocity = 0;
     final double highIntakeReverse_velocity = -2500;
     final double gatekeepOnPosition = 0.26;
@@ -146,6 +147,9 @@ public class intakeFSM {
                 break;
             case REVERSE:
                 powerHighIntake(highIntakeReverse_velocity);
+                break;
+            case SLOW:
+                powerHighIntake(highIntakeSlow_velocity);
                 break;
         }
         switch(gatekeepState) {

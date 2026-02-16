@@ -13,9 +13,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import pedroPathing.constants.Constants;
 import util.robot;
 
-@Autonomous(name="BlueFarAuto")
+@Autonomous(name="RedFarAuto")
 
-public class BlueFarAuto extends OpMode {
+public class RedFarAuto extends OpMode {
     private Follower follower;
     public int pathState = -1;
     public autoConfig auto;
@@ -53,7 +53,7 @@ public class BlueFarAuto extends OpMode {
     public void init() {
         R = new robot(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        auto = new autoConfig(R, telemetry, follower, autoConfig.Side.BLUEFAR);
+        auto = new autoConfig(R, telemetry, follower, autoConfig.Side.REDFAR);
         startPose = auto.startPose;
         follower.setStartingPose(startPose);
         kP = CONFIGkP;
@@ -111,9 +111,17 @@ public class BlueFarAuto extends OpMode {
             case 3:
                 if ((accelTimer.getElapsedTimeSeconds() > 2) && (auto.notBusy())) {
                     auto.startSlowShoot();
+                    delayTimer.resetTimer();
                     setPathState(4);
                 }
                 break;
+            /*case 50:
+                if ((delayTimer.getElapsedTimeSeconds() > 2.2) && (auto.notBusy())) {
+                    auto.startVomit();
+                    delayTimer.resetTimer();
+                    setPathState(4);
+                }
+                break;*/
             case 4:
                 if (auto.notBusy()) {
                     auto.startIntake();

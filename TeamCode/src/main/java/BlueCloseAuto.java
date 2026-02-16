@@ -101,7 +101,6 @@ public class BlueCloseAuto extends OpMode {
     public void pathUpdate() {
         switch (pathState) {
             case 1:
-                follower.setMaxPower(0.8);
                 auto.follower.followPath(auto.shootPreload, true);
                 setPathState(2);
                 break;
@@ -112,7 +111,7 @@ public class BlueCloseAuto extends OpMode {
                 }
                 break;
             case 3:
-                if ((accelTimer.getElapsedTimeSeconds() > 0.5) && (auto.notBusy())) {
+                if ((accelTimer.getElapsedTimeSeconds() > 0.1) && (auto.notBusy())) {
                     auto.startShoot();
                     //skip gate open
                     setPathState(5);
@@ -126,7 +125,6 @@ public class BlueCloseAuto extends OpMode {
                 break;*/
             case 5:
                 if (auto.notBusy()) {
-                    follower.setMaxPower(1);
                     auto.startIntake();
                     auto.follower.followPath(auto.intake2, true);
                     setPathState(6);

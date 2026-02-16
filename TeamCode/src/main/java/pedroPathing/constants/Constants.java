@@ -55,14 +55,14 @@ public class Constants {
     .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
     .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
     .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
+//pod offsets being a bit off could exacerbate drift, maybe double check
   public static PathConstraints pathConstraints = new PathConstraints(
     0.995,
     100,
     1.3,
     2
   );
-// brakingStrength was 1.3, brakingStart was 2
+// try decreasing braking start to 1?
   public static Follower createFollower(HardwareMap hardwareMap) {
     return new FollowerBuilder(followerConstants, hardwareMap)
       .mecanumDrivetrain(driveConstants)
