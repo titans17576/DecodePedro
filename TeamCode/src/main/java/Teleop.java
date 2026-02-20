@@ -116,7 +116,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
-        //aimer.stop();
+        aimer.stop();
     }
 
     /**

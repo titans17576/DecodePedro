@@ -41,9 +41,10 @@ public class VisionController {
     // Y: distance right and left of the robot's center
     // Z: distance up from the ground
     private final Position cameraPosition = new Position(DistanceUnit.INCH,
-            0, 0, 0, 0);
+            1, 3, 8, 0);
+    // (0,0,0) means exactly forward
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
-            0, 0, 0, 0);
+            0, -90 + 15, 0, 0);
 
     private PIDFController pidController = new PIDFController(Constants.followerConstants.coefficientsHeadingPIDF);
     private Pose targetPose = new Pose(0, 144);
@@ -123,9 +124,8 @@ public class VisionController {
         AprilTagDetection bestTag = getBestDetection();
 
         telemetry.addData("camState", vision.getCameraState());
-        telemetry.addData("rPose", follower.getPose());
-        telemetry.addData("tPose", targetPose);
-        telemetry.addData("timeSince", timer.seconds());
+        telemetry.addData("robotPose", follower.getPose());
+        telemetry.addData("timeSinceLocalized", timer.seconds());
 
         if (bestTag != null && bestTag.robotPose != null) {
             timer.reset();
@@ -133,22 +133,11 @@ public class VisionController {
             Pose rPose = new Pose(
                     robotPose.getPosition().x,
                     robotPose.getPosition().y,
-                    robotPose.getOrientation().getYaw(AngleUnit.RADIANS),
+                    robotPose.getOrientation().getYaw(AngleUnit.RADIANS)  + (Math.PI / 2),
                     FTCCoordinates.INSTANCE
             ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
             follower.setPose(rPose);
-            targetPose = rPose;
         }
-
-//        if (bestTag != null && bestTag.metadata != null && bestTag.metadata.fieldPosition != null) {
-//            VectorF pos = bestTag.metadata.fieldPosition;
-//            targetPose = new Pose(
-//                    pos.get(0),
-//                    pos.get(1),
-//                    0,
-//                    FTCCoordinates.INSTANCE
-//            ).getAsCoordinateSystem(PedroCoordinates.INSTANCE);
-//        }
     }
 
     // Returns the turn power to minimize bearing error
@@ -176,14 +165,11 @@ public class VisionController {
         double minBearing = Double.MAX_VALUE;
 
         for (AprilTagDetection detection : detections) {
-            if (detection.decisionMargin < 35) continue;
+            if (detection.decisionMargin < 40) continue;
 
-            // id 20, 24 are for goals
-            if (detection.id == 20 || detection.id == 24) {
-                if (Math.abs(detection.ftcPose.bearing) < minBearing) {
-                    minBearing = Math.abs(detection.ftcPose.bearing);
-                    best = detection;
-                }
+            if (Math.abs(detection.ftcPose.bearing) < minBearing) {
+                minBearing = Math.abs(detection.ftcPose.bearing);
+                best = detection;
             }
         }
         return best;
