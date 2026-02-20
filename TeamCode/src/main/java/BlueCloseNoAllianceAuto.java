@@ -39,17 +39,6 @@ public class BlueCloseNoAllianceAuto extends OpMode {
 
     private double LOOP_TIME = LOOPTIME;
     private double targetVelocity = 1140;
-    private double runPID(double target, double current, double currentPower) {
-        error = target - current;
-
-        integralSum += error * LOOP_TIME;
-        double derivative = (error - lastError) / LOOP_TIME;
-        double deltaPower = (kP * error) + (kI * integralSum) + (kD * derivative);
-
-        lastError = error;
-
-        return currentPower + deltaPower;
-    }
 
     @Override
     public void init() {

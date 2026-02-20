@@ -31,8 +31,9 @@ import java.util.function.Supplier;
 
 @TeleOp(name = "Teleop")
 public class Teleop extends OpMode {
-    private Follower follower;
     private robot R;
+    private Follower follower;
+    private VisionController localizer;
     private Gamepad currentGamepad1;
     private Gamepad previousGamepad1;
     public Timer motifTimer = new Timer();
@@ -46,7 +47,6 @@ public class Teleop extends OpMode {
     private double angleTowardsBlueGoal = 0;
     private double angleTowardsRedGoal = 0;
     private double distanceFromBlueGoal = 0;
-    private VisionController aimer;
 
     private final Pose end1Pose = new Pose(52, 104, Math.toRadians(125));
     private final Pose relocalizeBluePose = new Pose(63, 7, Math.toRadians(180));
@@ -87,7 +87,7 @@ public class Teleop extends OpMode {
                 .build();*/
 
         R = new robot(hardwareMap);
-        aimer = new VisionController(R, follower, telemetry);
+        localizer = new VisionController(R, follower, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -122,7 +122,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
-        aimer.stop();
+        localizer.stop();
     }
 
     /**
@@ -134,11 +134,9 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
-        aimer.update();
+        localizer.update();
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
-        //boolean aimerActive = gamepad1.right_trigger > 0.5;
-        //aimer.setActive(aimerActive);
         double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-2);
         double xFromRedGoal = (143.5-(Math.abs(follower.getPose().getX())));
         double yFromGoal = (141.5-Math.abs(follower.getPose().getY()));
@@ -158,7 +156,6 @@ public class Teleop extends OpMode {
                 follower.getPose().getY() + 0.1,
                 angleTowardsRedGoal
         );
-
 
         /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
@@ -255,7 +252,8 @@ public class Teleop extends OpMode {
         packet.put("Target Velocity", targetVelocity);
         dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
 
-        /*telemetry.addLine();
+        telemetry.addLine();
+        /*
         telemetry.addData("targetVelocity", launcher);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
