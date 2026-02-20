@@ -75,16 +75,16 @@ public class autoConfig {
                 endShootPose = new Pose(101.5, 108, Math.toRadians(35));
                 break;
             case BLUECLOSE:
-                startPose = new Pose(21, 123, Math.toRadians(138));
-                shoot1Pose = new Pose(48, 96, Math.toRadians(133));
+                startPose = new Pose(21, 123, Math.toRadians(142)); //was 138 degrees
+                shoot1Pose = new Pose(58, 86, Math.toRadians(133)); //was 48, 96 - try 54, 82?
                 release2Pose = new Pose(6,62, Math.toRadians(155)); //was 6, 61, 156
                 release1Pose = new Pose(7,59, Math.toRadians(133));
                 releaseControl1Pose = new Pose(45, 56);
                 pickup1Pose = new Pose(20, 84, Math.toRadians(180));
                 pickup1Control1Pose = new Pose(45, 78);
-                pickup2Pose = new Pose(16, 60, Math.toRadians(180)); //was 16, 180 degrees
-                pickup2Control1Pose = new Pose(50, 55); //was 52, 55
-                pickup2Control2Pose = new Pose(43, 62); //was 43, 60
+                pickup2Pose = new Pose(16, 60, Math.toRadians(180));
+                pickup2Control1Pose = new Pose(50, 55);
+                pickup2Control2Pose = new Pose(43, 62);
                 pickup3Pose = new Pose(16, 36, Math.toRadians(180)); //was 12
                 pickup3Control1Pose = new Pose(55, 26);
                 pickup3Control2Pose = new Pose(43, 35);
