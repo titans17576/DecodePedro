@@ -12,7 +12,6 @@ import util.robot;
 public class autoConfig {
     public Follower follower;
     public Telemetry telemetry;
-    public VisionController localizer;
 
     public enum Side {
         REDCLOSE,
@@ -45,7 +44,6 @@ public class autoConfig {
     public PathChain release1, shootPreload, shoot1, shoot2, shoot3, scorePreload, end, intake1, intake2, intake3, shootGate;
     public autoConfig(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         IntakeFSM = new intakeFSM(Robot, telemetry);
-        localizer = new VisionController(Robot, follower, telemetry);
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -292,7 +290,6 @@ public class autoConfig {
     public void update() {
         follower.update();
         IntakeFSM.update();
-        localizer.update();
         shoot();
         intake();
     }

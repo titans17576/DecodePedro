@@ -151,7 +151,11 @@ public class VisionController {
         return best;
     }
 
-    // Returns the turn power to minimize bearing error, just a testing function
+    /*
+     * for debugging if this localizer breaks again for some reason
+     * Returns the turn power to minimize bearing error
+     * turn to the direction of the blue goal
+     */
     public double getTurnPower() {
         Pose currentPose = follower.getPose();
         Pose targetPose = new Pose(0, 144);
