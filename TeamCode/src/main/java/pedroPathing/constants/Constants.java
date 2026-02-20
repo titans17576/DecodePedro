@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
 
   public static FollowerConstants followerConstants = new FollowerConstants()
-    .mass(9.097)
+    .mass(10.097)
     .forwardZeroPowerAcceleration(-53.7478)
     .lateralZeroPowerAcceleration(-60.6648)
     .useSecondaryTranslationalPIDF(false)
@@ -27,7 +27,7 @@ public class Constants {
     .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0, 0.03))
     .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1, 0,0.01, 0.03))
     .drivePIDFCoefficients(
-      new FilteredPIDFCoefficients(0.02, 0, 0, 0.6, 0.03)
+      new FilteredPIDFCoefficients(0.02, 0, 0.004, 0.6, 0.03)
     )
     .secondaryDrivePIDFCoefficients(
       new FilteredPIDFCoefficients(0.02, 0, 0.005, 0.6, 0.01)
@@ -55,14 +55,14 @@ public class Constants {
     .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
     .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
     .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
+//pod offsets being a bit off could exacerbate drift, maybe double check
   public static PathConstraints pathConstraints = new PathConstraints(
-    0.99,
+    0.995,
     100,
     1.3,
     2
   );
-
+// try decreasing braking start to 1?
   public static Follower createFollower(HardwareMap hardwareMap) {
     return new FollowerBuilder(followerConstants, hardwareMap)
       .mecanumDrivetrain(driveConstants)

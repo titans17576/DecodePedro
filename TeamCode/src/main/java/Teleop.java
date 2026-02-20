@@ -1,7 +1,7 @@
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -10,7 +10,6 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -36,8 +35,7 @@ public class Teleop extends OpMode {
     private robot R;
     private Gamepad currentGamepad1;
     private Gamepad previousGamepad1;
-    private Gamepad currentGamepad2;
-    private Gamepad previousGamepad2;
+    public Timer motifTimer = new Timer();
 
     private boolean automatedDrive;
     private Supplier<PathChain> blueClose, redClose;
@@ -45,12 +43,21 @@ public class Teleop extends OpMode {
     private TelemetryManager telemetryM;
     private FtcDashboard dashboard;
     private intakeFSM IntakeFSM;
+    private double angleTowardsBlueGoal = 0;
+    private double angleTowardsRedGoal = 0;
+    private double distanceFromBlueGoal = 0;
     private VisionController aimer;
 
-    private final Pose startPose = new Pose(36, 72, Math.toRadians(180));
+    private final Pose end1Pose = new Pose(52, 104, Math.toRadians(125));
+    private final Pose relocalizeBluePose = new Pose(63, 7, Math.toRadians(180));
+    private final Pose relocalizeRedPose = new Pose(81, 7, Math.toRadians(0));
+    private final Pose shoot1Pose = new Pose(48, 96, Math.toRadians(133));
+    private Pose slightOffsetBlue = new Pose(52,104, angleTowardsBlueGoal);
+    private Pose slightOffsetRed = new Pose(52,104, angleTowardsRedGoal);
     private final ElapsedTime pidTimer = new ElapsedTime();
     private double launcher = 0.5;
     private boolean slowMode = true;
+    private boolean endgame = false;
     private double slowModeMultiplier = 0.75;
     double error;
     private double kP, kV, kS, loopTime;
@@ -64,22 +71,20 @@ public class Teleop extends OpMode {
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
+        follower.setStartingPose(end1Pose);
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         currentGamepad1 = new Gamepad();
         previousGamepad1 = new Gamepad();
-        currentGamepad2 = new Gamepad();
-        previousGamepad2 = new Gamepad();
 
-        blueClose = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new Path(new BezierLine(follower::getPose, follower::getPose)))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(133), 0.8))
+        /*blueClose = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new BezierLine(follower::getPose, slightOffset))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, angleTowardsBlueGoal, 0.0))
                 .build();
         redClose = () -> follower.pathBuilder()
-                .addPath(new Path(new BezierLine(follower::getPose, follower::getPose)))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(47), 0.8))
-                .build();
+                .addPath((new BezierLine(follower::getPose, follower::getPose)))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, angleTowardsBlueGoal, 0.0))
+                .build();*/
 
         R = new robot(hardwareMap);
         aimer = new VisionController(R, follower, telemetry);
@@ -109,6 +114,7 @@ public class Teleop extends OpMode {
         kV = CONFIGkV;
         kS = CONFIGkS;
         loopTime = LOOPTIME;
+        motifTimer.resetTimer();
     }
 
     /**
@@ -125,18 +131,34 @@ public class Teleop extends OpMode {
     @Override
     public void loop() {
         currentGamepad1.copy(gamepad1);
-        currentGamepad2.copy(gamepad2);
 
         follower.update();
         telemetryM.update();
         aimer.update();
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
-        boolean aimerActive = gamepad1.right_trigger > 0.5;
-        aimer.setActive(aimerActive);
+        //boolean aimerActive = gamepad1.right_trigger > 0.5;
+        //aimer.setActive(aimerActive);
+        double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-2);
+        double xFromRedGoal = (143.5-(Math.abs(follower.getPose().getX())));
+        double yFromGoal = (141.5-Math.abs(follower.getPose().getY()));
+        double distanceFromBlueGoal = (Math.sqrt((xFromBlueGoal*xFromBlueGoal)+(yFromGoal * yFromGoal)));
+        double distanceFromRedGoal = (Math.sqrt((xFromRedGoal*xFromRedGoal)+(yFromGoal * yFromGoal)));
 
-        double currentVelocity = R.shooter.getVelocity();
-        error = targetVelocity - currentVelocity;
+        double angleTowardsBlueGoal = (Math.PI) - Math.atan2(yFromGoal,xFromBlueGoal);
+        double angleTowardsRedGoal = Math.atan2(yFromGoal,xFromRedGoal);
+
+        slightOffsetBlue = new Pose(
+                follower.getPose().getX() + 0.1,  // tiny offset to avoid zero length
+                follower.getPose().getY() + 0.1,
+                angleTowardsBlueGoal
+        );
+        slightOffsetRed = new Pose(
+                follower.getPose().getX() + 0.1,  // tiny offset to avoid zero length
+                follower.getPose().getY() + 0.1,
+                angleTowardsRedGoal
+        );
+
 
         /* Update Pedro to move the util.robot based on:
         - Forward/Backward Movement: -gamepad1.left_stick_y
@@ -149,62 +171,69 @@ public class Teleop extends OpMode {
             //In case the drivers want to use a "slowMode" you can scale the vectors
 
             double turn = -gamepad1.right_stick_x * 0.8;
-
-            if (aimerActive) {
-                turn = aimer.getTurnPower();
-            }
-
-            //This is the normal version to use in the TeleOp
             if (!slowMode) follower.setTeleOpDrive(
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     turn,
                     true // Robot Centric
-            );
-
-            //This is how it looks with slowMode on
-            else follower.setTeleOpDrive(
+            ); else follower.setTeleOpDrive(
                     -gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
-                    turn * (aimerActive ? 1 : slowModeMultiplier), // don't slow down auto aimer
+                    turn, // don't slow down auto aimer
                     true // Robot Centric
             );
 
         }
 
-        /*if (gamepad1.left_stick_button && !previousGamepad1.left_stick_button) {
+        if (gamepad1.left_stick_button && !previousGamepad1.left_stick_button) {
+            blueClose = () -> follower.pathBuilder() //Lazy Curve Generation
+                    .addPath(new BezierLine(follower::getPose, slightOffsetBlue))
+                    .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, angleTowardsBlueGoal, 0.0))
+                    .build();
             follower.followPath(blueClose.get());
             automatedDrive = true;
-        }
-        if (gamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
+        } else if (gamepad1.right_stick_button && !previousGamepad1.right_stick_button) {
+            redClose = () -> follower.pathBuilder()
+                    .addPath((new BezierLine(follower::getPose, slightOffsetRed)))
+                    .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, angleTowardsRedGoal, 0.0))
+                    .build();
             follower.followPath(redClose.get());
             automatedDrive = true;
         }
 
         //Stop automated following if the follower is done
-        if (automatedDrive && (gamepad1.dpad_left && !previousGamepad1.dpad_left) || !follower.isBusy()) {
+        if (automatedDrive && ((gamepad1.dpad_down && !previousGamepad1.dpad_down)/*|| !follower.isBusy()*/)) {
             follower.startTeleopDrive();
             automatedDrive = false;
-        }*/
+        }
         if (gamepad1.a && !previousGamepad1.a) {
-            kV = CONFIGkV; //for tuning purposes
-            kP = CONFIGkP; //was 0.000018
-            launcher = 1140;
+            /*kV = CONFIGkV; //for tuning purposes
+            kP = CONFIGkP;*/
+            launcher = 1140; //close launch zone velocity
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         } else if (gamepad1.b && !previousGamepad1.b) {
-            kV = CONFIGkV; //for tuning purposes
-            kP = CONFIGkP; //was 0.000018
-            launcher = 1460; /*far launch zone velocity*/
+            /*kV = CONFIGkV; //for tuning purposes
+            kP = CONFIGkP;*/
+            launcher = 1460; //far launch zone velocity
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
-        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
+        /*if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
             launcher += 20;
         } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
             launcher -= 20;
+        }*/
+        if (gamepad1.dpad_right && !previousGamepad1.dpad_right) {
+            follower.setPose(relocalizeBluePose);
+        } else if (gamepad1.dpad_left && !previousGamepad1.dpad_left) {
+            follower.setPose(relocalizeRedPose);
         }
 
+        if ((motifTimer.getElapsedTimeSeconds() > 90) && !endgame) {
+            gamepad1.rumble(500);
+            endgame = true;
+        }
 
         if (launcherOn) {
             targetVelocity = launcher; // ticks/sec
@@ -218,25 +247,23 @@ public class Teleop extends OpMode {
         } else {
             R.shooter.setPower(0);
             R.shooter2.setPower(0);
-            //targetVelocity = 0;
-            //pidOutput = 0;
+            IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.ON);
         }
 
-        TelemetryPacket packet = new TelemetryPacket();
+        /*TelemetryPacket packet = new TelemetryPacket();
         packet.put("Launcher Velocity", R.shooter.getVelocity());
         packet.put("Target Velocity", targetVelocity);
-        dashboard.sendTelemetryPacket(packet); // launcher tuning
+        dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
 
-        telemetry.addLine();
+        /*telemetry.addLine();
         telemetry.addData("targetVelocity", launcher);
         telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
-        telemetry.addData("automatedDrive", automatedDrive);
+        telemetry.addData("automatedDrive", automatedDrive);*/
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
         telemetryM.debug("automatedDrive", automatedDrive);
         previousGamepad1.copy(currentGamepad1);
-        previousGamepad2.copy(currentGamepad2);
     }
 }

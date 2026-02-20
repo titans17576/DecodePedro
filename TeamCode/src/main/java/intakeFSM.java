@@ -7,7 +7,7 @@ public class intakeFSM {
         ON, OFF, REVERSE
     }
     public enum HighIntakeState{
-        ON, OFF, REVERSE, STALL
+        ON, OFF, SLOW, REVERSE
     }
     public enum GatekeepState{
         ON, OFF
@@ -25,8 +25,8 @@ public class intakeFSM {
     final double lowIntakeOff_power = 0;
     final double lowIntakeReverse_power = -1;
     final double highIntakeOn_velocity = 1750;
+    final double highIntakeSlow_velocity = 1100;
     final double highIntakeOff_velocity = 0;
-    final double highIntakeStall_velocity = 100;
     final double highIntakeReverse_velocity = -2500;
     final double gatekeepOnPosition = 0.26;
     final double gatekeepOffPosition = 0.42;
@@ -63,18 +63,18 @@ public class intakeFSM {
                     setLowIntakeState(LowIntakeState.OFF);
                 } else if (currentGamepad.y && !previousGamepad.y) {
                     setLowIntakeState(LowIntakeState.REVERSE);
-                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                } /*else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
                     setLowIntakeState(LowIntakeState.OFF);
-                }
+                }*/
                 break;
             case OFF:
                 if (currentGamepad.x && !previousGamepad.x) {
                     setLowIntakeState(LowIntakeState.ON);
                 } else if (currentGamepad.y && !previousGamepad.y) {
                     setLowIntakeState(LowIntakeState.REVERSE);
-                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                } /*else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
                     setLowIntakeState(LowIntakeState.ON);
-                }
+                }*/
                 break;
             case REVERSE:
                 if (currentGamepad.x && !previousGamepad.x) {
@@ -85,25 +85,27 @@ public class intakeFSM {
         switch (highIntakeState) {
             case ON:
                 // State inputs
-                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                /*if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     setHighIntakeState(HighIntakeState.OFF);
-                } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+                } else */if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                     setHighIntakeState(HighIntakeState.REVERSE);
-                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                } else if (currentGamepad.x && !previousGamepad.x) {
                     setHighIntakeState(HighIntakeState.OFF);
                 }
                 break;
             case OFF:
-                if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                /*if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
                     setHighIntakeState(HighIntakeState.ON);
-                } else if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
+                } else */if (currentGamepad.left_bumper && !previousGamepad.left_bumper) {
                     setHighIntakeState(HighIntakeState.REVERSE);
-                } else if (currentGamepad.right_stick_button && !previousGamepad.right_stick_button) {
+                } else if (currentGamepad.x && !previousGamepad.x) {
                     setHighIntakeState(HighIntakeState.ON);
                 }
                 break;
             case REVERSE:
                 if (currentGamepad.dpad_up && !previousGamepad.dpad_up) {
+                    setHighIntakeState(HighIntakeState.OFF);
+                } else if (currentGamepad.x && !previousGamepad.x) {
                     setHighIntakeState(HighIntakeState.OFF);
                 }
                 break;
@@ -146,8 +148,8 @@ public class intakeFSM {
             case REVERSE:
                 powerHighIntake(highIntakeReverse_velocity);
                 break;
-            case STALL:
-                powerHighIntake(highIntakeStall_velocity);
+            case SLOW:
+                powerHighIntake(highIntakeSlow_velocity);
                 break;
         }
         switch(gatekeepState) {

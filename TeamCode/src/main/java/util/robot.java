@@ -38,7 +38,7 @@ public class robot{
         liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
         liftMotor2 = hardwareMap.get(DcMotorEx.class, "liftMotor2");
         */
-        camera = hardwareMap.get(WebcamName.class, "camera");
+        //camera = hardwareMap.get(WebcamName.class, "camera");
         gatekeep = hardwareMap.get(Servo.class, "gatekeepServo");
         intakeLow = hardwareMap.get(DcMotorEx.class, "intakeLow");
         intakeHigh = hardwareMap.get(DcMotorEx.class, "intakeHigh");
