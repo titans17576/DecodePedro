@@ -134,7 +134,10 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
+<<<<<<< HEAD
         localizer.update();
+=======
+>>>>>>> 37ccc46a1dd281633051927a9b92b5dde1a2f5e4
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
         double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-8);
@@ -179,6 +182,9 @@ public class Teleop extends OpMode {
                     turn, // don't slow down auto aimer
                     true // Robot Centric
             );
+
+            // only localize when not in the middle of a path
+            localizer.update();
 
         }
 
