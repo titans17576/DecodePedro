@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class Teleop extends OpMode {
     private robot R;
     private Follower follower;
-    //private VisionController localizer;
+    private VisionController localizer;
     private Gamepad currentGamepad1;
     private Gamepad previousGamepad1;
     public Timer motifTimer = new Timer();
@@ -87,7 +87,7 @@ public class Teleop extends OpMode {
                 .build();*/
 
         R = new robot(hardwareMap);
-        //localizer = new VisionController(R, follower, telemetry);
+        localizer = new VisionController(R, follower, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -122,7 +122,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
-        //localizer.stop();
+        localizer.stop();
     }
 
     /**
@@ -134,7 +134,6 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
-        //localizer.update();
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
         double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-2);
@@ -179,6 +178,9 @@ public class Teleop extends OpMode {
                     turn, // don't slow down auto aimer
                     true // Robot Centric
             );
+
+            // only localize when not in the middle of a path
+            localizer.update();
 
         }
 
