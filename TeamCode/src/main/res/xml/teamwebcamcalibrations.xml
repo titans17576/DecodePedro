@@ -11,14 +11,12 @@
         <LynxModule name="Expansion Hub 2" port="2">
 
 
-            <goBILDA5202SeriesMotor name="liftMotor" port="1"/>
+            <goBILDA5203SeriesMotor name="shooter" port="0"/>
+            <goBILDA5203SeriesMotor name="intakeLow" port="1"/>
+            <goBILDA5203SeriesMotor name="intakeHigh" port="2"/>
+            <goBILDA5203SeriesMotor name="shooter2" port="3"/>
 
-            <Servo name="specArmServo2" port="0"/>
-            <Servo name="intakeWrist2Servo" port="1"/>
-            <Servo name="specArmServo" port="2"/>
-            <Servo name="intakeClawServo" port="3"/>
-            <Servo name="intakeArmServo" port="4"/>
-            <Servo name="clawServo" port="5"/>
+            <Servo name="gatekeepServo" port="0"/>
 
             <!--Configure hardware devices here-->
 
@@ -35,8 +33,6 @@
             <goBILDA5203SeriesMotor name="leftRear" port="2" />
             <goBILDA5203SeriesMotor name="leftFront" port="3" />
 
-            <Servo name="intakeWrist1Servo" port="5"/>
-            <Servo name="extendoServo" port="5"/>
             <!--Configure hardware devices here-->
 
             <!--This line signifies that the Control Hub configuration has ended.-->

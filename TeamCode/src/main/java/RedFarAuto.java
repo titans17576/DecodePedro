@@ -34,7 +34,7 @@ public class RedFarAuto extends OpMode {
 
     private ElapsedTime pidTimer = new ElapsedTime();
 
-    private double targetVelocity = 1460;
+    private double targetVelocity = 1480;
     private double LOOP_TIME = LOOPTIME;
 
     @Override

@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class Teleop extends OpMode {
     private robot R;
     private Follower follower;
-    private VisionController localizer;
+    //private VisionController localizer;
     private Gamepad currentGamepad1;
     private Gamepad previousGamepad1;
     public Timer motifTimer = new Timer();
@@ -87,7 +87,7 @@ public class Teleop extends OpMode {
                 .build();*/
 
         R = new robot(hardwareMap);
-        localizer = new VisionController(R, follower, telemetry);
+        //localizer = new VisionController(R, follower, telemetry);
         IntakeFSM = new intakeFSM(R, telemetry);
         pidTimer.reset();
         R.shooter.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -122,7 +122,7 @@ public class Teleop extends OpMode {
      */
     @Override
     public void stop() {
-        localizer.stop();
+        //localizer.stop();
     }
 
     /**
@@ -134,7 +134,7 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
-        localizer.update();
+        //localizer.update();
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
         double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-2);
@@ -204,15 +204,15 @@ public class Teleop extends OpMode {
             automatedDrive = false;
         }
         if (gamepad1.a && !previousGamepad1.a) {
-            /*kV = CONFIGkV; //for tuning purposes
-            kP = CONFIGkP;*/
-            launcher = 1140; //close launch zone velocity
+            //kV = CONFIGkV; //for tuning purposes
+            kP = 0.007;
+            launcher = 1160; //close launch zone velocity, was 1140
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         } else if (gamepad1.b && !previousGamepad1.b) {
-            /*kV = CONFIGkV; //for tuning purposes
-            kP = CONFIGkP;*/
-            launcher = 1460; //far launch zone velocity
+            //kV = CONFIGkV; //for tuning purposes
+            kP = CONFIGkP;
+            launcher = 1480; //far launch zone velocity, was 1460
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }

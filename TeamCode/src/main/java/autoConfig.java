@@ -60,7 +60,7 @@ public class autoConfig {
             case REDCLOSE:
                 startPose = new Pose(120.5, 123, Math.toRadians(42));
                 shoot1Pose = new Pose(93.5, 96, Math.toRadians(47));
-                release2Pose = new Pose(135.5, 62, Math.toRadians(25));
+                release2Pose = new Pose(135.5, 61, Math.toRadians(25));
                 release1Pose = new Pose(134.5, 59, Math.toRadians(47));
                 releaseControl1Pose = new Pose(96.5, 56);
                 pickup1Pose = new Pose(121.5, 84, Math.toRadians(0));
@@ -77,7 +77,7 @@ public class autoConfig {
             case BLUECLOSE:
                 startPose = new Pose(21, 123, Math.toRadians(142)); //was 138 degrees
                 shoot1Pose = new Pose(58, 86, Math.toRadians(133)); //was 48, 96 - try 54, 82?
-                release2Pose = new Pose(6,62, Math.toRadians(155)); //was 6, 61, 156
+                release2Pose = new Pose(6,61, Math.toRadians(155)); //was 6, 61, 156
                 release1Pose = new Pose(7,59, Math.toRadians(133));
                 releaseControl1Pose = new Pose(45, 56);
                 pickup1Pose = new Pose(20, 84, Math.toRadians(180));
@@ -93,7 +93,7 @@ public class autoConfig {
                 break;
             case BLUEFAR:
                 startPose = new Pose(60, 8, Math.toRadians(90));
-                shootFar1Pose = new Pose(58, 16,Math.toRadians(115)); //was 116
+                shootFar1Pose = new Pose(58, 16,Math.toRadians(118)); //was 115
                 turnHPZone1Pose = new Pose(28, 12, Math.toRadians(180));
                 pickupHPZone1Pose = new Pose(10, 10, Math.toRadians(180));
                 turnPickupFar1Pose = new Pose(45, 33, Math.toRadians(180));
@@ -103,7 +103,7 @@ public class autoConfig {
                 break;
             case REDFAR:
                 startPose = new Pose(81.5, 8, Math.toRadians(90));
-                shootFar1Pose = new Pose(141.5-58, 16,Math.toRadians(65));
+                shootFar1Pose = new Pose(141.5-58, 16,Math.toRadians(62)); //was 65
                 turnHPZone1Pose = new Pose(141.5-28, 12, Math.toRadians(0));
                 pickupHPZone1Pose = new Pose(141.5-10, 10, Math.toRadians(0));
                 turnPickupFar1Pose = new Pose(141.5-45, 33, Math.toRadians(0));
