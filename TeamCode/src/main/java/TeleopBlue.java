@@ -29,8 +29,8 @@ import java.util.function.Supplier;
  * @version 2.0, 12/30/2024
  */
 
-@TeleOp(name = "Teleop")
-public class Teleop extends OpMode {
+@TeleOp(name = "TeleopBlue")
+public class TeleopBlue extends OpMode {
     private robot R;
     private Follower follower;
     private VisionController localizer;
@@ -47,6 +47,7 @@ public class Teleop extends OpMode {
     private double angleTowardsBlueGoal = 0;
     private double angleTowardsRedGoal = 0;
     private double distanceFromBlueGoal = 0;
+    public double lookupValue = 1160;
 
     private final Pose end1Pose = new Pose(52, 104, Math.toRadians(125));
     private final Pose relocalizeBluePose = new Pose(63, 7, Math.toRadians(180));
@@ -76,15 +77,6 @@ public class Teleop extends OpMode {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
         currentGamepad1 = new Gamepad();
         previousGamepad1 = new Gamepad();
-
-        /*blueClose = () -> follower.pathBuilder() //Lazy Curve Generation
-                .addPath(new BezierLine(follower::getPose, slightOffset))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, angleTowardsBlueGoal, 0.0))
-                .build();
-        redClose = () -> follower.pathBuilder()
-                .addPath((new BezierLine(follower::getPose, follower::getPose)))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, angleTowardsBlueGoal, 0.0))
-                .build();*/
 
         R = new robot(hardwareMap);
         localizer = new VisionController(R, follower, telemetry);
@@ -134,14 +126,11 @@ public class Teleop extends OpMode {
 
         follower.update();
         telemetryM.update();
-<<<<<<< HEAD
-        localizer.update();
-=======
->>>>>>> 37ccc46a1dd281633051927a9b92b5dde1a2f5e4
+
         IntakeFSM.teleopUpdate(currentGamepad1, previousGamepad1);
 
-        double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-8);
-        double xFromRedGoal = (143.5-(Math.abs(follower.getPose().getX())));
+        double xFromBlueGoal = ((Math.abs(follower.getPose().getX()))-10);
+        double xFromRedGoal = (135.5-(Math.abs(follower.getPose().getX())));
         double yFromGoal = (141.5-Math.abs(follower.getPose().getY()));
         double distanceFromBlueGoal = (Math.sqrt((xFromBlueGoal*xFromBlueGoal)+(yFromGoal * yFromGoal)));
         double distanceFromRedGoal = (Math.sqrt((xFromRedGoal*xFromRedGoal)+(yFromGoal * yFromGoal)));
@@ -149,14 +138,50 @@ public class Teleop extends OpMode {
         double angleTowardsBlueGoal = (Math.PI) - Math.atan2(yFromGoal,xFromBlueGoal);
         double angleTowardsRedGoal = Math.atan2(yFromGoal,xFromRedGoal);
 
+        /*if (distanceFromBlueGoal >= 96) { //need to make toggle? was 96
+            IntakeFSM.highIntakeOn_velocity = 1100; //slower transfer speed means less bounce outs due to artifact contact
+        } else if (distanceFromBlueGoal < 96){
+            IntakeFSM.highIntakeOn_velocity = 1600;
+        }*/
+
+        if (distanceFromBlueGoal <= 60) {
+            lookupValue = 1160;
+            kP = 0.007;
+        } else if ((distanceFromBlueGoal > 60) && (distanceFromBlueGoal <= 72)) {
+            lookupValue = 1190;
+            kP = 0.007;
+        } else if ((distanceFromBlueGoal > 72) && (distanceFromBlueGoal <= 84)) {
+            lookupValue = 1220;
+            kP = 0.007;
+        } else if ((distanceFromBlueGoal > 84) && (distanceFromBlueGoal <= 96)) {
+            lookupValue = 1240;
+            kP = 0.007;
+        } else if ((distanceFromBlueGoal > 96) && (distanceFromBlueGoal <= 108)) {
+            lookupValue = 1270;
+        } else if ((distanceFromBlueGoal > 108) && (distanceFromBlueGoal <= 120)) {
+            lookupValue = 1300;
+        } else if ((distanceFromBlueGoal > 120) && (distanceFromBlueGoal <= 132)) {
+            lookupValue = 1340;
+        } else if ((distanceFromBlueGoal > 132) && (distanceFromBlueGoal <= 144)) {
+            lookupValue = 1380;
+        } else if ((distanceFromBlueGoal > 144) && (distanceFromBlueGoal <= 156)) {
+            lookupValue = 1420;
+        } else if ((distanceFromBlueGoal > 156) && (distanceFromBlueGoal <= 168)) {
+            lookupValue = 1460;
+        } else if ((distanceFromBlueGoal > 168) && (distanceFromBlueGoal <= 180)) {
+            lookupValue = 1500;
+        } else if (distanceFromBlueGoal > 180) {
+            lookupValue = 1540;
+        }
+
         slightOffsetBlue = new Pose(
-                follower.getPose().getX() + 0.1,  // tiny offset to avoid zero length
-                follower.getPose().getY() + 0.1,
+                follower.getPose().getX() + 0.5,  // tiny offset to avoid zero length
+                follower.getPose().getY() + 0.5,
                 angleTowardsBlueGoal
         );
         slightOffsetRed = new Pose(
-                follower.getPose().getX() + 0.1,  // tiny offset to avoid zero length
-                follower.getPose().getY() + 0.1,
+                follower.getPose().getX() + 0.5,  // tiny offset to avoid zero length
+                follower.getPose().getY() + 0.5,
                 angleTowardsRedGoal
         );
 
@@ -210,15 +235,16 @@ public class Teleop extends OpMode {
             automatedDrive = false;
         }
         if (gamepad1.a && !previousGamepad1.a) {
-            //kV = CONFIGkV; //for tuning purposes
+            //kV = 0.0002; //for tuning purposes
             kP = 0.007;
-            launcher = 1160; //close launch zone velocity, was 1140
+            launcher = 1120; //close launch zone velocity, was 1160
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         } else if (gamepad1.b && !previousGamepad1.b) {
             //kV = CONFIGkV; //for tuning purposes
             kP = CONFIGkP;
-            launcher = 1480; //far launch zone velocity, was 1460
+            //launcher = 1460; //far launch zone velocity
+            launcher = lookupValue;
             launcherOn = !launcherOn;
             IntakeFSM.setGatekeepState(intakeFSM.GatekeepState.OFF);
         }
@@ -259,9 +285,10 @@ public class Teleop extends OpMode {
         dashboard.sendTelemetryPacket(packet);*/ // launcher tuning
 
         telemetry.addLine();
-        /*
+
         telemetry.addData("targetVelocity", launcher);
-        telemetry.addData("launchPower", R.shooter.getPower());
+        telemetry.addData("distanceFromBlueGoal", distanceFromBlueGoal);
+        /*telemetry.addData("launchPower", R.shooter.getPower());
         telemetry.addData("launchVelo", R.shooter.getVelocity());
         telemetry.addData("transferVelocity", R.intakeHigh.getVelocity());
         telemetry.addData("automatedDrive", automatedDrive);*/

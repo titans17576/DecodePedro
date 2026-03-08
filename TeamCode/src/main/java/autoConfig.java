@@ -32,16 +32,16 @@ public class autoConfig {
     public int intakeState = -1;
 
     public Pose startPose,
-            shoot1Pose, center1Pose, center2Pose, center3Pose, release1Pose, release2Pose, releaseControl1Pose, releaseControl2Pose,
-            pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose, pickup2Control2Pose,
-            pickup3Pose, pickup3Control1Pose, pickup3Control2Pose, end1Pose, endShootPose,
-            return2Pose,
-            shootFar1Pose, turnHPZone1Pose, pickupHPZone1Pose, turnPickupFar1Pose, turnPickupFar1ControlPose, pickupFar1Pose, farParkPose;
+        shoot1Pose, center1Pose, center2Pose, center3Pose, release1Pose, release2Pose, releaseControl1Pose, releaseControl2Pose,
+        pickup1Pose, pickup1Control1Pose, pickup2Pose, pickup2Control1Pose, pickup2Control2Pose,
+        pickup3Pose, pickup3Control1Pose, pickup3Control2Pose, end1Pose, endShootPose, return2Pose,
+        shootFar1Pose, turnHPZone1Pose, pickupHPZone1Pose, turnPickupFar1Pose, turnPickupFar1ControlPose, pickupFar1Pose, farParkPose,
+        pickupHPZone2Pose, pickupHPZone2ControlPose;
     ;
 
     //public Path scorePreload, end;
 
-    public PathChain release1, shootPreload, shoot1, shoot2, shoot3, scorePreload, end, intake1, intake2, intake3, shootGate;
+    public PathChain release1, shootPreload, shoot1, shoot2, shoot3, shoot4, scorePreload, end, intake1, intake2, intake3, shootGate;
     public autoConfig(robot Robot, Telemetry telemetry, Follower follower, Side side) {
         IntakeFSM = new intakeFSM(Robot, telemetry);
 
@@ -63,7 +63,7 @@ public class autoConfig {
                 release2Pose = new Pose(135.5, 61, Math.toRadians(25));
                 release1Pose = new Pose(134.5, 59, Math.toRadians(47));
                 releaseControl1Pose = new Pose(96.5, 56);
-                pickup1Pose = new Pose(121.5, 84, Math.toRadians(0));
+                pickup1Pose = new Pose(123.5, 84, Math.toRadians(0));
                 pickup1Control1Pose = new Pose(96.5, 78);
                 pickup2Pose = new Pose(125.5, 60, Math.toRadians(0));
                 pickup2Control1Pose = new Pose(91.5, 55);
@@ -71,7 +71,7 @@ public class autoConfig {
                 pickup3Pose = new Pose(125.5, 36, Math.toRadians(0));
                 pickup3Control1Pose = new Pose(86.5, 26);
                 pickup3Control2Pose = new Pose(98.5, 35);
-                end1Pose = new Pose(89.5, 104, Math.toRadians(55));
+                end1Pose = new Pose(95.5, 76, Math.toRadians(55)); //was 104 y
                 endShootPose = new Pose(101.5, 108, Math.toRadians(35));
                 break;
             case BLUECLOSE:
@@ -80,7 +80,7 @@ public class autoConfig {
                 release2Pose = new Pose(6,61, Math.toRadians(155)); //was 6, 61, 156
                 release1Pose = new Pose(7,59, Math.toRadians(133));
                 releaseControl1Pose = new Pose(45, 56);
-                pickup1Pose = new Pose(20, 84, Math.toRadians(180));
+                pickup1Pose = new Pose(18, 84, Math.toRadians(180));
                 pickup1Control1Pose = new Pose(45, 78);
                 pickup2Pose = new Pose(16, 60, Math.toRadians(180));
                 pickup2Control1Pose = new Pose(50, 55);
@@ -88,27 +88,31 @@ public class autoConfig {
                 pickup3Pose = new Pose(16, 36, Math.toRadians(180)); //was 12
                 pickup3Control1Pose = new Pose(55, 26);
                 pickup3Control2Pose = new Pose(43, 35);
-                end1Pose = new Pose(52, 104, Math.toRadians(125));
+                end1Pose = new Pose(46, 76, Math.toRadians(133)); //was 52, 104
                 endShootPose = new Pose(40, 108, Math.toRadians(145));
                 break;
             case BLUEFAR:
                 startPose = new Pose(60, 8, Math.toRadians(90));
                 shootFar1Pose = new Pose(58, 16,Math.toRadians(118)); //was 115
-                turnHPZone1Pose = new Pose(28, 12, Math.toRadians(180));
+                turnHPZone1Pose = new Pose(28, 10, Math.toRadians(180)); //y was 12
                 pickupHPZone1Pose = new Pose(10, 10, Math.toRadians(180));
-                turnPickupFar1Pose = new Pose(45, 33, Math.toRadians(180));
+                pickupHPZone2Pose = new Pose(10, 24, Math.toRadians(180)); //untested
+                pickupHPZone2ControlPose = new Pose(59, 26); //untested
+                turnPickupFar1Pose = new Pose(45, 36, Math.toRadians(180)); //y was 33
                 turnPickupFar1ControlPose = new Pose(54, 32);
-                pickupFar1Pose = new Pose(14, 33, Math.toRadians(180));
+                pickupFar1Pose = new Pose(14, 36, Math.toRadians(180)); //y was 33
                 farParkPose = new Pose(60, 36, Math.toRadians(90));
                 break;
             case REDFAR:
                 startPose = new Pose(81.5, 8, Math.toRadians(90));
                 shootFar1Pose = new Pose(141.5-58, 16,Math.toRadians(62)); //was 65
-                turnHPZone1Pose = new Pose(141.5-28, 12, Math.toRadians(0));
+                turnHPZone1Pose = new Pose(141.5-28, 10, Math.toRadians(0));
                 pickupHPZone1Pose = new Pose(141.5-10, 10, Math.toRadians(0));
-                turnPickupFar1Pose = new Pose(141.5-45, 33, Math.toRadians(0));
+                pickupHPZone2Pose = new Pose(141.5-10, 24, Math.toRadians(180)); //untested
+                pickupHPZone2ControlPose = new Pose(141.5-59, 26); //untested
+                turnPickupFar1Pose = new Pose(141.5-45, 36, Math.toRadians(0));
                 turnPickupFar1ControlPose = new Pose(141.5-54, 32);
-                pickupFar1Pose = new Pose(141.5-14, 33, Math.toRadians(0));
+                pickupFar1Pose = new Pose(141.5-14, 36, Math.toRadians(0));
                 farParkPose = new Pose(141.5-60, 36, Math.toRadians(90));
                 break;
         }
@@ -142,7 +146,7 @@ public class autoConfig {
 
                 shoot1 = follower.pathBuilder()
                         .addPath(new BezierLine(pickup1Pose, shoot1Pose))
-                        .setLinearHeadingInterpolation(pickup1Pose.getHeading(), shoot1Pose.getHeading())
+                        .setConstantHeadingInterpolation(shoot1Pose.getHeading()) //was linear
                         .build();
 
                 intake2 = follower.pathBuilder()
@@ -184,6 +188,16 @@ public class autoConfig {
                         .setConstantHeadingInterpolation(pickupHPZone1Pose.getHeading())
                         .build();
 
+                intake3 = follower.pathBuilder()
+                        .addPath(new BezierCurve(shootFar1Pose, pickupHPZone2ControlPose, pickupHPZone2Pose))
+                        .setLinearHeadingInterpolation(shootFar1Pose.getHeading(), pickupHPZone2Pose.getHeading())
+                        .build();
+
+                shoot4 = follower.pathBuilder()
+                        .addPath(new BezierLine(pickupHPZone2Pose, shootFar1Pose))
+                        .setLinearHeadingInterpolation(pickupHPZone2Pose.getHeading(), shootFar1Pose.getHeading())
+                        .build();
+
                 shoot2 = follower.pathBuilder()
                         .addPath(new BezierLine(pickupHPZone1Pose, shootFar1Pose))
                         .setLinearHeadingInterpolation(pickupHPZone1Pose.getHeading(), shootFar1Pose.getHeading())
@@ -195,10 +209,12 @@ public class autoConfig {
                         .addPath(new BezierLine(turnPickupFar1Pose, pickupFar1Pose))
                         .setConstantHeadingInterpolation(pickupFar1Pose.getHeading())
                         .build();
+
                 shoot3 = follower.pathBuilder()
                         .addPath(new BezierLine(pickupFar1Pose, shootFar1Pose))
                         .setLinearHeadingInterpolation(pickupFar1Pose.getHeading(), shootFar1Pose.getHeading())
                         .build();
+
                 end = follower.pathBuilder()
                         .addPath(new BezierLine(shootFar1Pose, farParkPose))
                         .setLinearHeadingInterpolation(shootFar1Pose.getHeading(), farParkPose.getHeading())

@@ -152,14 +152,14 @@ public class RedFarAuto extends OpMode {
             case 30:
                 if (auto.notBusy()) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.intake1, true);
+                    auto.follower.followPath(auto.intake3, true);
                     delayTimer.resetTimer();
                     setPathState(31);
                 }
                 break;
             case 31:
                 if (auto.notBusy() || (delayTimer.getElapsedTimeSeconds() > 4)) {
-                    auto.follower.followPath(auto.shoot2, true);
+                    auto.follower.followPath(auto.shoot4, true);
                     setPathState(32);
                 }
                 break;

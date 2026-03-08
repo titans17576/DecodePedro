@@ -66,7 +66,7 @@ public class VisionController {
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                .setLensIntrinsics(549.651, 549.651, 317.108, 236.644) // Values from yes
+                .setLensIntrinsics(1004.4, 1004.4, 640.0, 360.0) // Values for ARDU cam
                 // ... these parameters are fx, fy, cx, cy.
 
                 .build();
@@ -87,7 +87,7 @@ public class VisionController {
         builder.setCamera(r.camera);
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        builder.setCameraResolution(new Size(640,480)); // this should be lowered to reduce bandwidth
+        builder.setCameraResolution(new Size(1280, 720)); // this should be lowered to reduce bandwidth
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         //builder.enableLiveView(true);

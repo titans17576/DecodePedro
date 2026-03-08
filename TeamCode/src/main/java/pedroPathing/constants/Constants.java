@@ -25,7 +25,7 @@ public class Constants {
     .centripetalScaling(0.0003)
     .translationalPIDFCoefficients(new PIDFCoefficients(0.1, 0, 0.01, 0.03))
     .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0, 0.03))
-    .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1, 0,0.01, 0.03))
+    .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(1.5, 0,0.01, 0.03)) //p was 1
     .drivePIDFCoefficients(
       new FilteredPIDFCoefficients(0.02, 0, 0.004, 0.6, 0.03)
     )

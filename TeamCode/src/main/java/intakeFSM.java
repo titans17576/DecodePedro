@@ -24,8 +24,8 @@ public class intakeFSM {
     final double lowIntakeOn_power = 1;
     final double lowIntakeOff_power = 0;
     final double lowIntakeReverse_power = -1;
-    final double highIntakeOn_velocity = 1750; //was 1750
-    final double highIntakeSlow_velocity = 1100;
+    double highIntakeOn_velocity = 1600; //was 1750, was 1550
+    double highIntakeSlow_velocity = 1100;
     final double highIntakeOff_velocity = 0;
     final double highIntakeReverse_velocity = -2500;
     final double gatekeepOnPosition = 0.26;

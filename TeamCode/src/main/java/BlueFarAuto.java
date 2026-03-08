@@ -99,9 +99,17 @@ public class BlueFarAuto extends OpMode {
             case 3:
                 if ((accelTimer.getElapsedTimeSeconds() > 2) && (auto.notBusy())) {
                     auto.startSlowShoot();
+                    delayTimer.resetTimer();
                     setPathState(4);
                 }
                 break;
+            /*case 50:
+                if ((delayTimer.getElapsedTimeSeconds() > 2.2) && (auto.notBusy())) {
+                    auto.startVomit();
+                    delayTimer.resetTimer();
+                    setPathState(4);
+                }
+                break;*/
             case 4:
                 if (auto.notBusy()) {
                     auto.startIntake();
@@ -144,14 +152,14 @@ public class BlueFarAuto extends OpMode {
             case 30:
                 if (auto.notBusy()) {
                     auto.startIntake();
-                    auto.follower.followPath(auto.intake1, true);
+                    auto.follower.followPath(auto.intake3, true);
                     delayTimer.resetTimer();
                     setPathState(31);
                 }
                 break;
             case 31:
                 if (auto.notBusy() || (delayTimer.getElapsedTimeSeconds() > 4)) {
-                    auto.follower.followPath(auto.shoot2, true);
+                    auto.follower.followPath(auto.shoot4, true);
                     setPathState(32);
                 }
                 break;
